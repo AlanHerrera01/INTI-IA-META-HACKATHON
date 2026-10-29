@@ -13,10 +13,41 @@ Interfaces change. Conventional automation breaks silently. INTI AI's long-term
 goal is to perceive an interface, reason about an authorized objective, act,
 verify the outcome, and recover when the interface changes.
 
-Phase 3 adds authorized browser execution to the observation and planning foundation.
-Approved typed plans run in an isolated Chromium worker against the local sandbox,
-with fresh evidence before and after every action. The full roadmap is
-PERCEIVE → REASON → PLAN → ACT → VERIFY → RECOVER; autonomous recovery is future work.
+Version 0.5 adds bounded recovery and independent outcome verification. Approved
+typed plans run in an isolated Chromium worker; a separate read-only source checks
+what the application actually persisted. The lifecycle is
+PERCEIVE → REASON → PLAN → ACT → RECOVER → VERIFY.
+
+Execution completion, immediate UI checks and VERIFIED_SUCCESS are separate
+results. Five actual browser/database fault trials produced the expected verdicts:
+three VERIFIED_FAILURE, one INCONCLUSIVE and one VERIFIED_SUCCESS. No live Meta
+calls were made for these phases, as requested. Recovery diagnosis is implemented
+but evaluated with explicit test fixtures; live-model performance remains blocked.
+
+## Recovery and independent verification
+
+- [Recovery Center](http://localhost:5173/recovery): private evidence, budgets,
+  diagnosis, reviewed repair plans and separate HIGH action approvals.
+- [Verification Center](http://localhost:5173/verification): versioned criteria,
+  fresh read-only evidence, deterministic results, history and reports.
+- [Verification engine](docs/VERIFICATION-ENGINE.md) and [evidence model](docs/EVIDENCE-MODEL.md).
+- [Phase 4 report](docs/PHASE-04-REPORT.md), [Phase 5 report](docs/PHASE-05-REPORT.md),
+  [measured benchmark](benchmarks/reports/phase-05-verification.json).
+
+Generate distinct random capabilities in ignored `.env`: existing
+`EXECUTION_OPERATOR_TOKEN`, `BROWSER_WORKER_TOKEN` and new `VERIFICATION_READ_TOKEN`
+(at least 24 characters each). Enable `EXECUTION_ENABLED=true` and
+`VERIFICATION_ENABLED=true`; optional `RECOVERY_ENABLED=true` needs configured Meta
+credentials for real diagnosis. `docker compose up --build -d` preserves existing
+volumes and runs migrations through 0005. The new `inventory-state` service has no
+published port and mounts application data read-only. Fault administration is
+disabled unless a separate `DEMO_FAULT_CONTROL_TOKEN` is configured.
+
+Connect with the operator token in Live Execution, review and approve the authored
+sandbox plan and its HIGH save action, then start. Automatic verification defines
+criteria/baseline before execution and evaluates fresh persisted state afterward.
+Historical terminal runs can also be verified; missing historical baselines remain
+explicitly unknown. The authored recipe is not represented as model reasoning.
 
 ## Current functionality
 
@@ -205,16 +236,16 @@ Read [SDD](docs/INTI-SDD.md), [architecture](docs/ARCHITECTURE.md), and [API](do
 ## Scope and roadmap
 
 This development stack serves one trusted local operator. Execution uses local
-capability tokens, not an account system. Remote browsing, autonomous recovery,
+capability tokens, not an account system. Remote browsing, general-purpose recovery,
 a durable job queue and production deployment remain outside scope.
 Metadata persists; artifacts must be backed up together with the database.
 Screenshots are limited to 1920 × 1080 and 5 MB. History returns the latest 20
 records by default, up to 100. Meta access and hackathon eligibility must be verified
 against the organizer/account before submission. No benchmark result is implied.
 
-Phase 4 prerequisites: verify real Meta access and localization quality, add a
-reusable independent goal verifier, classify recoverable failures and define
-bounded recovery/reapproval and stronger prompt-injection evaluations.
+Phase 6 prerequisites: evaluate real Meta recovery quality, add explicit criterion
+authoring for additional applications, distributed ownership, artifact retention
+and stronger prompt-injection/concurrent-writer evaluations.
 
 All project source in this repository was authored for this implementation session.
 No proprietary assets or application source were copied. Third-party packages

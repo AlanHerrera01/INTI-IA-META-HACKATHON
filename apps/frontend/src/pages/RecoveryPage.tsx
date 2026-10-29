@@ -225,6 +225,22 @@ export function RecoveryPage() {
                   </ul>
                   <h3>Uncertainties</h3>
                   <p>{d.uncertainties.join("; ") || "None declared"}</p>
+                  <h3>Relevant target regions</h3>
+                  <p>
+                    {d.candidate_targets
+                      .map((t) => `${t.role}: ${t.name}`)
+                      .join("; ") || "No candidate controls declared"}
+                  </p>
+                  <pre>
+                    {d.changed_regions?.length
+                      ? JSON.stringify(d.changed_regions, null, 2)
+                      : "No reliable changed regions proposed"}
+                  </pre>
+                  <h3>Validation warnings</h3>
+                  <p>
+                    {bundle.warnings.join("; ") ||
+                      "No validation warnings recorded"}
+                  </p>
                 </section>
               ))}
               {bundle.plan && (

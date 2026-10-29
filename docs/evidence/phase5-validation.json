@@ -1,0 +1,174 @@
+{
+  "recorded_at": "2026-10-29T21:28:58.005011+00:00",
+  "application_version": "0.5.0",
+  "main_backend_suite": {
+    "passed": 214,
+    "deselected_e2e": 5,
+    "domain_application_coverage_percent": 89.38,
+    "seconds": 216.43
+  },
+  "additional_checks": {
+    "verification_lifecycle": {
+      "passed": 1,
+      "seconds": 12.78
+    },
+    "meta_transport_and_recovery": {
+      "passed": 13,
+      "seconds": 10.08,
+      "note": "Includes existing tests; one new two-image contract check."
+    },
+    "recovery_rest": {
+      "passed": 1,
+      "seconds": 8.58
+    }
+  },
+  "frontend": {
+    "passed": 26,
+    "files": 5,
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "production_build": "PASS"
+  },
+  "static": {
+    "ruff": "PASS",
+    "format": "PASS",
+    "mypy_strict_source_files": 56,
+    "mypy": "PASS"
+  },
+  "docker": {
+    "services_healthy": 6,
+    "migration": "0005",
+    "evidence_container_root_readonly": true,
+    "inventory_mount_readonly": true,
+    "evidence_host_ports": 0,
+    "browser_worker_database_mount": false
+  },
+  "workspace_acceptance": {
+    "recorded_at": "2026-10-29T21:27:37.462101+00:00",
+    "health": {
+      "status": "ok",
+      "version": "0.5.0"
+    },
+    "execution_id": "4e0b42de-88df-4b19-8fa1-04ef2ef57d43",
+    "verification_id": "d975a975-7cc3-460e-9fef-217862ce64b9",
+    "historical_execution_preserved": true,
+    "application_unchanged": true,
+    "verdict": "VERIFIED_SUCCESS",
+    "criteria": [
+      {
+        "criterion_id": "b6d6a985-5236-5c6d-87d8-360cf08c01b5",
+        "status": "PASS",
+        "observed_value": true,
+        "expected_value": true,
+        "evidence_ids": [
+          "c0652cc5-1597-45c8-a856-dc1405b55316",
+          "78c7f53e-f77d-4a07-b638-0974fc1063ee",
+          "9ccd3ee3-ff60-4e43-a7c2-6fa424167d8b",
+          "56ef1c79-47d4-48ca-979b-f4947e97c6c7",
+          "0b753758-a1b2-4ee7-ad55-350099d8b48c",
+          "630db84a-4016-45d4-a418-58f4b387f7ac",
+          "f31dfde2-02f0-40a9-b561-acc514eeaaf5"
+        ],
+        "explanation": "Record/field existence established by read-only database snapshots"
+      },
+      {
+        "criterion_id": "c1205685-549a-5c3a-9958-f041eac96e8f",
+        "status": "PASS",
+        "observed_value": "Operational",
+        "expected_value": "Operational",
+        "evidence_ids": [
+          "c0652cc5-1597-45c8-a856-dc1405b55316",
+          "78c7f53e-f77d-4a07-b638-0974fc1063ee",
+          "9ccd3ee3-ff60-4e43-a7c2-6fa424167d8b",
+          "56ef1c79-47d4-48ca-979b-f4947e97c6c7",
+          "0b753758-a1b2-4ee7-ad55-350099d8b48c",
+          "630db84a-4016-45d4-a418-58f4b387f7ac",
+          "f31dfde2-02f0-40a9-b561-acc514eeaaf5"
+        ],
+        "explanation": "Deterministic assertion against fresh persisted state"
+      },
+      {
+        "criterion_id": "310f395d-4054-538e-8ec2-30d8bbbbe494",
+        "status": "PASS",
+        "observed_value": "Operational",
+        "expected_value": "Operational",
+        "evidence_ids": [
+          "c0652cc5-1597-45c8-a856-dc1405b55316",
+          "78c7f53e-f77d-4a07-b638-0974fc1063ee",
+          "9ccd3ee3-ff60-4e43-a7c2-6fa424167d8b",
+          "56ef1c79-47d4-48ca-979b-f4947e97c6c7",
+          "0b753758-a1b2-4ee7-ad55-350099d8b48c",
+          "630db84a-4016-45d4-a418-58f4b387f7ac",
+          "f31dfde2-02f0-40a9-b561-acc514eeaaf5"
+        ],
+        "explanation": "Two read-only SQLite snapshots agree on record identity, version and value"
+      },
+      {
+        "criterion_id": "d81c1f4b-8943-50d0-a3a7-2bb49f877b56",
+        "status": "UNKNOWN",
+        "observed_value": null,
+        "expected_value": {
+          "before": null,
+          "after": "Operational"
+        },
+        "evidence_ids": [
+          "c0652cc5-1597-45c8-a856-dc1405b55316",
+          "78c7f53e-f77d-4a07-b638-0974fc1063ee",
+          "9ccd3ee3-ff60-4e43-a7c2-6fa424167d8b",
+          "56ef1c79-47d4-48ca-979b-f4947e97c6c7",
+          "0b753758-a1b2-4ee7-ad55-350099d8b48c",
+          "630db84a-4016-45d4-a418-58f4b387f7ac",
+          "f31dfde2-02f0-40a9-b561-acc514eeaaf5"
+        ],
+        "explanation": "No trustworthy pre-execution baseline is available"
+      },
+      {
+        "criterion_id": "5cfc430a-4f99-580a-a779-e50b34873f58",
+        "status": "UNKNOWN",
+        "observed_value": null,
+        "expected_value": null,
+        "evidence_ids": [
+          "c0652cc5-1597-45c8-a856-dc1405b55316",
+          "78c7f53e-f77d-4a07-b638-0974fc1063ee",
+          "9ccd3ee3-ff60-4e43-a7c2-6fa424167d8b",
+          "56ef1c79-47d4-48ca-979b-f4947e97c6c7",
+          "0b753758-a1b2-4ee7-ad55-350099d8b48c",
+          "630db84a-4016-45d4-a418-58f4b387f7ac",
+          "f31dfde2-02f0-40a9-b561-acc514eeaaf5"
+        ],
+        "explanation": "No intact pre-execution baseline proves unrelated record state"
+      }
+    ],
+    "evidence_count": 7,
+    "events_count": 15,
+    "request_join_latency_ms": 113.91849999927217,
+    "verification_duration_ms": 1936.79,
+    "protected_artifact": true,
+    "idempotency": true,
+    "browser_page_errors": [],
+    "mobile_overflow": false,
+    "model_calls": 0,
+    "browser_surface": "project Playwright; in-app connection failed sandbox metadata"
+  },
+  "benchmark": "benchmarks/reports/phase-05-verification.json",
+  "real_meta_calls": 0,
+  "live_meta_recovery_evaluation": "BLOCKED: user explicitly deferred real calls",
+  "in_app_browser": "Unavailable: sandbox metadata missing; project Playwright used",
+  "private_screenshots": "artifacts/phase5 (ignored; visually inspected desktop/mobile)",
+  "hosted_ci": {
+    "run_id": 40958245154,
+    "url": "https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON/actions/runs/40958245154",
+    "code_commit": "cca1982",
+    "status": "QUEUED"
+  },
+  "live_regression": {
+    "passed": 4,
+    "skipped_real_meta": 1,
+    "seconds": 8.17,
+    "sources": [
+      "Chromium",
+      "live API",
+      "PostgreSQL temporary schema"
+    ]
+  }
+}

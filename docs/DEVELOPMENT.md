@@ -1,6 +1,6 @@
 # Development
 
-Current version: 0.3.0, authorized sandbox execution. Existing observation/planning
+Current version: 0.5.0, authorized sandbox execution. Existing observation/planning
 setup remains valid. Execution is disabled until its capability tokens are configured.
 
 ## Phase 3 on Windows and Docker Desktop
@@ -231,3 +231,49 @@ Failure events without a completed plan are stored by task/correlation ID; they
 are not shown in successful-plan history. Revalidation appends trace events but
 does not invoke Meta. Repeated generation requests are distinct, potentially
 billable operations; there is no server idempotency key or durable job queue.
+
+## Phase 4-5 development
+
+Version 0.5.0 adds migrations 0004 (six recovery tables) and 0005 (six verification
+tables). `docker compose up --build -d` preserves all existing volumes. Configure
+distinct random operator/worker/read-only tokens in ignored `.env`, set
+`VERIFICATION_ENABLED=true` and retain `VERIFICATION_AUTO_TRIGGER=true`. The separate
+`inventory-state` container mounts demo data `:ro`, has no published port and joins
+an internal evidence network. No application data is reset. Missing read capability
+fails closed. Recovery is optional and real diagnosis needs a configured Meta key;
+there is no runtime fixture fallback.
+
+Run tests from the root with the local virtual environment:
+
+```powershell
+.venv/Scripts/python.exe -m pytest apps/backend/tests -m 'not e2e' --cov=inti.domain --cov=inti.application --cov-fail-under=80
+.venv/Scripts/python.exe scripts/benchmark_verification.py
+.venv/Scripts/python.exe -m ruff check apps/backend scripts
+.venv/Scripts/python.exe -m ruff format --check apps/backend scripts
+```
+
+Frontend checks remain `npm run typecheck`, `npm run lint`, `npm test`,
+`npm run build` in `apps/frontend`. New fault integration tests launch isolated real
+Chromium and SQLite stores; a Playwright Chromium installation is required. They do
+not use the existing Compose inventory. Recovery tests label every model response
+as a test fixture. Five verification benchmark trials use zero model calls.
+
+### TLS-inspecting local networks
+
+Dockerfiles accept an optional BuildKit secret named `build_ca` containing a PEM
+public root already trusted by your organization/Windows. Supply it through a local
+Compose build override (`build.secrets: [build_ca]` for backend, browser-worker and
+frontend, and `secrets.build_ca.file` pointing to the PEM). Keep that override/PEM
+under ignored `.tmp`. Do not export a private key. Python/Node use that CA during
+build; Debian dependencies use HTTPS and validate the same temporary bundle. The
+bundle is removed and is not installed as runtime trust. Never disable TLS checking.
+
+### Workspace acceptance
+
+`python scripts/verify_verification_workspace.py` inspects an existing terminal
+execution, creates idempotent fresh read-only verification, checks protected routes,
+opens the real UI and saves local screenshots/summary under ignored `artifacts/phase5`.
+It reads the operator capability from ignored `.env` and never prints it. It never
+saves an application record. [Fault setup](FAULT-INJECTION.md),
+[verification design](VERIFICATION-ENGINE.md) and [evidence model](EVIDENCE-MODEL.md)
+explain trust/retention limitations.

@@ -1,6 +1,6 @@
 # INTI AI — Software Design Document
 
-Version 0.3.0 · Phase 3 · Ecuador · Meta Global AI Developer Hackathon 2026
+Version 0.5.0 · Phase 5 · Ecuador · Meta Global AI Developer Hackathon 2026
 
 ## Phase 3 implementation
 
@@ -187,3 +187,21 @@ PostgreSQL upgrade is checked separately. Plan/action/completion persistence is
 transactional. History is offset/limit paginated. Redis and distributed frameworks
 remain unnecessary. Wonder and SAM are not integrated because no measured need
 or verified account entitlement justifies them. See [Phase 2 report](PHASE-02-REPORT.md).
+
+## Phase 4-5 implemented extension (0.5.0)
+
+The lifecycle now includes bounded recovery and independent verification. Recovery
+retains original objective/approval scope and resumes only after the original
+interrupted action checks pass. Changed repair scope needs renewed digest and HIGH
+authorization. Live model recovery remains unverified under the user's no-call scope.
+
+The independent verifier defines and versions explicit criteria, uses fresh
+read-only application snapshots plus isolated browser evidence, validates provenance
+and SHA-256, evaluates nine deterministic assertion types and publishes a tri-state
+verdict. It does not receive an action-executor port. Execution completion cannot
+set the verdict. Optional unknown criteria remain visible. Six recovery tables and
+six verification tables are additive migrations 0004/0005.
+
+See [Recovery engine](RECOVERY-ENGINE.md), [verification engine](VERIFICATION-ENGINE.md),
+[evidence model](EVIDENCE-MODEL.md) and [Phase 5 report](PHASE-05-REPORT.md) for actual
+semantics, tests, benchmark denominators and remaining limitations.

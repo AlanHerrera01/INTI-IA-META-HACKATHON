@@ -1,7 +1,7 @@
 # Architecture
 
-Current milestone: Phase 3, authorized sandbox execution. Phase 1 observation and
-Phase 2 planning are preserved.
+Current milestone: Phase 5, independent verification and bounded recovery.
+Phase 1 observation, Phase 2 planning and Phase 3 execution are preserved.
 
 ## Phase 3 execution boundary
 
@@ -196,3 +196,31 @@ Generation is non-idempotent: repeated requests create distinct plans and can
 incur additional inference cost. Revalidation is state-idempotent and intentionally
 appends audit events. Cancellation stops coroutine orchestration, but cannot
 forcibly interrupt a database write already running in a worker thread.
+
+## Recovery and independent evidence boundary
+
+```mermaid
+flowchart TD
+  EX[ExecutionOrchestrator] -->|structured failure| RE[RecoveryOrchestrator]
+  RE -->|two private observations| META[Meta proposal adapter]
+  META --> POL[Deterministic recovery policy]
+  POL --> AUTH[Exact or renewed operator approval]
+  AUTH --> WORKER[Existing action executor / worker]
+  WORKER -->|original checks satisfied| EX
+  EX -->|saved completion event| V[IndependentVerificationOrchestrator]
+  CR[Immutable versioned success criteria] --> V
+  V --> RO[Read-only inventory API / new browser context]
+  RO --> DB[(Application SQLite: OS read-only mount)]
+  V --> HASH[Provenance / SHA-256 / assertions]
+  HASH --> LEDGER[(Verification ledger + artifact volume)]
+  LEDGER --> UI[Protected report + frontend + existing WS]
+```
+
+The verifier's execution reader exposes get/events only. There is no reverse call
+from verification into execution or recovery. `inventory-state` is isolated on an
+internal Compose network with no host port; its separate token grants only reads.
+The browser worker receives no Meta key, app database mount or fault-admin token.
+The gateway and local store are trusted; filesystem hashes are not source attestation.
+Recovery and verification persist atomic state/event updates with CAS versions.
+
+See [verification design](VERIFICATION-ENGINE.md) and [evidence schema](EVIDENCE-MODEL.md).

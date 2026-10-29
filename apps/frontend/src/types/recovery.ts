@@ -3,6 +3,7 @@ import type {
   ActionResult,
   BrowserTarget,
 } from "./execution";
+import type { BoundingBox } from "./planning";
 export interface RecoveryBundle {
   session: {
     id: string;
@@ -41,6 +42,7 @@ export interface RecoveryBundle {
     change_summary: string;
     uncertainties: string[];
     candidate_targets: BrowserTarget[];
+    changed_regions: BoundingBox[];
   }[];
   plan: {
     objective: string;

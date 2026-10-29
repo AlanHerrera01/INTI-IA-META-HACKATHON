@@ -1,6 +1,6 @@
 # REST API v1
 
-Application version: 0.3.0. Existing observation routes retain their contracts.
+Application version: 0.5.0. Existing observation routes retain their contracts.
 
 Base URL: `http://localhost:8000/api/v1`. Interactive OpenAPI: `/docs`.
 Local single-operator service. Execution routes and execution evidence require a
@@ -195,3 +195,62 @@ same header to correlate a request. Malformed correlation IDs return 400.
 Events expose timestamp, task/plan/correlation IDs, kind, safe code and optional
 usage. Token counts absent from provider output remain null. No cost is estimated.
 Generation is not idempotent; retrying can create another plan and inference cost.
+
+## Phase 4 recovery API
+
+All routes require `Authorization: Bearer <operator token>` and recovery enabled.
+
+| Method | Path | Behavior |
+|---|---|---|
+| GET | `/api/v1/recoveries?offset=0&limit=20` | Paginated saved bundles |
+| GET | `/api/v1/recoveries/{id}` | Typed session/context/diagnosis/plan/results |
+| GET | `/api/v1/recoveries/{id}/attempts` | Bounded attempt history |
+| GET | `/api/v1/recoveries/{id}/events?after=0` | Saved monotonic events |
+| POST | `/api/v1/recoveries/{id}/approve` | Exact repair digest, plan or high_risk scope |
+| POST | `/api/v1/recoveries/{id}/cancel` | Stops recovery and active parent execution |
+| POST | `/api/v1/recoveries/{id}/retry` | Only active transient escalation within original budget |
+
+Approval body: `manifest_digest` (64 hex characters), `scope` (`plan` or
+`high_risk`), `action_ids` (HIGH IDs for second confirmation). Invalid scope/state,
+changed digest or exhausted budget returns 409. Recovery is created by structured
+execution failure, never through an unrestricted public patch endpoint.
+
+## Phase 5 verification API
+
+All routes require the same operator capability and verification enabled. Responses
+are typed in OpenAPI at `/docs`; anonymous evidence/report/artifact access is denied.
+
+| Method | Path | Behavior |
+|---|---|---|
+| POST | `/api/v1/verifications` | Create/join terminal execution verification (201) |
+| GET | `/api/v1/verifications` | Paginated bundles; optional execution_id filter |
+| GET | `/api/v1/verifications/{id}` | Session, criteria version, evidence metadata |
+| GET | `/api/v1/verifications/{id}/criteria` | Immutable selected criteria version |
+| GET | `/api/v1/verifications/{id}/evidence` | Provenance/hash metadata |
+| GET | `/api/v1/verifications/{id}/evidence/{evidence_id}/artifact` | Integrity-checked PNG/JSON bytes |
+| GET | `/api/v1/verifications/{id}/report?format=json` | Reconstructed report and current integrity |
+| GET | `/api/v1/verifications/{id}/report?format=html` | Escaped CSP-protected report |
+| GET | `/api/v1/verifications/{id}/events?after=0` | Saved verification events |
+| POST | `/api/v1/verifications/{id}/cancel` | Idempotent cancellation (200) |
+| POST | `/api/v1/verifications/criteria` | Explicit append-only criteria revision |
+
+Create body: `execution_id` UUID, optional `criteria_version_id`, `idempotency_key`
+(default `terminal`, 1-80 characters). Nonterminal/unapproved execution or mismatched
+criteria returns 409; missing record 404; malformed input 422; capability missing or
+wrong 401; disabled configuration 503. A new key explicitly requests fresh collection.
+Revision body: `execution_id`, `expected_version`, `additional` typed criteria and
+`reason`. The server records the authorized operator. Stale versions or attempts
+to replace mandatory criteria are rejected. No arbitrary target SQL is accepted.
+
+Report `final_verdict` is historical; `effective_verdict` becomes INCONCLUSIVE if
+stored evidence fails current integrity validation. FAILED means an internal
+verification process error; VERIFIED_FAILURE means trustworthy evidence disproves
+a required criterion. UNKNOWN never means PASS.
+
+Events reuse `/ws/executions/{execution_id}`, authenticated in its first message
+`{token,after}`. Recovery/verification IDs are included in projected payloads. REST
+and WebSocket sequences belong to separate ledgers; clients deduplicate event UUIDs.
+
+The internal gateway accepts authenticated fixed GET routes only. It requires a
+separate read capability and correlation headers. It exposes no SQL, file path or
+mutation endpoint and is not publicly routed by the frontend.
