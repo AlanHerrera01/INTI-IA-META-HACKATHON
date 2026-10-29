@@ -69,7 +69,10 @@ class RepairFixture:
                     PlannedActionType.CLICK,
                     target,
                     ActionParameters(),
-                    (BrowserCheck(CheckKind.VISIBLE, target),),
+                    (
+                        BrowserCheck(CheckKind.VISIBLE, target),
+                        BrowserCheck(CheckKind.VISIBLE, modal),
+                    ),
                     (BrowserCheck(CheckKind.NOT_VISIBLE, modal),),
                     RiskLevel.HIGH,
                 ),

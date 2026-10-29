@@ -90,6 +90,8 @@ Keep the original task, record, action parameters and final postconditions uncha
 Every action needs typed checks. The final step must be the interrupted action, with
 identical parameters and postconditions; only a visibly justified binding may change.
 Preceding steps may inspect, wait or dismiss a reviewed modal. Unused parameters are null.
+Modal dismissal requires a visible dialog precondition and a not_visible postcondition
+for that exact dialog, as well as an exact dismissal control. It remains HIGH risk.
 No new record, external URL, script, shell, credential access, deletion or new permissions.
 If uncertain or ambiguous, propose REQUEST_HUMAN_APPROVAL or ABORT_SAFELY; never guess.
 Save/update remains HIGH; altered scope needs human approval. A timed-out save may

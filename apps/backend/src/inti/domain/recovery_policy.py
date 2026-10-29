@@ -150,6 +150,21 @@ class RecoveryPolicy:
                             "RECOVERY_SCOPE_CHANGED",
                             "New clicks require a reviewed modal-dismissal strategy",
                         )
+                    dialogs = {
+                        check.target
+                        for check in action.preconditions
+                        if check.kind == CheckKind.VISIBLE
+                        and check.target
+                        and check.target.role == "dialog"
+                    }
+                    if not dialogs or not any(
+                        check.kind == CheckKind.NOT_VISIBLE and check.target in dialogs
+                        for check in action.expected_postconditions
+                    ):
+                        raise ExecutionError(
+                            "RECOVERY_SCOPE_UNPROVEN",
+                            "Modal dismissal needs visible/hidden checks for the same dialog",
+                        )
                     risk = RiskLevel.HIGH
             if (
                 action.action_type == PlannedActionType.NAVIGATE

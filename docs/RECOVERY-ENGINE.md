@@ -21,6 +21,8 @@ must end with the interrupted action's original parameters, action type and exac
 postconditions, preserving its guards except a justified target rebinding. Prefix
 steps may inspect, wait or dismiss an explicitly reviewed modal. Other records,
 external URLs, prohibited operations and unresolved uncertainty are rejected.
+Modal dismissal additionally proves the same dialog visible before and hidden
+after through typed checks; declaring a strategy name alone does not authorize it.
 
 Only an exact equivalent contract can inherit existing authorization. Changed
 bindings or new steps require a sealed repair-plan approval and separate HIGH

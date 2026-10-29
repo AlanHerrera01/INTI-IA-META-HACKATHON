@@ -155,3 +155,44 @@ def test_strategy_selection_ignores_confidence():
         RecoveryStrategySelector().select(replace(d, strategies=(invasive, *d.strategies)))
         == d.strategies[0]
     )
+
+
+def test_modal_prefix_requires_typed_dialog_proof_and_renewed_high_approval(prepared):
+    from inti.domain.execution import BrowserCheck, BrowserTarget, CheckKind, ExecutableAction
+
+    policy, result, contract = prepared
+    manifest = prepare(policy, result, contract)
+    bundle = ExecutionBundle(ExecutionSession(result.plan.task_id, result.plan.id), manifest)
+    original = manifest.actions[0]
+    button = BrowserTarget("button", "Dismiss notice")
+    dialog = BrowserTarget("dialog", "Workspace notice")
+    prefix = ExecutableAction(
+        uuid4(),
+        "dismiss-fixture",
+        PlannedActionType.CLICK,
+        button,
+        ActionParameters(),
+        (BrowserCheck(CheckKind.VISIBLE, button), BrowserCheck(CheckKind.VISIBLE, dialog)),
+        (BrowserCheck(CheckKind.NOT_VISIBLE, dialog),),
+        RiskLevel.LOW,
+    )
+    d = diagnosis(original)
+    strategy = replace(
+        d.strategies[0],
+        strategy_type=StrategyType.DISMISS_AUTHORIZED_MODAL,
+        required_actions=(prefix, original),
+    )
+    guard = RecoveryPolicy(policy.allowed_urls)
+    plan = guard.prepare(bundle, 0, replace(d, strategies=(strategy,)))
+    assert plan.decision.requires_approval and plan.actions[0].risk_level == RiskLevel.HIGH
+    for changed in [
+        replace(prefix, preconditions=(BrowserCheck(CheckKind.VISIBLE, button),)),
+        replace(prefix, expected_postconditions=(BrowserCheck(CheckKind.VISIBLE, dialog),)),
+    ]:
+        with pytest.raises(ExecutionError) as error:
+            guard.prepare(
+                bundle,
+                0,
+                replace(d, strategies=(replace(strategy, required_actions=(changed, original)),)),
+            )
+        assert error.value.code == "RECOVERY_SCOPE_UNPROVEN"
