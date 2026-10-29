@@ -231,8 +231,10 @@ refusals; it was repeated after all services reported healthy and passed. Final
 0.3.0 workspace/evidence and saved Operational state were rechecked without writes.
 
 GitHub Actions installs Chromium with Linux dependencies and runs backend/frontend
-lint, typing, tests, coverage, policy benchmark and production build. Hosted-run
-status is recorded after publication; configuration alone is not a hosted success.
+lint, typing, tests, coverage, policy benchmark and production build. The hosted
+run for implementation commit `627570b` completed successfully for both backend
+and frontend: [run 40812399954](https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON/actions/runs/40812399954).
+This also runs the added firewall test together with the complete Linux suite.
 
 ## 12. Actual execution results
 
