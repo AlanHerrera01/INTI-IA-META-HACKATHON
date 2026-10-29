@@ -188,17 +188,24 @@ extraction/deletion requests are rejected regardless of confidence.
 | Final frontend component tests | **10 passed** |
 | Real Phase 1 observation E2E after extension | **3 passed** |
 | Isolated real PostgreSQL planning E2E | **1 passed**, mocked model ports explicitly |
+| Consolidated final E2E command | **4 passed, 1 skipped** |
 | Paid live-model E2E | **Skipped**, explicit opt-in disabled / credentials absent |
 | Ruff lint and format | Passed |
 | Strict MyPy | Passed, 28 source files |
 | Frontend TypeScript, ESLint, production build | Passed |
 | Docker builds and four-service health | Passed |
 | Real workspace + test-fixture visualization | Passed; no generated actions executed |
+| Hosted GitHub Actions | **Success**, backend and frontend workflow for cce1aad |
 
 One upstream Starlette warning deprecates the current HTTPX TestClient path;
 the suite still passes. No production API credentials are required by CI. The CI
 workflow now includes the offline policy benchmark. Hosted run results are not
 inferred from local checks.
+
+The published source revision `cce1aad` passed
+[GitHub Actions run 40804996594](https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON/actions/runs/40804996594).
+The source/workspace/report were published in three descriptive commits; the
+follow-up recording this hosted result changes documentation only.
 
 ## 11. Benchmark results
 
