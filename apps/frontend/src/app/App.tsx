@@ -12,6 +12,7 @@ import { Dashboard } from "../pages/Dashboard";
 import { SystemPage } from "../pages/SystemPage";
 import { ObservationPage } from "../pages/ObservationPage";
 import { PlanningPage } from "../pages/PlanningPage";
+import { ExecutionPage, ExecutionBoundary } from "../pages/ExecutionPage";
 
 export function App() {
   return (
@@ -44,11 +45,15 @@ export function App() {
             <BrainCircuit size={18} />
             AI Planning
           </NavLink>
+          <NavLink to="/execution">
+            <Activity size={18} />
+            Live Execution
+          </NavLink>
         </nav>
         <div className="sidebar-bottom">
           <div className="phase-card">
-            <span className="phase-badge">PHASE 02</span>
-            <h3>Visual reasoning & planning</h3>
+            <span className="phase-badge">PHASE 03</span>
+            <h3>Authorized browser execution</h3>
             <p>
               The first step toward
               <br />
@@ -83,6 +88,14 @@ export function App() {
             <Route path="/observations/:id" element={<ObservationPage />} />
             <Route path="/system" element={<SystemPage />} />
             <Route path="/planning" element={<PlanningPage />} />
+            <Route
+              path="/execution"
+              element={
+                <ExecutionBoundary>
+                  <ExecutionPage />
+                </ExecutionBoundary>
+              }
+            />
             <Route
               path="*"
               element={
