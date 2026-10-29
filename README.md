@@ -13,9 +13,10 @@ Interfaces change. Conventional automation breaks silently. INTI AI's long-term
 goal is to perceive an interface, reason about an authorized objective, act,
 verify the outcome, and recover when the interface changes.
 
-Phase 2 adds screenshot reasoning, intent interpretation and inspectable typed
-plans to the Phase 1 observation foundation. It does not execute generated
-actions. The full roadmap is PERCEIVE → REASON → PLAN → ACT → VERIFY → RECOVER.
+Phase 3 adds authorized browser execution to the observation and planning foundation.
+Approved typed plans run in an isolated Chromium worker against the local sandbox,
+with fresh evidence before and after every action. The full roadmap is
+PERCEIVE → REASON → PLAN → ACT → VERIFY → RECOVER; autonomous recovery is future work.
 
 ## Current functionality
 
@@ -25,14 +26,17 @@ actions. The full roadmap is PERCEIVE → REASON → PLAN → ACT → VERIFY →
 - React dashboard, observation history/detail viewer, responsive layout, live diagnostics.
 - Meta HTTP adapter with documented multimodal requests, schema validation,
   bounded retries, safe errors, and explicit missing-credential status.
-- Synthetic inventory sandbox with search, editable equipment and session-only save.
+- Synthetic inventory sandbox with search, record dialogs and persistent SQLite saves.
 - Docker Compose, automated tests, lint/type checks and GitHub Actions configuration.
 - AI Planning workspace: goals, constraints, estimated visual overlays, action
   timelines, uncertainty, risk, validation, paginated history and correlated events.
 - Deterministic policy: bounded steps, exact URL restrictions, fresh-observation
   checkpoints, prohibited-operation rejection and screenshot-based plan expiry.
 
-See [the Phase 2 implementation report](docs/PHASE-02-REPORT.md) for measured results and
+- Live Execution workspace with exact-manifest approval, separate HIGH confirmation,
+  pause/resume/cancel, private screenshot evidence, history and persisted WebSocket events.
+
+See [the Phase 3 implementation report](docs/PHASE-03-REPORT.md) for measured results and
 the distinction between verified, unverified, blocked, and excluded functionality.
 
 ## Start with Docker Desktop
@@ -52,8 +56,39 @@ backend opens `http://demo:8001/` over the internal Docker network. The host
 browser sees the screenshot through the backend; the `demo` hostname does not
 need to resolve on Windows. Reload the dashboard to inspect persisted metadata.
 
-All published ports bind to loopback. PostgreSQL and artifacts use named volumes.
+All published ports bind to loopback. PostgreSQL, artifacts and demo data use named volumes.
 `docker compose down` stops the stack and retains those volumes.
+
+## Authorized sandbox execution
+
+Execution is disabled by default. Set `EXECUTION_ENABLED=true` in your ignored `.env`,
+and generate separate `EXECUTION_OPERATOR_TOKEN` and `BROWSER_WORKER_TOKEN` values:
+
+```powershell
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+Run that command twice and copy the values into the corresponding settings. Recreate
+the services with `docker compose up -d`. Open [Live Execution](http://localhost:5173/execution),
+enter your operator token, then **Prepare PC-104 sandbox**. Review **Approve Plan**,
+confirm the HIGH Save action separately, then start. Pause takes effect after the
+current observation/action cycle; resume revalidates the live session. Cancellation
+closes the browser and preserves any application changes already committed.
+
+The deterministic demo recipe is explicitly authored, uses actual accessible DOM
+observations and calls no model. It is not presented as a Meta-generated plan.
+PC-104 starts Inactive in a new demo database and is saved as Operational by browser
+interaction. Repeating the original recipe after that change fails its Inactive
+precondition; it never silently resets user data. To repeat, edit PC-104 back to
+Inactive explicitly in the demo UI. Ordinary automated tests use fresh temporary stores.
+
+Existing Phase 2 plans can be loaded with typed target/precondition/postcondition
+contracts in the advanced editor or API. Business ambiguity, stale plans and rejected
+plans are blocked. Approved runtime observation checkpoints resolve future controls
+only after new screenshots. `COMPLETED` records finished steps and immediate checks;
+the engine keeps `overall_goal_verified=false`. The verification harness separately
+checks the demo store and a fresh browser reload. See [API](docs/API.md) and
+[development instructions](docs/DEVELOPMENT.md).
 
 ## Meta configuration
 
@@ -169,16 +204,17 @@ Read [SDD](docs/INTI-SDD.md), [architecture](docs/ARCHITECTURE.md), and [API](do
 
 ## Scope and roadmap
 
-This development stack serves one trusted local operator. There is no account
-system, remote browsing, action executor, recovery engine, job queue, or production
-deployment. Metadata persists; artifacts must be backed up together with the database.
+This development stack serves one trusted local operator. Execution uses local
+capability tokens, not an account system. Remote browsing, autonomous recovery,
+a durable job queue and production deployment remain outside scope.
+Metadata persists; artifacts must be backed up together with the database.
 Screenshots are limited to 1920 × 1080 and 5 MB. History returns the latest 20
 records by default, up to 100. Meta access and hackathon eligibility must be verified
 against the organizer/account before submission. No benchmark result is implied.
 
-Phase 3 prerequisites: verify real Meta access and localization quality, define
-execution authorization, isolated browser sessions, deterministic outcome evidence,
-human approval gates, recovery and prompt-injection policies.
+Phase 4 prerequisites: verify real Meta access and localization quality, add a
+reusable independent goal verifier, classify recoverable failures and define
+bounded recovery/reapproval and stronger prompt-injection evaluations.
 
 All project source in this repository was authored for this implementation session.
 No proprietary assets or application source were copied. Third-party packages

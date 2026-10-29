@@ -1,6 +1,82 @@
 # Architecture
 
-Current milestone: Phase 2, planning only. Phase 1 observation is preserved.
+Current milestone: Phase 3, authorized sandbox execution. Phase 1 observation and
+Phase 2 planning are preserved.
+
+## Phase 3 execution boundary
+
+```mermaid
+flowchart LR
+    UI[Live Execution] -->|Bearer operator capability| API[Protected REST and WebSocket]
+    API --> O[ExecutionOrchestrator]
+    O --> P[Deterministic domain policy]
+    O --> DB[(PostgreSQL: bundle, CAS version, results, decisions, events)]
+    O --> FS[Private UUID PNG artifacts]
+    O -->|Private worker capability| W[HTTP browser worker]
+    W --> C[Isolated persistent Chromium context]
+    C -->|Every request restricted| D[Local inventory demo]
+    D --> S[(Demo SQLite named volume)]
+```
+
+`ExecutionRepositoryPort`, `BrowserSessionPort` and `ActionExecutorPort` separate
+orchestration from SQL, RPC and Playwright. `execution_policy.py` converts a frozen
+validated planning result and exact typed operator contracts into a manifest.
+SHA-256 covers the entire plan snapshot, action IDs, parameters, bindings, checks,
+grounding mode, viewport, URL and limits. Integral floats normalize across JSON
+round trips. Changes invalidate approval. The original plan is checked again on
+start, resume and every action cycle. LOW/MEDIUM require plan approval; HIGH actions
+need a second exact-action confirmation. PROHIBITED actions cannot be approved.
+
+Business uncertainty remains blocking. The adapter may accept a conditional Phase 2
+plan only when its clarification findings describe runtime grounding/checkpoints:
+unresolved, stale or future controls, option checks, low confidence or disabled
+targets. Every action still requires approved typed pre/postconditions and fresh
+runtime evidence; disabled, ambiguous, missing or offscreen controls fail closed.
+This does not convert business assumptions into authorization.
+
+The orchestrator persists a RUNNING action record before dispatch, executes once,
+captures the resulting PNG and stores immediate check outcomes. DOM resolution
+records exact accessible role/name; selector mode intersects an approved data-testid
+with that semantic target. Visual mode requires fresh model coordinates, unchanged
+screenshot digest and session-bound evidence; there is no coordinate fallback.
+Visual mode supports URL assertions and coordinate click/type; DOM assertions and
+select-option are explicitly unsupported in that mode. It remains unverified with
+a real Meta model in this environment. Hybrid DOM is the verified demo mode.
+
+Each result distinguishes `action_executed`, `postconditions_satisfied`, and
+`may_have_executed`. Immediate checks briefly observe asynchronous application
+effects within the action timeout; dispatch is never repeated. The Phase 3 engine
+never sets `overall_goal_verified=true`. An independent test reads the application
+store and opens a new browser to certify the demonstration outcome.
+
+One backend process owns its asynchronous schedulers. Database compare-and-swap
+versions protect mutations and results/events/decisions commit atomically. Startup
+marks abandoned RUNNING/PAUSED executions FAILED/PROCESS_RESTART and revokes browser
+sessions; it never replays actions. Multi-process scheduling is unsupported. Artifact
+writes precede metadata commits with compensation; a crash can leave an orphan PNG.
+Cancellation records terminal state, interrupts supported pending work, revokes the
+worker session and records an uncertain outcome when interruption obscures effects.
+It cannot undo an application commit. Worker TTL bounds cleanup after lost transport.
+
+Events share the transaction with execution state. An indexed monotonic sequence
+supports REST `after` replay and WebSocket reconnect. Clients deduplicate UUIDs and
+retain a sequence cursor; REST polling continues if the socket is unavailable.
+The socket accepts the operator capability in its first frame, never the URL.
+
+Compose puts the worker only on an internal network shared with backend/demo. It
+receives no Meta key or database URL, exposes no host port, drops capabilities,
+disallows privilege escalation and uses a read-only root with temporary storage,
+768 MiB memory and 256 PID limits. Chromium receives an environment whitelist.
+All HTTP resources enforce exact demo origin, allowed methods and bounded main-frame
+navigation; redirects, frames, popups, downloads and WebSockets are blocked.
+This is a trusted local synthetic sandbox boundary, not a general public browsing service.
+The legacy observation adapter remains separate and continues using fresh contexts.
+
+Defaults: 30 actions, 180 seconds including pauses, 10 seconds/action, 5 MB/PNG,
+2 contexts, 3 navigations including initial load, 5-second evidence freshness and
+180-second session inactivity TTL. Application scheduling and worker caps are separate.
+Container memory/PID limits are shared by the whole worker. No durable queue,
+automatic recovery or automatic non-idempotent retry exists.
 
 Dependencies point inward: presentation → application → domain. Infrastructure
 implements domain ports. Domain imports only the Python standard library.
@@ -20,8 +96,8 @@ flowchart LR
 ```
 
 Domain entities use dataclasses and explicit invariant validation, independent of
-Pydantic. `Task` restricts transitions; action/execution/verification contracts are
-future-facing data contracts, not claims that action orchestration exists.
+Pydantic. Legacy `Task` contracts remain compatible. Phase 3 execution entities,
+policies and ports live in `domain/execution*`; `ExecutionSession` owns explicit transitions.
 Ports are structural Python protocols, enabling typed adapters and test doubles.
 
 Application capture persists metadata after browser capture and removes the PNG
@@ -111,7 +187,8 @@ flowchart TD
     Reject --> DB
     Expired --> DB
     DB --> UI[Inspect timeline, grounding, uncertainty and trace]
-    UI --> Stop[Stop: no execution capability]
+    UI --> Stop[Planning does not grant execution approval]
+    Stop --> Execute[Separate Phase 3 manifest and authorization gates]
 ```
 
 This remains local synchronous HTTP orchestration, not a durable job queue.

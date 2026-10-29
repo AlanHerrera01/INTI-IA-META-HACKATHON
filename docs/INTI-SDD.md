@@ -1,6 +1,54 @@
 # INTI AI — Software Design Document
 
-Version 0.2.0 · Phase 2 · Ecuador · Meta Global AI Developer Hackathon 2026
+Version 0.3.0 · Phase 3 · Ecuador · Meta Global AI Developer Hackathon 2026
+
+## Phase 3 implementation
+
+Scope: PLAN → AUTHORIZE → ACT → OBSERVE → RECORD. The Phase 1 and Phase 2 sections
+below describe their original design; current execution boundaries are specified
+in [Architecture](ARCHITECTURE.md) and measured in [Phase 3 report](PHASE-03-REPORT.md).
+
+Domain contracts: ExecutionSession, ExecutionStatus, ExecutableAction,
+ActionExecutionResult, BrowserSession, ExecutionEvent and AuthorizationDecision.
+Typed checks cover visibility, enabled state, input value, selected option, exact
+text and URL. Supported dispatch types are click, type_text, select_option, scroll,
+navigate, wait, inspect and verify. No user/model-supplied executable scripts exist.
+
+```mermaid
+stateDiagram-v2
+    [*] --> CREATED
+    CREATED --> AWAITING_APPROVAL
+    AWAITING_APPROVAL --> READY: plan plus separate HIGH decisions
+    READY --> RUNNING: fresh unchanged approved manifest
+    RUNNING --> PAUSED: finish current observation/action cycle
+    PAUSED --> RUNNING: revalidate authorization and live session
+    RUNNING --> COMPLETED: all immediate checks satisfied
+    RUNNING --> FAILED: fail closed
+    RUNNING --> TIMED_OUT: total budget exhausted
+    RUNNING --> CANCELLED
+    PAUSED --> CANCELLED
+    AWAITING_APPROVAL --> CANCELLED
+    READY --> CANCELLED
+    PAUSED --> FAILED: session lost or process restart
+    PAUSED --> TIMED_OUT: total budget includes pause
+```
+
+CREATED may also cancel. READY may fail for abandoned-start handling; all terminal
+states reject further transitions. Duplicate starts are rejected. Every allowed
+and forbidden state pair is covered by a parameterized test. Approvals are separate
+records bound to exact manifest digests and server operator identity. The demo recipe
+is visibly authored, never a substitute for an unavailable model response.
+
+Data migration 0003 adds five execution tables and private-observation classification.
+Screenshots stay in artifact storage. Historical observation and planning rows survive
+upgrade; downgrade tests use temporary databases only. Execution runs on one backend
+process, with an isolated private worker and persisted events, not a durable job queue.
+
+Acceptance evidence includes real browser actions, SQLite writes, PostgreSQL events,
+private screenshots, authorization controls, pause/resume/cancel, failure/timeout
+tests, responsive UI and independent store/fresh-browser verification. The engine
+records immediate outcomes; full autonomous recovery and a reusable goal verifier
+are outside Phase 3. A real Meta-derived end-to-end run remains blocked by credentials.
 
 ## System overview
 

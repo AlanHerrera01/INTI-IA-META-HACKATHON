@@ -1,0 +1,68 @@
+{
+  "recorded_at": "2026-10-29T03:07:46.864488+00:00",
+  "execution_id": "4e0b42de-88df-4b19-8fa1-04ef2ef57d43",
+  "plan_id": "97c33699-ba54-42bd-a72e-2aae291d322e",
+  "manifest_digest": "487944ab4d95ccceffb9b2f938c38acd7af7010155ec8ee8716a88a9e7e4643a",
+  "status": "COMPLETED",
+  "grounding_mode": "hybrid_dom",
+  "planned_actions": 9,
+  "executed_actions": 9,
+  "successful_actions": 9,
+  "failed_actions": 0,
+  "target_resolution_failures": 0,
+  "authorization_rejections": 0,
+  "authorization_rejection_scope": "This completed run only; denied paths tested separately",
+  "browser_session_failures": 0,
+  "postcondition_pass_rate": 1.0,
+  "duration_seconds": 6.001199,
+  "events": 47,
+  "evidence_references": [
+    {
+      "before": "86205cca-cf67-4c07-a966-f90ee5ca21a1",
+      "after": "431c4b71-5f45-44f8-aafa-5efd22156d5a"
+    },
+    {
+      "before": "4d43b4ee-89ad-4d66-b02b-b95142978d2d",
+      "after": "5f404d98-4b37-423f-b54e-3253a375eb41"
+    },
+    {
+      "before": "3e7ea5fc-94db-4468-ba0b-23b4af32e5f8",
+      "after": "c4a9640e-d2b9-462f-bcc5-0a0c57a9cc4e"
+    },
+    {
+      "before": "d7e19e43-36f9-4c1b-8812-1a1aaf9a653f",
+      "after": "4b396781-3c99-48e1-b240-8d7f4189c7d6"
+    },
+    {
+      "before": "b8171fa9-7b22-4b47-ab00-5e5045ea00d4",
+      "after": "9a77ade2-c635-4d27-a179-d176072b073e"
+    },
+    {
+      "before": "5674d552-5b6e-4101-b311-51135e4242db",
+      "after": "437957e3-0b69-48f0-8cb1-830f064a80b8"
+    },
+    {
+      "before": "91542aec-17c5-40a5-b7fa-c9fcb2f0cd3c",
+      "after": "88532f53-adbe-44f3-adb2-5699f4ae50d1"
+    },
+    {
+      "before": "9df732a5-026b-4753-96ec-7965e392d18d",
+      "after": "1d4e4c36-df25-4831-853a-f9240cfbdb1d"
+    },
+    {
+      "before": "342c9266-8d6f-4dc2-8bd0-58532a5c5db1",
+      "after": "2d9edf10-f031-4a9f-ae39-5f32d9d79e10"
+    }
+  ],
+  "pause_resume_verified": true,
+  "application_store_status": "Operational",
+  "application_store_version": 2,
+  "fresh_browser_reload_verified": true,
+  "ui_evidence_and_event_stream_verified": true,
+  "engine_overall_goal_verified": false,
+  "model_calls": 0,
+  "plan_provenance": "Explicit authored sandbox recipe; no Meta inference",
+  "cancellation_response_ms": 74.98710000072606,
+  "cancellation_status": "CANCELLED",
+  "cancellation_scope": "Unstarted AWAITING_APPROVAL session; live cancellation covered by automated test"
+}

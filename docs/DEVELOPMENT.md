@@ -1,6 +1,88 @@
 # Development
 
-Current version: 0.2.0, planning only. Existing observation setup remains valid.
+Current version: 0.3.0, authorized sandbox execution. Existing observation/planning
+setup remains valid. Execution is disabled until its capability tokens are configured.
+
+## Phase 3 on Windows and Docker Desktop
+
+Use Linux containers. Copy `.env.example` only if `.env` does not already exist;
+preserve existing credentials. Generate two separate random values with
+`python -c "import secrets; print(secrets.token_urlsafe(32))"`, put them in
+`EXECUTION_OPERATOR_TOKEN` and `BROWSER_WORKER_TOKEN`, then set `EXECUTION_ENABLED=true`.
+Keep these local. The operator token is entered into Live Execution; the worker
+token stays between services. Browser connections use a first-frame capability,
+not URL credentials. Tokens are kept in React memory and disappear on reload.
+
+```powershell
+docker compose up --build -d
+docker compose ps
+docker compose logs --tail 50 browser-worker backend
+```
+
+Open `http://localhost:5173/execution`. The worker has no published port and its
+network has no external gateway. Only backend/demo share that network; PostgreSQL
+stays on the default network. Do not attach host folders or credentials to the
+worker. Its writable temporary files are disposable. `demo-data` persists the
+inventory SQLite database across container rebuilds; no automatic reset exists.
+
+Native development (separate terminals, activated venv):
+
+```powershell
+python apps/demo-app/server.py --host 127.0.0.1 --port 8001 --db artifacts/demo/inventory.db
+python -m uvicorn inti.worker:app --host 127.0.0.1 --port 8010
+python -m alembic -c apps/backend/alembic.ini upgrade head
+python -m uvicorn inti.main:app --host 127.0.0.1 --port 8000
+npm --prefix apps/frontend run dev
+```
+
+Native worker execution is for trusted local development and does not provide
+Docker network/memory isolation. Compose is the demonstrated deployment boundary.
+Native settings use `http://127.0.0.1:8001/`; Compose overrides URL/worker addresses.
+Configuration defaults and bounds appear in `.env.example` and `/docs` schemas.
+Compose forwards action, time, context, navigation, artifact and TTL limits;
+worker memory/PID caps are in `docker-compose.yml`.
+
+Run baseline plus credential-free browser integration tests:
+
+```powershell
+python -m playwright install chromium
+python -m pytest apps/backend/tests -m "not e2e" --cov=inti.domain --cov=inti.application --cov-fail-under=80
+python -m ruff check apps/backend scripts
+python -m ruff format --check apps/backend scripts
+python -m mypy --config-file apps/backend/pyproject.toml apps/backend/src
+npm --prefix apps/frontend test
+npm --prefix apps/frontend run lint
+npm --prefix apps/frontend run build
+```
+
+On restricted Windows temp directories, create `.tmp` and add
+`--basetemp=.tmp/phase3-tests -p no:cacheprovider` to pytest. Tests create new demo
+SQLite databases and stop their own servers/browsers; no Meta call is required.
+CI installs Chromium with OS dependencies, runs those browser tests on Linux and
+checks at least 80% domain/application statement coverage.
+
+For the explicit demonstration against the running Compose stack:
+
+```powershell
+python scripts/verify_execution.py --run-sandbox
+```
+
+This opt-in harness reviews the known authored sandbox recipe programmatically,
+submits exact plan and separate HIGH approvals using the configured local operator
+capability, pauses/resumes it, and checks the saved store and a fresh browser.
+Its recorded actor is the configured test operator, not a claim of interactive
+human confirmation. It refuses to reset an already changed PC-104. UI operators
+normally review the two confirmation dialogs themselves. To inspect an existing
+completed run and regenerate UI evidence without writes, omit `--run-sandbox`.
+JSON metrics and desktop/mobile screenshots go under ignored `artifacts/phase3/`.
+The successful original run's metrics are also included in `docs/evidence/`.
+
+Backend startup migrates through 0003. Interrupted live executions fail with
+PROCESS_RESTART; READY/AWAITING_APPROVAL records may continue after revalidation.
+Use one Uvicorn process, not multiple workers. Do not downgrade a populated database:
+0003 downgrade removes execution history and its privacy marker. Upgrade/downgrade
+tests use temporary databases and preserve legacy observations. Artifact metadata
+and PNG backups should be kept together. Never use volume deletion to rerun a demo.
 
 Run commands from the repository root. Recommended: Docker Desktop Linux engine
 and `docker compose up --build -d`. See [README](../README.md) for native commands.
@@ -117,7 +199,7 @@ Phase 1 observations.
 
 The backend Dockerfile caches dependency/Chromium installation before copying
 application source, reducing repeat rebuild cost without changing dependency
-declarations. Python/frontend package and API versions are now 0.2.0.
+declarations. Phase 2 introduced version 0.2.0; Phase 3 is version 0.3.0.
 
 Planning settings are in `.env.example` and forwarded by Compose. Tokens/retries
 are bounded per model call; an overall timeout bounds the three-stage pipeline.
