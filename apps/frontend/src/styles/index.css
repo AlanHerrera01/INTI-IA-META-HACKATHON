@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./planning.css";
 :root {
   font-family: Inter, "Segoe UI", sans-serif;
   color: #f8fafc;

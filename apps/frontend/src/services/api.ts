@@ -6,7 +6,7 @@ import type {
   VisionAnalysis,
 } from "../types/api";
 
-const client = axios.create({ baseURL: "/api/v1", timeout: 70000 });
+export const client = axios.create({ baseURL: "/api/v1", timeout: 70000 });
 export const api = {
   system: async () => (await client.get<SystemStatus>("/system/status")).data,
   model: async () => (await client.get<ModelStatus>("/models/status")).data,

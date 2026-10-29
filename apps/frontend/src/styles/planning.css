@@ -1,0 +1,463 @@
+.planning-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(290px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.planning-main,
+.planning-aside {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+.planning-only {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font: 10px monospace;
+  letter-spacing: 1px;
+  color: #f6b649;
+  border: 1px solid #f59e0b44;
+  padding: 9px 12px;
+  border-radius: 5px;
+}
+.planning-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+.task-input label {
+  display: block;
+  font-size: 11px;
+  color: #b8c8dc;
+  margin: 20px 0 8px;
+}
+.task-input textarea,
+.task-input select {
+  display: block;
+  width: 100%;
+  background: #0a1321;
+  color: #d5dfed;
+  border: 1px solid #2b3b50;
+  padding: 12px;
+  border-radius: 6px;
+  font:
+    12px/1.7 "Segoe UI",
+    sans-serif;
+}
+.task-input select {
+  min-height: 44px;
+  max-width: 100%;
+}
+.task-input textarea {
+  min-height: 95px;
+  resize: vertical;
+}
+.task-input #planning-constraints {
+  min-height: 66px;
+}
+.planning-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.planning-warning {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #e8c28b;
+  background: #f59e0b09;
+  border: 1px solid #f59e0b30;
+  padding: 12px;
+  margin-top: 17px;
+  border-radius: 6px;
+}
+.planning-warning h3 {
+  font-size: 13px;
+}
+.planning-warning ul,
+.timeline-body ul,
+.inspector-group ul {
+  list-style: disc;
+  padding-left: 18px;
+}
+.planning-empty {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 25px;
+  gap: 14px;
+  color: #6fc1d1;
+}
+.planning-empty p {
+  font-size: 12px;
+  color: #94a3b8;
+  max-width: 360px;
+}
+.planning-empty .mono {
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+.scene-image {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #294058;
+  border-radius: 6px;
+}
+.scene-image > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.element-overlay {
+  position: absolute;
+  border: 1px solid #06b6d4;
+  background: #06b6d417;
+  min-height: 0;
+  min-width: 0;
+  border-radius: 2px;
+  padding: 0;
+}
+.element-overlay span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font: 8px monospace;
+  color: #fff;
+  background: #066c82;
+  padding: 1px 3px;
+  max-width: 100%;
+  overflow: hidden;
+}
+.element-overlay:hover,
+.element-overlay.selected {
+  border-color: #f59e0b;
+  background: #f59e0b20;
+  z-index: 2;
+}
+.element-list {
+  display: grid;
+  gap: 8px;
+  max-height: 330px;
+  overflow: auto;
+  margin-top: 15px;
+}
+.element-list > button {
+  text-align: left;
+  border: 1px solid #24354a;
+  border-radius: 5px;
+  background: #111e30;
+  padding: 12px;
+  color: #dae6f2;
+  width: 100%;
+}
+.element-list > button.selected {
+  border-color: #06b6d4;
+}
+.element-list > button > div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.element-list p {
+  font-size: 11px;
+  line-height: 1.7;
+  color: #94a3b8;
+  margin: 8px 0;
+}
+.provenance {
+  display: inline-block;
+  font: 9px monospace;
+  color: #6ed3e1;
+}
+.element-list .hint {
+  font-size: 9px;
+}
+.plan-status {
+  font: 9px/1.7 monospace;
+  letter-spacing: 0.3px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  display: inline-block;
+  background: #243449;
+  color: #b6c7d9;
+}
+.plan-status.valid {
+  color: #6be6a1;
+  background: #22c55e14;
+}
+.plan-status.requires_clarification,
+.plan-status.expired {
+  color: #efbd78;
+  background: #f59e0b15;
+}
+.plan-status.rejected {
+  color: #fda4af;
+  background: #f43f5e15;
+}
+.plan-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 25px 0;
+}
+.plan-timeline > li {
+  display: flex;
+  gap: 15px;
+  padding-bottom: 25px;
+  position: relative;
+}
+.timeline-number {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid #176078;
+  color: #4ccbe1;
+  background: #102738;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font: 10px monospace;
+  z-index: 1;
+}
+.plan-timeline > li:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 30px;
+  bottom: 0;
+  left: 14px;
+  width: 1px;
+  background: #2b3b50;
+}
+.timeline-body {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #23364d;
+  border-radius: 7px;
+  padding: 15px;
+  background: #101d2e;
+  font-size: 12px;
+  color: #c2d3e5;
+}
+.timeline-body h3 {
+  text-transform: capitalize;
+  font-size: 14px;
+}
+.timeline-body > p {
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+.timeline-body h4 {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: #879fb9;
+  margin: 14px 0 5px;
+  text-transform: uppercase;
+}
+.timeline-body li {
+  font-size: 11px;
+  line-height: 1.8;
+}
+.risk {
+  font: 9px monospace;
+  padding: 3px 6px;
+  border-radius: 3px;
+  background: #22c55e15;
+  color: #71dca1;
+}
+.risk-medium {
+  background: #06b6d41a;
+  color: #67cfe0;
+}
+.risk-high {
+  background: #f59e0b1a;
+  color: #f6bd6c;
+}
+.risk-prohibited {
+  background: #f43f5e1a;
+  color: #fda4af;
+}
+.checkpoint {
+  display: block;
+  color: #edbd77;
+  font-size: 10px;
+  margin-top: 8px;
+}
+.step-validation {
+  font-size: 10px;
+  border-top: 1px solid #293a50;
+  padding-top: 12px;
+  margin-top: 14px;
+  line-height: 1.8;
+}
+.finding-error {
+  color: #fda4af;
+}
+.finding-warning {
+  color: #e5bd82;
+}
+.planning-safety {
+  color: #86a9bf;
+  border-top: 1px solid #293b51;
+  padding-top: 18px;
+  font-size: 11px;
+}
+.parameter-list {
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+  font: 10px/1.8 monospace;
+}
+.parameter-list span {
+  color: #839ab3;
+}
+.plan-history > button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: #cbdcec;
+  background: #101d2e;
+  border: 1px solid #2a3c52;
+  border-radius: 6px;
+  margin-top: 12px;
+  padding: 13px;
+}
+.plan-history > button.selected {
+  border-color: #06b6d4;
+}
+.plan-history b {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  overflow-wrap: anywhere;
+}
+.plan-history time {
+  display: block;
+  font-size: 9px;
+  color: #8297af;
+  margin-top: 8px;
+}
+.history-pagination {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+.history-pagination .button {
+  font-size: 10px;
+  padding: 7px 10px;
+  min-height: 32px;
+}
+.planning-metadata dd {
+  max-width: 65%;
+}
+.usage-row {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid #25354b;
+  color: #8fa9c2;
+  overflow-wrap: anywhere;
+}
+.usage-row b {
+  color: #d4e1ef;
+  font-weight: 500;
+}
+.inspector-group {
+  margin-top: 18px;
+}
+.inspector-group h3 {
+  font-size: 12px;
+  color: #c7d7e6;
+}
+.inspector-group li {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.8;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+}
+.planning-trace > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  font-size: 10px;
+  border-bottom: 1px solid #25354b;
+  padding: 11px 0;
+  color: #a7c2d8;
+}
+.planning-trace .hint {
+  margin: 0;
+}
+.revalidate-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.revalidate-row .hint {
+  margin: 0;
+  flex: 1;
+  min-width: 160px;
+}
+@media (max-width: 1200px) {
+  .planning-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .planning-aside {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .planning-aside > .plan-history {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 760px) {
+  .planning-aside {
+    grid-template-columns: 1fr;
+  }
+  .planning-section-title {
+    flex-wrap: wrap;
+  }
+  .planning-layout {
+    gap: 18px;
+  }
+  .planning-main,
+  .planning-aside {
+    gap: 18px;
+  }
+  .task-input,
+  .scene-panel {
+    padding: 17px;
+  }
+  .timeline-body {
+    padding: 12px;
+  }
+  .plan-timeline > li {
+    gap: 10px;
+  }
+  .timeline-number {
+    width: 25px;
+    height: 25px;
+  }
+  .plan-timeline > li:not(:last-child)::before {
+    left: 12px;
+    top: 25px;
+  }
+  .task-input select {
+    font-size: 10px;
+  }
+  nav {
+    flex-wrap: wrap;
+  }
+  nav a {
+    flex: 1 1 40%;
+  }
+}

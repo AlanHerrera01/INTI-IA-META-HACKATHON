@@ -5,11 +5,13 @@ import {
   LayoutDashboard,
   Mountain,
   Sun,
+  BrainCircuit,
 } from "lucide-react";
 import { NavLink, Route, Routes, Link } from "react-router-dom";
 import { Dashboard } from "../pages/Dashboard";
 import { SystemPage } from "../pages/SystemPage";
 import { ObservationPage } from "../pages/ObservationPage";
+import { PlanningPage } from "../pages/PlanningPage";
 
 export function App() {
   return (
@@ -38,11 +40,15 @@ export function App() {
             <Activity size={18} />
             System status
           </NavLink>
+          <NavLink to="/planning">
+            <BrainCircuit size={18} />
+            AI Planning
+          </NavLink>
         </nav>
         <div className="sidebar-bottom">
           <div className="phase-card">
-            <span className="phase-badge">PHASE 01</span>
-            <h3>Foundation & core</h3>
+            <span className="phase-badge">PHASE 02</span>
+            <h3>Visual reasoning & planning</h3>
             <p>
               The first step toward
               <br />
@@ -76,6 +82,7 @@ export function App() {
             />
             <Route path="/observations/:id" element={<ObservationPage />} />
             <Route path="/system" element={<SystemPage />} />
+            <Route path="/planning" element={<PlanningPage />} />
             <Route
               path="*"
               element={
