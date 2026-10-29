@@ -241,7 +241,8 @@ a durable job queue and production deployment remain outside scope.
 Metadata persists; artifacts must be backed up together with the database.
 Screenshots are limited to 1920 × 1080 and 5 MB. History returns the latest 20
 records by default, up to 100. Meta access and hackathon eligibility must be verified
-against the organizer/account before submission. No benchmark result is implied.
+against the organizer/account before submission. Local deterministic benchmarks
+do not establish live-model performance.
 
 Phase 6 prerequisites: evaluate real Meta recovery quality, add explicit criterion
 authoring for additional applications, distributed ownership, artifact retention

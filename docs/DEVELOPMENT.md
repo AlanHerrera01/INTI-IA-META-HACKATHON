@@ -1,6 +1,7 @@
 # Development
 
-Current version: 0.5.0, authorized sandbox execution. Existing observation/planning
+Current version: 0.5.0, authorized execution, bounded recovery and verification.
+Existing observation/planning
 setup remains valid. Execution is disabled until its capability tokens are configured.
 
 ## Phase 3 on Windows and Docker Desktop
@@ -271,9 +272,11 @@ bundle is removed and is not installed as runtime trust. Never disable TLS check
 ### Workspace acceptance
 
 `python scripts/verify_verification_workspace.py` inspects an existing terminal
-execution, creates idempotent fresh read-only verification, checks protected routes,
+execution, creates or joins an idempotent read-only verification, checks protected routes,
 opens the real UI and saves local screenshots/summary under ignored `artifacts/phase5`.
-It reads the operator capability from ignored `.env` and never prints it. It never
+The stable acceptance key joins its historical record on later runs; use the UI's
+fresh-evidence control for a new collection. It reads the operator capability from
+ignored `.env` and never prints it. It never
 saves an application record. [Fault setup](FAULT-INJECTION.md),
 [verification design](VERIFICATION-ENGINE.md) and [evidence model](EVIDENCE-MODEL.md)
 explain trust/retention limitations.

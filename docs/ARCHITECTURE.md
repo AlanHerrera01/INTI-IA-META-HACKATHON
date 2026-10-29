@@ -75,8 +75,9 @@ The legacy observation adapter remains separate and continues using fresh contex
 Defaults: 30 actions, 180 seconds including pauses, 10 seconds/action, 5 MB/PNG,
 2 contexts, 3 navigations including initial load, 5-second evidence freshness and
 180-second session inactivity TTL. Application scheduling and worker caps are separate.
-Container memory/PID limits are shared by the whole worker. No durable queue,
-automatic recovery or automatic non-idempotent retry exists.
+Container memory/PID limits are shared by the whole worker. There is no durable
+queue or automatic non-idempotent retry. Phase 4 adds the bounded recovery path
+described below; the original Phase 3 coordinator stopped on action failure.
 
 Dependencies point inward: presentation → application → domain. Infrastructure
 implements domain ports. Domain imports only the Python standard library.

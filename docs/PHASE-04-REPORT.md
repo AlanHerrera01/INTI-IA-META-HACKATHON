@@ -72,6 +72,9 @@ requires exact repair digest approval and separate HIGH confirmation. Other reco
 IDs, external destinations, unsupported prefixes and weakened checks are rejected.
 Uncertain writes are not replayed; already-satisfied original checks advance
 without another mutation. Retry cannot extend the original deadline.
+Modal dismissal must prove the same dialog visible before and hidden after;
+declaring a modal strategy alone is insufficient. The final guard passed 31
+affected local tests and the hosted CI linked in the Phase 5 report.
 
 ## 10. Frontend functionality
 

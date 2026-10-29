@@ -20,6 +20,11 @@
     "recovery_rest": {
       "passed": 1,
       "seconds": 8.58
+    },
+    "modal_proof_and_recovery_faults": {
+      "passed": 31,
+      "seconds": 46.53,
+      "note": "Overlaps earlier runs; includes one added modal proof unit test."
     }
   },
   "frontend": {
@@ -156,10 +161,14 @@
   "in_app_browser": "Unavailable: sandbox metadata missing; project Playwright used",
   "private_screenshots": "artifacts/phase5 (ignored; visually inspected desktop/mobile)",
   "hosted_ci": {
-    "run_id": 40958245154,
-    "url": "https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON/actions/runs/40958245154",
-    "code_commit": "cca1982",
-    "status": "QUEUED"
+    "run_id": 40959344298,
+    "url": "https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON/actions/runs/40959344298",
+    "code_commit": "f37930554d1c73fa01e526fe41c75fd773fb2206",
+    "status": "SUCCESS",
+    "backend": "SUCCESS",
+    "frontend": "SUCCESS",
+    "backend_selected_tests": 217,
+    "e2e_deselected": 5
   },
   "live_regression": {
     "passed": 4,

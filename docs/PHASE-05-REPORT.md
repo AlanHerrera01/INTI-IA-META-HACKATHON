@@ -151,6 +151,11 @@ were healthy on migration 0005. Actual container inspection confirmed read-only
 root/application mount and no published evidence-service port.
 Live regression against Chromium, the running API and an isolated PostgreSQL schema
 also passed four tests; the explicitly billable Meta test remained skipped.
+Final hosted [CI run 40959344298](https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON/actions/runs/40959344298)
+passed backend and frontend on commit `f379305`. The final backend collection has
+217 selected checks and five opt-in E2E checks excluded; frontend has 26 passing
+tests. This includes the final typed-modal-proof guard and its 31 affected local
+regressions. Earlier overlapping targeted runs are not added to those counts.
 
 The historical Phase 3 execution `4e0b42de-88df-4b19-8fa1-04ef2ef57d43` remained
 intact. Independent verification `d975a975-7cc3-460e-9fef-217862ce64b9` produced
