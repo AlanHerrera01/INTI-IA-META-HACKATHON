@@ -28,6 +28,7 @@ class Observation:
     timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     source: ObservationSource = ObservationSource.BROWSER
     analysis: VisionAnalysis | None = None
+    restricted: bool = False
 
     def __post_init__(self) -> None:
         if not self.source_url.startswith(("http://", "https://")):

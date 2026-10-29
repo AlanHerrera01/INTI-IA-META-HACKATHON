@@ -1,10 +1,13 @@
 from dataclasses import dataclass
 
+from inti.application.execution import ExecutionOrchestrator
 from inti.application.planning import (
     GenerateActionPlanUseCase,
     InterpretTaskIntentUseCase,
     InterpretVisualSceneUseCase,
 )
+from inti.domain.execution import ExecutionLimits
+from inti.domain.execution_policy import ExecutionPolicy
 from inti.domain.planning_policy import PlanningPolicy
 from inti.domain.planning_ports import PlanRepositoryPort, PlanValidationPort
 from inti.domain.ports import (
@@ -14,11 +17,13 @@ from inti.domain.ports import (
     VisionModelPort,
 )
 from inti.infrastructure.browser import PlaywrightBrowserAdapter
+from inti.infrastructure.browser.remote import RemoteBrowserWorker
 from inti.infrastructure.config import ConfigurationProvider
 from inti.infrastructure.grounding import VisualGroundingAdapter
 from inti.infrastructure.meta import MetaModelAPIAdapter
 from inti.infrastructure.meta.planning import MetaPlanningAdapter, MetaVisualReasoningAdapter
 from inti.infrastructure.persistence import SQLAlchemyObservationRepository
+from inti.infrastructure.persistence.execution import SQLAlchemyExecutionRepository
 from inti.infrastructure.persistence.planning import (
     PlanningTelemetryAdapter,
     SQLAlchemyPlanRepository,
@@ -34,6 +39,7 @@ class Services:
     browser: BrowserObservationPort
     model: VisionModelPort
     planning: "PlanningServices | None" = None
+    execution: ExecutionOrchestrator | None = None
 
 
 @dataclass
@@ -77,6 +83,28 @@ def build_services(settings: ConfigurationProvider) -> Services:
             settings.planning_timeout_seconds,
         ),
     )
+    execution = None
+    if settings.execution_enabled:
+        worker = RemoteBrowserWorker(settings)
+        limits = ExecutionLimits(
+            settings.execution_max_actions,
+            settings.execution_max_duration_seconds,
+            settings.execution_action_timeout_seconds,
+            settings.execution_max_navigation_count,
+        )
+        execution = ExecutionOrchestrator(
+            SQLAlchemyExecutionRepository(repository.engine),
+            plans,
+            repository,
+            storage,
+            worker,
+            worker,
+            ExecutionPolicy(
+                policy, tuple(settings.browser_allowed_urls), limits, settings.planning_ttl_seconds
+            ),
+            MetaVisualReasoningAdapter(meta, storage, settings),
+            settings.execution_max_concurrent_sessions,
+        )
     return Services(
         settings,
         repository,
@@ -84,4 +112,5 @@ def build_services(settings: ConfigurationProvider) -> Services:
         PlaywrightBrowserAdapter(settings, storage),
         meta,
         planning,
+        execution,
     )

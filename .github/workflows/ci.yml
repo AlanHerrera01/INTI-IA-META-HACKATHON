@@ -1,4 +1,4 @@
-name: Phase 1 checks
+name: INTI checks
 on: [push, pull_request]
 permissions:
   contents: read
@@ -11,6 +11,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -e 'apps/backend[dev]'
+      - run: playwright install --with-deps chromium
       - run: ruff check apps/backend scripts
       - run: ruff format --check apps/backend scripts
       - run: mypy

@@ -6,10 +6,7 @@
 <header><b>◈ INTI / Inventory</b><span>Authorized local sandbox</span></header>
 <main><small>OPERATIONS / EQUIPMENT</small><h1>Equipment inventory</h1><p>Review and update your workspace equipment.</p>
 <div class="toolbar"><input id="search" aria-label="Search equipment" placeholder="Search equipment or asset ID…"><button id="save">Save changes</button></div>
-<table><thead><tr><th>ASSET ID</th><th>EQUIPMENT</th><th>LOCATION</th><th>STATUS</th></tr></thead><tbody id="records"></tbody></table>
-<p id="notice" role="status"></p><p class="note">Synthetic demo data · Changes remain in this browser session only.</p></main>
-<script>
-const items=[{id:'EQ-001',name:'Andes Workstation',location:'Quito Lab',status:'Available'},{id:'EQ-002',name:'Solar Camera',location:'Cuenca Lab',status:'In use'},{id:'EQ-003',name:'Field Sensor Kit',location:'Loja Lab',status:'Maintenance'},{id:'EQ-004',name:'Network Switch',location:'Quito Lab',status:'Available'}];
-function render(){const rows=document.querySelector('#records');rows.replaceChildren();const query=document.querySelector('#search').value.toLowerCase();items.filter(x=>(x.id+' '+x.name).toLowerCase().includes(query)).forEach(x=>{const row=document.createElement('tr');const id=document.createElement('td');id.textContent=x.id;row.append(id);for(const field of ['name','location']){const td=document.createElement('td');const input=document.createElement('input');input.value=x[field];input.setAttribute('aria-label',x.id+' '+field);input.oninput=()=>x[field]=input.value;td.append(input);row.append(td)}const td=document.createElement('td');const select=document.createElement('select');select.setAttribute('aria-label',x.id+' status');for(const value of ['Available','In use','Maintenance']){const option=document.createElement('option');option.textContent=value;option.selected=x.status===value;select.append(option)}select.onchange=()=>x.status=select.value;td.append(select);row.append(td);rows.append(row)});}
-document.querySelector('#search').oninput=render;document.querySelector('#save').onclick=()=>{document.querySelector('#notice').textContent='Changes saved in this session.'};render();
-</script></body></html>
+<table aria-label="Equipment inventory"><thead><tr><th>ASSET ID</th><th>EQUIPMENT</th><th>LOCATION</th><th>STATUS</th></tr></thead><tbody id="records"></tbody></table>
+<p id="notice" role="status"></p><p class="note">Synthetic demo data · Changes persist in the sandbox SQLite store.</p></main>
+<dialog id="asset-dialog" aria-label="Asset record" style="border:1px solid #cad5df;border-radius:12px;padding:30px;min-width:340px"><h2 id="asset-heading"></h2><p id="asset-summary"></p><label id="status-label" for="record-status">Status</label><select id="record-status" style="display:block;margin:15px 0"></select><button id="record-save">Save</button> <button id="record-close">Close record</button></dialog>
+<script src="inventory.js"></script></body></html>

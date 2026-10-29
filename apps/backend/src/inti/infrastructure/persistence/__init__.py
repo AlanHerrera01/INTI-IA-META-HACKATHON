@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import JSON, DateTime, Integer, String, create_engine, select, text
+from sqlalchemy import JSON, Boolean, DateTime, Integer, String, create_engine, select, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
@@ -27,6 +27,7 @@ class ObservationRecord(Base):
     artifact_path: Mapped[str] = mapped_column(String(40))
     analysis_status: Mapped[str] = mapped_column(String(20), default="not_analyzed")
     analysis: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    restricted: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
 
 class SQLAlchemyObservationRepository:
@@ -47,6 +48,7 @@ class SQLAlchemyObservationRepository:
                         artifact_path=f"{observation.id}.png",
                         analysis_status="completed" if observation.analysis else "not_analyzed",
                         analysis=asdict(observation.analysis) if observation.analysis else None,
+                        restricted=observation.restricted,
                     )
                 )
         except SQLAlchemyError as exc:
@@ -76,6 +78,7 @@ class SQLAlchemyObservationRepository:
             )
             if analysis
             else None,
+            restricted=record.restricted,
         )
 
     def _get(self, id: UUID) -> Observation | None:
@@ -94,6 +97,7 @@ class SQLAlchemyObservationRepository:
             with Session(self.engine) as session:
                 records = session.scalars(
                     select(ObservationRecord)
+                    .where(ObservationRecord.restricted.is_(False))
                     .order_by(ObservationRecord.timestamp.desc())
                     .limit(limit)
                 )

@@ -14,6 +14,7 @@ artifacts/
 *.db
 *.egg-info/
 .local/
+.tmp/
 test-results/
 *.tsbuildinfo
 pytest-cache-files-*/

@@ -11,6 +11,7 @@ from inti.application.use_cases import (
 )
 from inti.domain.exceptions import NotFoundError
 from inti.presentation.dependencies import Services
+from inti.presentation.execution_auth import require_operator
 from inti.presentation.schemas import (
     AnalysisResponse,
     AnalyzeRequest,
@@ -60,17 +61,22 @@ async def list_observations(
 
 
 @router.get("/observations/{id}")
-async def get_observation(id: UUID, svc: Container) -> ObservationResponse:
+async def get_observation(id: UUID, svc: Container, request: Request) -> ObservationResponse:
     observation = await svc.repository.get(id)
     if observation is None:
         raise NotFoundError("Observation not found")
+    if observation.restricted:
+        require_operator(svc.settings, request.headers.get("Authorization"))
     return ObservationResponse.from_entity(observation)
 
 
 @router.get("/observations/{id}/screenshot")
-async def screenshot(id: UUID, svc: Container) -> Response:
-    if await svc.repository.get(id) is None:
+async def screenshot(id: UUID, svc: Container, request: Request) -> Response:
+    observation = await svc.repository.get(id)
+    if observation is None:
         raise NotFoundError("Observation not found")
+    if observation.restricted:
+        require_operator(svc.settings, request.headers.get("Authorization"))
     return Response(
         await svc.storage.read(id),
         media_type="image/png",
@@ -79,7 +85,12 @@ async def screenshot(id: UUID, svc: Container) -> Response:
 
 
 @router.post("/observations/{id}/analyze")
-async def analyze(id: UUID, payload: AnalyzeRequest, svc: Container) -> AnalysisResponse:
+async def analyze(
+    id: UUID, payload: AnalyzeRequest, svc: Container, request: Request
+) -> AnalysisResponse:
+    observation = await svc.repository.get(id)
+    if observation and observation.restricted:
+        require_operator(svc.settings, request.headers.get("Authorization"))
     result = await AnalyzeObservationUseCase(svc.model, svc.repository).execute(
         id, payload.instruction
     )

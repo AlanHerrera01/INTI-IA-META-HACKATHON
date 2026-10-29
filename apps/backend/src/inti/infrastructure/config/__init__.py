@@ -28,6 +28,25 @@ class ConfigurationProvider(BaseSettings):
     planning_ttl_seconds: int = Field(default=900, ge=60, le=86400)
     planning_min_confidence: float = Field(default=0.6, ge=0, le=1)
     meta_max_response_bytes: int = Field(default=262144, ge=1024, le=1_000_000)
+    execution_enabled: bool = False
+    execution_operator_token: SecretStr = SecretStr("")
+    execution_operator_name: str = "local-operator"
+    browser_worker_url: str = "http://127.0.0.1:8010"
+    browser_worker_token: SecretStr = SecretStr("")
+    execution_max_actions: int = Field(default=30, ge=1, le=50)
+    execution_max_duration_seconds: float = Field(default=180, ge=1, le=600)
+    execution_action_timeout_seconds: float = Field(default=10, ge=0.1, le=60)
+    execution_max_concurrent_sessions: int = Field(default=2, ge=1, le=4)
+    execution_max_navigation_count: int = Field(default=3, ge=1, le=10)
+    execution_observation_max_age_seconds: float = Field(default=5, ge=1, le=30)
+    browser_session_ttl_seconds: float = Field(default=180, ge=2, le=600)
+
+    @field_validator("execution_operator_token", "browser_worker_token")
+    @classmethod
+    def execution_secret_length(cls, value: SecretStr) -> SecretStr:
+        if value.get_secret_value() and len(value.get_secret_value()) < 24:
+            raise ValueError("Execution capability tokens need at least 24 characters")
+        return value
 
     @field_validator("browser_allowed_urls")
     @classmethod

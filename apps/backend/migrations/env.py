@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, pool
 from inti.infrastructure.config import ConfigurationProvider
 from inti.infrastructure.persistence import (
     Base,
+    execution,  # noqa: F401
     planning,  # noqa: F401
 )
 

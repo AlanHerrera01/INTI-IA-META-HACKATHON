@@ -15,6 +15,8 @@ services:
       retries: 20
   demo:
     build: ./apps/demo-app
+    volumes: ["demo-data:/app/data"]
+    networks: [default, browser-sandbox]
     ports: ["127.0.0.1:8001:8001"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/')"]
@@ -40,14 +42,55 @@ services:
       PLANNING_TTL_SECONDS: ${PLANNING_TTL_SECONDS:-900}
       PLANNING_MIN_CONFIDENCE: ${PLANNING_MIN_CONFIDENCE:-0.6}
       META_MAX_RESPONSE_BYTES: ${META_MAX_RESPONSE_BYTES:-262144}
+      EXECUTION_ENABLED: ${EXECUTION_ENABLED:-false}
+      EXECUTION_OPERATOR_TOKEN: ${EXECUTION_OPERATOR_TOKEN:-}
+      BROWSER_WORKER_TOKEN: ${BROWSER_WORKER_TOKEN:-}
+      BROWSER_WORKER_URL: http://browser-worker:8010
+      EXECUTION_MAX_ACTIONS: ${EXECUTION_MAX_ACTIONS:-30}
+      EXECUTION_MAX_DURATION_SECONDS: ${EXECUTION_MAX_DURATION_SECONDS:-180}
+      EXECUTION_ACTION_TIMEOUT_SECONDS: ${EXECUTION_ACTION_TIMEOUT_SECONDS:-10}
+      EXECUTION_MAX_CONCURRENT_SESSIONS: ${EXECUTION_MAX_CONCURRENT_SESSIONS:-2}
+      EXECUTION_MAX_NAVIGATION_COUNT: ${EXECUTION_MAX_NAVIGATION_COUNT:-3}
+      MAX_ARTIFACT_BYTES: ${MAX_ARTIFACT_BYTES:-5000000}
+    networks: [default, browser-sandbox]
     ports: ["127.0.0.1:8000:8000"]
     volumes: ["artifacts:/app/artifacts"]
     shm_size: 256mb
     depends_on:
       postgres: {condition: service_healthy}
       demo: {condition: service_healthy}
+      browser-worker: {condition: service_healthy}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+  browser-worker:
+    build: ./apps/backend
+    command: ["uvicorn", "inti.worker:app", "--host", "0.0.0.0", "--port", "8010"]
+    environment:
+      BROWSER_ALLOWED_URLS: '["http://demo:8001/"]'
+      BROWSER_WORKER_TOKEN: ${BROWSER_WORKER_TOKEN:-}
+      EXECUTION_MAX_ACTIONS: ${EXECUTION_MAX_ACTIONS:-30}
+      EXECUTION_MAX_DURATION_SECONDS: ${EXECUTION_MAX_DURATION_SECONDS:-180}
+      EXECUTION_ACTION_TIMEOUT_SECONDS: ${EXECUTION_ACTION_TIMEOUT_SECONDS:-10}
+      EXECUTION_MAX_CONCURRENT_SESSIONS: ${EXECUTION_MAX_CONCURRENT_SESSIONS:-2}
+      EXECUTION_MAX_NAVIGATION_COUNT: ${EXECUTION_MAX_NAVIGATION_COUNT:-3}
+      EXECUTION_OBSERVATION_MAX_AGE_SECONDS: ${EXECUTION_OBSERVATION_MAX_AGE_SECONDS:-5}
+      BROWSER_SESSION_TTL_SECONDS: ${BROWSER_SESSION_TTL_SECONDS:-180}
+      MAX_ARTIFACT_BYTES: ${MAX_ARTIFACT_BYTES:-5000000}
+    networks: [browser-sandbox]
+    read_only: true
+    tmpfs: ["/tmp:size=268435456,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 768m
+    pids_limit: 256
+    shm_size: 256mb
+    depends_on:
+      demo: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8010/health')"]
       interval: 10s
       timeout: 3s
       retries: 15
@@ -64,3 +107,7 @@ services:
 volumes:
   postgres-data:
   artifacts:
+  demo-data:
+networks:
+  browser-sandbox:
+    internal: true

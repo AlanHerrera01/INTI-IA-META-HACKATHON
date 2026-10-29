@@ -5,7 +5,7 @@ from inti.domain.entities import VisionAnalysis
 
 
 def test_health_and_status(client) -> None:
-    assert client.get("/api/v1/health").json() == {"status": "ok", "version": "0.2.0"}
+    assert client.get("/api/v1/health").json() == {"status": "ok", "version": "0.3.0"}
     assert client.get("/api/v1/system/status").json()["ready"] is True
     model = client.get("/api/v1/models/status").json()
     assert model["configured"] is False

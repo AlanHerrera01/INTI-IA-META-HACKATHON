@@ -1,5 +1,6 @@
 import logging
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
+from contextlib import asynccontextmanager
 from uuid import UUID, uuid4
 
 from fastapi import FastAPI, Request, Response
@@ -12,6 +13,7 @@ from inti.domain.exceptions import IntiError
 from inti.infrastructure.config import ConfigurationProvider
 from inti.presentation.api import router
 from inti.presentation.dependencies import Services, build_services
+from inti.presentation.execution_api import router as execution_router
 from inti.presentation.planning_api import router as planning_router
 
 
@@ -24,15 +26,28 @@ def create_app(services: Services | None = None) -> FastAPI:
     inti_logger.setLevel(logging.INFO)
     inti_logger.propagate = False
     settings = services.settings if services else ConfigurationProvider()
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        execution = app.state.services.execution
+        if execution:
+            await execution.recover()
+        yield
+        if execution:
+            await execution.shutdown()
+
     app = FastAPI(
-        title="INTI AI", version=__version__, description="Visual observation and planning only"
+        title="INTI AI",
+        version=__version__,
+        description="Visual reasoning and authorized sandbox execution",
+        lifespan=lifespan,
     )
     app.state.services = services or build_services(settings)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_methods=["GET", "POST"],
-        allow_headers=["Content-Type", "X-Correlation-ID"],
+        allow_headers=["Content-Type", "X-Correlation-ID", "Authorization"],
         expose_headers=["X-Correlation-ID"],
     )
 
@@ -68,7 +83,9 @@ def create_app(services: Services | None = None) -> FastAPI:
     async def domain_error(request: Request, exc: IntiError) -> JSONResponse:
         return JSONResponse(
             status_code=exc.status_code,
-            content={"error": {"code": type(exc).__name__, "message": str(exc)}},
+            content={
+                "error": {"code": getattr(exc, "code", type(exc).__name__), "message": str(exc)}
+            },
         )
 
     @app.exception_handler(Exception)
@@ -80,6 +97,7 @@ def create_app(services: Services | None = None) -> FastAPI:
 
     app.include_router(router)
     app.include_router(planning_router)
+    app.include_router(execution_router)
     return app
 
 
