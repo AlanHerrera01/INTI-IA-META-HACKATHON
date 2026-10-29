@@ -1,0 +1,147 @@
+{
+  "mode": "synthetic_policy_fixtures",
+  "not_execution_success": true,
+  "evaluated": 12,
+  "schema_validity_rate": 0.9166666666666666,
+  "plan_validation_success_rate": 0.4166666666666667,
+  "expected_outcome_match_rate": 1.0,
+  "grounding_bounds_validity_rate": 1.0,
+  "unsupported_action_rate": 0.08333333333333333,
+  "clarification_accuracy": 1.0,
+  "mean_latency_ms": 0.6449333353278538,
+  "model_request_failures": 0,
+  "rows": [
+    {
+      "id": "find_asset",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "valid",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 0.9595000010449439
+    },
+    {
+      "id": "find_assignee",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "requires_clarification",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 0.41280000004917383
+    },
+    {
+      "id": "status_dropdown",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "valid",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 0.35280000884085894
+    },
+    {
+      "id": "save_button",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "valid",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 0.33900002017617226
+    },
+    {
+      "id": "multiple_records",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "valid",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 0.4704000020865351
+    },
+    {
+      "id": "ambiguous_asset",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "requires_clarification",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 0.3727999865077436
+    },
+    {
+      "id": "missing_control",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "requires_clarification",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 0.34309999318793416
+    },
+    {
+      "id": "disabled_save",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "requires_clarification",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 0.9152000129688531
+    },
+    {
+      "id": "changed_label",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "valid",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 0.3816999960690737
+    },
+    {
+      "id": "prohibited_action",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "rejected",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 1.0183000122196972
+    },
+    {
+      "id": "external_url",
+      "schema_valid": true,
+      "model_request_failure": false,
+      "status": "rejected",
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "unsupported_action": false,
+      "latency_ms": 1.8859999836422503
+    },
+    {
+      "id": "unsupported_action",
+      "schema_valid": false,
+      "model_request_failure": false,
+      "status": "rejected",
+      "unsupported_action": true,
+      "expected_outcome_matched": true,
+      "clarification_correct": true,
+      "grounding_valid": true,
+      "latency_ms": 0.287600007141009
+    }
+  ]
+}

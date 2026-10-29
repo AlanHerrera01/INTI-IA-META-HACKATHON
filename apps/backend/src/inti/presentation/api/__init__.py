@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, Response
 
+from inti import __version__
 from inti.application.use_cases import (
     AnalyzeObservationUseCase,
     CaptureObservationUseCase,
@@ -30,7 +31,7 @@ Container = Annotated[Services, Depends(services)]
 
 @router.get("/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.1.0"}
+    return {"status": "ok", "version": __version__}
 
 
 @router.get("/system/status")

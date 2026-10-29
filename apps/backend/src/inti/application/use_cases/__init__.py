@@ -1,6 +1,7 @@
 from dataclasses import replace
 from uuid import UUID
 
+from inti import __version__
 from inti.domain.entities import Observation, VisionAnalysis
 from inti.domain.exceptions import NotFoundError
 from inti.domain.ports import (
@@ -57,5 +58,5 @@ class GetSystemStatusUseCase:
             "database": database,
             "browser": browser,
             "ready": database and browser,
-            "version": "0.1.0",
+            "version": __version__,
         }

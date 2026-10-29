@@ -21,6 +21,13 @@ class ConfigurationProvider(BaseSettings):
     meta_request_timeout_seconds: float = Field(default=60, ge=1, le=120)
     browser_timeout_ms: int = Field(default=15000, ge=1000, le=60000)
     max_artifact_bytes: int = Field(default=5_000_000, ge=1000, le=10_000_000)
+    planning_max_steps: int = Field(default=20, ge=1, le=50)
+    planning_max_retries: int = Field(default=2, ge=0, le=3)
+    planning_max_tokens: int = Field(default=4096, ge=512, le=16384)
+    planning_timeout_seconds: float = Field(default=120, ge=1, le=240)
+    planning_ttl_seconds: int = Field(default=900, ge=60, le=86400)
+    planning_min_confidence: float = Field(default=0.6, ge=0, le=1)
+    meta_max_response_bytes: int = Field(default=262144, ge=1024, le=1_000_000)
 
     @field_validator("browser_allowed_urls")
     @classmethod

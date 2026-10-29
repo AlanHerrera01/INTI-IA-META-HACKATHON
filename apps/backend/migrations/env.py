@@ -2,7 +2,10 @@ from alembic import context
 from sqlalchemy import create_engine, pool
 
 from inti.infrastructure.config import ConfigurationProvider
-from inti.infrastructure.persistence import Base
+from inti.infrastructure.persistence import (
+    Base,
+    planning,  # noqa: F401
+)
 
 config = context.config
 target_metadata = Base.metadata

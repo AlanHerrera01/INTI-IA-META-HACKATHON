@@ -11,11 +11,12 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -e 'apps/backend[dev]'
-      - run: ruff check apps/backend
-      - run: ruff format --check apps/backend
+      - run: ruff check apps/backend scripts
+      - run: ruff format --check apps/backend scripts
       - run: mypy
         working-directory: apps/backend
       - run: pytest apps/backend/tests -m 'not e2e' --cov=inti.domain --cov=inti.application --cov-fail-under=80
+      - run: python scripts/benchmark_planning.py --output /tmp/inti-policy.json
   frontend:
     runs-on: ubuntu-latest
     defaults:
