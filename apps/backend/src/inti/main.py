@@ -15,6 +15,8 @@ from inti.presentation.api import router
 from inti.presentation.dependencies import Services, build_services
 from inti.presentation.execution_api import router as execution_router
 from inti.presentation.planning_api import router as planning_router
+from inti.presentation.recovery_api import router as recovery_router
+from inti.presentation.verification_api import router as verification_router
 
 
 def create_app(services: Services | None = None) -> FastAPI:
@@ -32,9 +34,17 @@ def create_app(services: Services | None = None) -> FastAPI:
         execution = app.state.services.execution
         if execution:
             await execution.recover()
+        verification = app.state.services.verification
+        if verification:
+            await verification.recover_interrupted()
+        recovery = app.state.services.recovery
+        if recovery:
+            await recovery.recover_interrupted()
         yield
         if execution:
             await execution.shutdown()
+        if verification:
+            await verification.shutdown()
 
     app = FastAPI(
         title="INTI AI",
@@ -98,6 +108,8 @@ def create_app(services: Services | None = None) -> FastAPI:
     app.include_router(router)
     app.include_router(planning_router)
     app.include_router(execution_router)
+    app.include_router(verification_router)
+    app.include_router(recovery_router)
     return app
 
 

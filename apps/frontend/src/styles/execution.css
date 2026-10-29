@@ -153,8 +153,8 @@
   accent-color: #06b6d4;
 }
 .state-completed {
-  color: #22c55e;
-  border-color: #22c55e66;
+  color: #06b6d4;
+  border-color: #06b6d466;
 }
 .state-failed,
 .state-timed_out,

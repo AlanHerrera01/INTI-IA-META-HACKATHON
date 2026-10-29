@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict
 from inti.domain.entities import Observation
 from inti.domain.execution import (
     ActionDispatchOutcome,
+    BrowserCheck,
     BrowserSession,
     ExecutableAction,
     ExecutionError,
@@ -22,7 +23,9 @@ from inti.domain.execution import (
     TargetQuery,
 )
 from inti.domain.planning import Viewport, VisualElement
+from inti.domain.verification_ports import StateReadRequest
 from inti.infrastructure.browser.controller import BrowserSessionManager, PlaywrightActionExecutor
+from inti.infrastructure.browser.readonly import ReadOnlyBrowserAdapter
 from inti.infrastructure.config import ConfigurationProvider
 
 
@@ -51,6 +54,16 @@ class DispatchRequest(BaseModel):
 class CatalogRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     queries: list[TargetQuery]
+
+
+class ChecksRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    checks: list[BrowserCheck]
+    mode: GroundingMode
+
+
+class ReadOnlyPacket(ObservationPacket):
+    dom: dict[str, str | int | bool | None]
 
 
 def create_worker(settings: ConfigurationProvider | None = None) -> FastAPI:
@@ -115,6 +128,15 @@ def create_worker(settings: ConfigurationProvider | None = None) -> FastAPI:
             payload.execution_id, payload.url, payload.viewport, payload.limits
         )
 
+    @worker.post("/readonly-observation", dependencies=[Depends(authorize)])
+    async def readonly_observation(payload: StateReadRequest) -> ReadOnlyPacket:
+        result = await ReadOnlyBrowserAdapter(manager).capture_readonly(payload)
+        return ReadOnlyPacket(
+            observation=result.observation,
+            png_base64=base64.b64encode(result.png).decode(),
+            dom=result.dom,
+        )
+
     @worker.get("/sessions/{id}", dependencies=[Depends(authorize)])
     async def info(id: UUID) -> BrowserSession:
         return await manager.info(id)
@@ -138,6 +160,12 @@ def create_worker(settings: ConfigurationProvider | None = None) -> FastAPI:
     @worker.post("/sessions/{id}/catalog", dependencies=[Depends(authorize)])
     async def catalog(id: UUID, payload: CatalogRequest) -> tuple[VisualElement, ...]:
         return await manager.catalog(id, tuple(payload.queries))
+
+    @worker.post("/sessions/{id}/checks", dependencies=[Depends(authorize)])
+    async def check_state(id: UUID, payload: ChecksRequest) -> dict[str, bool]:
+        if not 1 <= len(payload.checks) <= 10:
+            raise ExecutionError("CHECK_LIMIT", "Bounded checks are required")
+        return {"satisfied": await manager.checks(id, tuple(payload.checks), payload.mode)}
 
     @worker.delete("/sessions/{id}", dependencies=[Depends(authorize)])
     async def close(id: UUID) -> Response:

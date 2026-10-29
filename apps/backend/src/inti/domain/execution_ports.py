@@ -4,6 +4,7 @@ from uuid import UUID
 from inti.domain.entities import Observation
 from inti.domain.execution import (
     ActionDispatchOutcome,
+    BrowserCheck,
     BrowserSession,
     ExecutableAction,
     ExecutionBundle,
@@ -32,6 +33,9 @@ class ExecutionRepositoryPort(Protocol):
 
 
 class BrowserSessionPort(Protocol):
+    async def checks(
+        self, id: UUID, checks: tuple[BrowserCheck, ...], mode: GroundingMode
+    ) -> bool: ...
     async def open(
         self, execution_id: UUID, url: str, viewport: Viewport, limits: ExecutionLimits
     ) -> BrowserSession: ...

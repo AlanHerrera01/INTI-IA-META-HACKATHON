@@ -35,6 +35,8 @@ from inti.domain.execution_ports import (
 from inti.domain.planning import RiskLevel
 from inti.domain.planning_ports import PlanRepositoryPort, VisualReasoningPort
 from inti.domain.ports import ArtifactStoragePort, ObservationRepositoryPort
+from inti.domain.recovery_ports import RecoveryPort
+from inti.domain.verification_ports import VerificationTriggerPort
 
 
 class ExecutionOrchestrator:
@@ -61,6 +63,8 @@ class ExecutionOrchestrator:
         self.locks: dict[UUID, asyncio.Lock] = {}
         self.start_lock = asyncio.Lock()
         self.max_concurrent = max_concurrent
+        self.recovery: RecoveryPort | None = None
+        self.verification: VerificationTriggerPort | None = None
 
     def _lock(self, id: UUID) -> asyncio.Lock:
         return self.locks.setdefault(id, asyncio.Lock())
@@ -213,6 +217,13 @@ class ExecutionOrchestrator:
             await self._current(bundle)
             if len(await self.repository.unfinished()) >= self.max_concurrent:
                 raise ExecutionError("SESSION_LIMIT", "Maximum concurrent executions reached")
+            if self.verification:
+                try:
+                    await self.verification.prepare(id)
+                except Exception:
+                    logging.getLogger("inti.execution").warning(
+                        "verification_criteria_preparation_failed"
+                    )
             updated = replace(bundle, session=bundle.session.transition(ExecutionStatus.RUNNING))
             await self._save(bundle, updated, ExecutionEvent(id, "execution_started"))
             self.tasks[id] = asyncio.create_task(self._run(id), name=f"inti-execution-{id}")
@@ -513,11 +524,70 @@ class ExecutionOrchestrator:
                             )
                         await self._save(current, updated, *events)
                     if outcome.error_code:
+                        if self.recovery:
+                            async with self._lock(id):
+                                current = await self.get(id)
+                                recovering = replace(
+                                    current,
+                                    session=current.session.transition(ExecutionStatus.RECOVERING),
+                                )
+                                await self._save(
+                                    current, recovering, ExecutionEvent(id, "execution_recovering")
+                                )
+                            recovered = await self.recovery.recover(recovering, index)
+                            if recovered.recovered:
+                                async with self._lock(id):
+                                    current = await self.get(id)
+                                    if current.session.status in TERMINAL:
+                                        break
+                                    resumed = replace(
+                                        current,
+                                        session=current.session.transition(
+                                            ExecutionStatus.RUNNING
+                                        ).change(
+                                            current_action_index=index + 1,
+                                            latest_observation_id=recovered.observation_id,
+                                        ),
+                                        results=tuple(
+                                            replace(
+                                                r,
+                                                status="SATISFIED",
+                                                postconditions_satisfied=True,
+                                                after_observation_id=recovered.observation_id,
+                                            )
+                                            if r.action_id == action.id
+                                            else r
+                                            for r in current.results
+                                        ),
+                                    )
+                                    await self._save(
+                                        current,
+                                        resumed,
+                                        ExecutionEvent(
+                                            id,
+                                            "execution_resumed",
+                                            payload={
+                                                "reason": "RECOVERY_CONFIRMED_IMMEDIATE_OUTCOME"
+                                            },
+                                        ),
+                                    )
+                                continue
+                            await self._finish(
+                                id,
+                                ExecutionStatus.CANCELLED
+                                if recovered.cancelled
+                                else ExecutionStatus.FAILED,
+                                recovered.error_code or "RECOVERY_FAILED",
+                                "Recovery stopped; original task was not resumed",
+                            )
+                            break
                         raise ExecutionError(
                             outcome.error_code, outcome.error_message or "Action failed"
                         )
         except asyncio.CancelledError:
-            pass
+            await self._finish(
+                id, ExecutionStatus.CANCELLED, "EXECUTION_INTERRUPTED", "Execution was interrupted"
+            )
         except TimeoutError:
             await self._finish(
                 id,
@@ -586,3 +656,10 @@ class ExecutionOrchestrator:
                 updated,
                 ExecutionEvent(id, event, payload={"code": code, "overall_goal_verified": False}),
             )
+        if status == ExecutionStatus.COMPLETED and self.verification:
+            try:
+                await self.verification.completed(id)
+            except Exception:
+                logging.getLogger("inti.execution").warning(
+                    "independent_verification_trigger_failed"
+                )

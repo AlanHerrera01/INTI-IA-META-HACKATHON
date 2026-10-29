@@ -10,6 +10,7 @@ from pydantic import TypeAdapter, ValidationError
 from inti.domain.entities import Observation
 from inti.domain.execution import (
     ActionDispatchOutcome,
+    BrowserCheck,
     BrowserSession,
     ExecutableAction,
     ExecutionError,
@@ -19,10 +20,25 @@ from inti.domain.execution import (
     TargetQuery,
 )
 from inti.domain.planning import Viewport, VisualElement
+from inti.domain.verification_ports import ReadOnlyBrowserCapture, StateReadRequest
 from inti.infrastructure.config import ConfigurationProvider
 
 
 class RemoteBrowserWorker:
+    async def capture_readonly(self, request: StateReadRequest) -> ReadOnlyBrowserCapture:
+        body = await self._call("POST", "/readonly-observation", asdict(request))
+        return ReadOnlyBrowserCapture(
+            TypeAdapter(Observation).validate_json(json.dumps(body["observation"])),
+            base64.b64decode(body["png_base64"], validate=True),
+            body["dom"],
+        )
+
+    async def checks(self, id: UUID, checks: tuple[BrowserCheck, ...], mode: GroundingMode) -> bool:
+        result = await self._call(
+            "POST", f"/sessions/{id}/checks", {"checks": [asdict(c) for c in checks], "mode": mode}
+        )
+        return bool(result["satisfied"])
+
     def __init__(self, settings: ConfigurationProvider) -> None:
         self.settings = settings
 

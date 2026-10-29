@@ -102,14 +102,21 @@ class MetaModelAPIAdapter:
         image_base64: str | None = None,
         max_tokens: int = 4096,
         max_retries: int = 2,
+        images_base64: tuple[str, ...] = (),
     ) -> tuple[T, ModelUsage]:
         """One shared authenticated transport for vision, intent and planning."""
         if not (await self.status())["configured"]:
             raise ConfigurationError("Meta is not configured: set META_API_KEY and META_MODEL_ID")
         content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
-        if image_base64:
+        images = ((image_base64,) if image_base64 else ()) + images_base64
+        if len(images) > 50:
+            raise DependencyError("Too many images for one Meta request")
+        for encoded_image in images:
             content.append(
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_base64}"}}
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/png;base64,{encoded_image}"},
+                }
             )
         payload: dict[str, Any] = {
             "model": self.settings.meta_model_id,

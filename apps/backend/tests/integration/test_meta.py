@@ -6,7 +6,37 @@ import pytest
 
 from inti.domain.exceptions import ConfigurationError, DependencyError
 from inti.infrastructure.config import ConfigurationProvider
-from inti.infrastructure.meta import MetaModelAPIAdapter
+from inti.infrastructure.meta import MetaModelAPIAdapter, StructuredVision
+
+
+async def test_two_image_recovery_transport_has_no_hidden_retry():
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        payload = json.loads(request.content)
+        images = payload["messages"][1]["content"][1:]
+        assert [i["image_url"]["url"] for i in images] == [
+            "data:image/png;base64,cHJldmlvdXM=",
+            "data:image/png;base64,Y3VycmVudA==",
+        ]
+        return httpx.Response(503)
+
+    model = adapter(handler)
+    with pytest.raises(DependencyError):
+        await model.complete_schema(
+            StructuredVision,
+            "Test fixture instructions",
+            "Compare",
+            images_base64=("cHJldmlvdXM=", "Y3VycmVudA=="),
+            max_retries=0,
+        )
+    assert len(calls) == 1
+    with pytest.raises(DependencyError, match="Too many images"):
+        await model.complete_schema(
+            StructuredVision, "Test", "Test", images_base64=("fixture",) * 51, max_retries=0
+        )
+    assert len(calls) == 1
 
 
 def adapter(handler, key="test-only-key"):

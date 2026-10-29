@@ -4,7 +4,7 @@ import asyncio
 import hashlib
 import os
 import time
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from urllib.parse import urljoin, urlsplit
 from uuid import UUID, uuid4
@@ -61,9 +61,18 @@ class LiveContext:
     lock: asyncio.Lock
     last_observation: Observation | None = None
     last_digest: str = ""
+    read_only: bool = False
+    target_frames: dict[str, list[tuple[float, ...]]] = field(default_factory=dict)
 
 
 class BrowserSessionManager:
+    async def checks(self, id: UUID, checks: tuple[BrowserCheck, ...], mode: GroundingMode) -> bool:
+        runtime = self._get(id)
+        async with runtime.lock, asyncio.timeout(runtime.limits.action_timeout_seconds):
+            self._state(runtime)
+            inspector = PlaywrightActionExecutor(self)
+            return all([await inspector._check(runtime, check, mode) for check in checks])
+
     def __init__(self, settings: ConfigurationProvider) -> None:
         self.settings = settings
         self.sessions: dict[UUID, LiveContext] = {}
@@ -107,7 +116,12 @@ class BrowserSessionManager:
         return runtime
 
     def _state(self, runtime: LiveContext) -> None:
-        if runtime.page.url not in self.settings.browser_allowed_urls:
+        allowed = (
+            [self.settings.verification_readonly_url]
+            if runtime.read_only
+            else self.settings.browser_allowed_urls
+        )
+        if runtime.page.url not in allowed:
             raise ExecutionError("URL_DENIED", "Browser left the exact authorized URL allowlist")
         if runtime.page.viewport_size != {
             "width": runtime.session.viewport.width,
@@ -116,9 +130,19 @@ class BrowserSessionManager:
             raise ExecutionError("VIEWPORT_CHANGED", "Browser viewport changed")
 
     async def open(
-        self, execution_id: UUID, url: str, viewport: Viewport, limits: ExecutionLimits
+        self,
+        execution_id: UUID,
+        url: str,
+        viewport: Viewport,
+        limits: ExecutionLimits,
+        read_only: bool = False,
     ) -> BrowserSession:
-        if url not in self.settings.browser_allowed_urls:
+        allowed_urls = (
+            [self.settings.verification_readonly_url]
+            if read_only
+            else self.settings.browser_allowed_urls
+        )
+        if url not in allowed_urls:
             raise ExecutionError("URL_DENIED", "Only configured local demo URLs are allowed")
         async with self.guard:
             if execution_id in self.revoked:
@@ -142,6 +166,12 @@ class BrowserSessionManager:
                     service_workers="block",
                     accept_downloads=False,
                     permissions=[],
+                    extra_http_headers={
+                        "Authorization": "Bearer "
+                        + self.settings.verification_read_token.get_secret_value()
+                    }
+                    if read_only
+                    else {},
                 )
                 page = await context.new_page()
                 context.on("page", lambda popup: asyncio.create_task(popup.close()))
@@ -149,7 +179,9 @@ class BrowserSessionManager:
                 session = BrowserSession(
                     uuid4(), execution_id, url, url, viewport, now, now, "OPEN"
                 )
-                runtime = LiveContext(browser, context, page, session, limits, asyncio.Lock())
+                runtime = LiveContext(
+                    browser, context, page, session, limits, asyncio.Lock(), read_only=read_only
+                )
                 origin = urlsplit(url)
 
                 async def restrict(route: Route) -> None:
@@ -157,13 +189,15 @@ class BrowserSessionManager:
                     if (destination.scheme, destination.netloc) != (
                         origin.scheme,
                         origin.netloc,
-                    ) or route.request.method not in {"GET", "HEAD", "POST", "PUT"}:
+                    ) or route.request.method not in (
+                        {"GET", "HEAD"} if read_only else {"GET", "HEAD", "POST", "PUT"}
+                    ):
                         await route.abort()
                         return
                     if route.request.is_navigation_request():
                         if (
                             route.request.frame != page.main_frame
-                            or route.request.url not in self.settings.browser_allowed_urls
+                            or route.request.url not in allowed_urls
                         ):
                             await route.abort()
                             return
@@ -278,6 +312,24 @@ class BrowserSessionManager:
                 raise ExecutionError("SCREENSHOT_LIMIT", "Screenshot exceeds configured size limit")
             runtime.last_observation = observation
             runtime.last_digest = hashlib.sha256(data).hexdigest()
+            frames = await runtime.page.locator(
+                'button,input,select,[role="button"],[role="textbox"],[role="combobox"]'
+            ).evaluate_all("""nodes => nodes.slice(0,200).map(node=>{
+                const r=node.getBoundingClientRect();
+                const style=getComputedStyle(node);
+                const role=node.getAttribute('role') || (node.tagName==='SELECT'?'combobox':
+                    node.tagName==='INPUT'?(node.type==='checkbox'?'checkbox':'textbox'):'button');
+                const name=(node.getAttribute('aria-label') ||
+                    (node.labels?[...node.labels].map(label=>label.innerText).join(' '):'') ||
+                    node.innerText || '').trim().replace(/\\s+/g,' ');
+                return {role,name,box:[r.x,r.y,r.width,r.height],
+                    visible:r.width>0&&r.height>0&&style.visibility!=='hidden'&&style.display!=='none'};
+            })""")
+            runtime.target_frames = {}
+            for frame in frames:
+                if frame["visible"]:
+                    key = frame["role"] + "\0" + frame["name"]
+                    runtime.target_frames.setdefault(key, []).append(tuple(frame["box"]))
             runtime.session = replace(
                 runtime.session, current_url=runtime.page.url, last_activity_at=datetime.now(UTC)
             )
@@ -362,6 +414,9 @@ class PlaywrightActionExecutor:
             )
         assert check.target is not None
         locator = self.resolver.locator(runtime.page, check.target, mode)
+        if check.kind == CheckKind.NOT_VISIBLE:
+            count = await locator.count()
+            return count == 0 or (count == 1 and not await locator.is_visible())
         if await locator.count() != 1 or not await locator.is_visible():
             return False
         if check.kind == CheckKind.VISIBLE:
@@ -391,6 +446,14 @@ class PlaywrightActionExecutor:
         try:
             async with runtime.lock, asyncio.timeout(runtime.limits.action_timeout_seconds):
                 self.manager._state(runtime)
+                if runtime.read_only and action.action_type not in {
+                    PlannedActionType.INSPECT,
+                    PlannedActionType.VERIFY,
+                }:
+                    raise ExecutionError(
+                        "READ_ONLY_SESSION",
+                        "Verification browser contexts cannot modify application state",
+                    )
                 if (
                     action.authorization_status != AuthorizationStatus.APPROVED
                     or action.risk_level == RiskLevel.PROHIBITED
@@ -441,6 +504,20 @@ class PlaywrightActionExecutor:
                         resolution = await self.resolver.resolve(
                             runtime.page, action.target, mode, observation, screenshot_digest
                         )
+                        previous = runtime.target_frames.get(
+                            action.target.role + "\0" + action.target.name, []
+                        )
+                        if len(previous) == 1 and resolution.bounding_box:
+                            box = resolution.bounding_box
+                            current_box = (box.x, box.y, box.width, box.height)
+                            if len(previous[0]) == 4 and any(
+                                abs(old - new) > 2
+                                for old, new in zip(previous[0], current_box, strict=True)
+                            ):
+                                raise ExecutionError(
+                                    "ELEMENT_MOVED",
+                                    "Control moved after observation; no action attempted",
+                                )
                 else:
                     resolution = ResolvedTarget(
                         "page", mode, None, None, observation.id, screenshot_digest
@@ -457,6 +534,22 @@ class PlaywrightActionExecutor:
                     if action.target and mode != GroundingMode.VISUAL_ONLY
                     else None
                 )
+                if locator and action.action_type in {
+                    PlannedActionType.CLICK,
+                    PlannedActionType.TYPE_TEXT,
+                    PlannedActionType.SELECT_OPTION,
+                }:
+                    hit = await locator.evaluate("""node => {
+                        const r=node.getBoundingClientRect();
+                        const top=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
+                        return {clear:!!top && (top===node || node.contains(top)),
+                            modal:!!top?.closest('dialog,[role="dialog"]')};
+                    }""")
+                    if not hit["clear"]:
+                        raise ExecutionError(
+                            "MODAL_OBSTRUCTION" if hit["modal"] else "TARGET_OBSTRUCTED",
+                            "Approved control is covered; no action attempted",
+                        )
                 attempted = True
                 if kind == PlannedActionType.CLICK:
                     if locator:

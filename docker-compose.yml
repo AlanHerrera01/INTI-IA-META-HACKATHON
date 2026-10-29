@@ -17,9 +17,31 @@ services:
     build: ./apps/demo-app
     volumes: ["demo-data:/app/data"]
     networks: [default, browser-sandbox]
-    ports: ["127.0.0.1:8001:8001"]
+    ports: ["127.0.0.1:8001:8001", "127.0.0.1:8002:8002"]
+    environment:
+      DEMO_FAULT_CONTROL_TOKEN: ${DEMO_FAULT_CONTROL_TOKEN:-}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/')"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+  inventory-state:
+    build: ./apps/demo-app
+    command: ["python", "verification_server.py", "--host", "0.0.0.0", "--port", "8003", "--db", "/app/data/inventory.db"]
+    environment:
+      VERIFICATION_READ_TOKEN: ${VERIFICATION_READ_TOKEN:-}
+    volumes: ["demo-data:/app/data:ro"]
+    networks: [verification-plane]
+    read_only: true
+    tmpfs: ["/tmp:size=16777216,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 64m
+    pids_limit: 32
+    depends_on:
+      demo: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/health')"]
       interval: 10s
       timeout: 3s
       retries: 10
@@ -44,6 +66,20 @@ services:
       META_MAX_RESPONSE_BYTES: ${META_MAX_RESPONSE_BYTES:-262144}
       EXECUTION_ENABLED: ${EXECUTION_ENABLED:-false}
       EXECUTION_OPERATOR_TOKEN: ${EXECUTION_OPERATOR_TOKEN:-}
+      VERIFICATION_ENABLED: ${VERIFICATION_ENABLED:-false}
+      VERIFICATION_AUTO_TRIGGER: ${VERIFICATION_AUTO_TRIGGER:-true}
+      VERIFICATION_TIMEOUT_SECONDS: ${VERIFICATION_TIMEOUT_SECONDS:-30}
+      VERIFICATION_SOURCE_TIMEOUT_SECONDS: ${VERIFICATION_SOURCE_TIMEOUT_SECONDS:-3}
+      VERIFICATION_SOURCE_RETRIES: ${VERIFICATION_SOURCE_RETRIES:-1}
+      VERIFICATION_EVIDENCE_MAX_AGE_SECONDS: ${VERIFICATION_EVIDENCE_MAX_AGE_SECONDS:-30}
+      VERIFICATION_MAX_RESPONSE_BYTES: ${VERIFICATION_MAX_RESPONSE_BYTES:-500000}
+      RECOVERY_ENABLED: ${RECOVERY_ENABLED:-false}
+      RECOVERY_MAX_ATTEMPTS: ${RECOVERY_MAX_ATTEMPTS:-3}
+      RECOVERY_MAX_DURATION_SECONDS: ${RECOVERY_MAX_DURATION_SECONDS:-120}
+      RECOVERY_MAX_MODEL_CALLS: ${RECOVERY_MAX_MODEL_CALLS:-5}
+      RECOVERY_MAX_ACTIONS: ${RECOVERY_MAX_ACTIONS:-10}
+      RECOVERY_MAX_TOKENS: ${RECOVERY_MAX_TOKENS:-}
+      RECOVERY_MAX_IDENTICAL_FAILURES: ${RECOVERY_MAX_IDENTICAL_FAILURES:-2}
       BROWSER_WORKER_TOKEN: ${BROWSER_WORKER_TOKEN:-}
       BROWSER_WORKER_URL: http://browser-worker:8010
       EXECUTION_MAX_ACTIONS: ${EXECUTION_MAX_ACTIONS:-30}
@@ -51,12 +87,15 @@ services:
       EXECUTION_ACTION_TIMEOUT_SECONDS: ${EXECUTION_ACTION_TIMEOUT_SECONDS:-10}
       EXECUTION_MAX_CONCURRENT_SESSIONS: ${EXECUTION_MAX_CONCURRENT_SESSIONS:-2}
       EXECUTION_MAX_NAVIGATION_COUNT: ${EXECUTION_MAX_NAVIGATION_COUNT:-3}
+      VERIFICATION_READONLY_URL: http://inventory-state:8003/
+      VERIFICATION_READ_TOKEN: ${VERIFICATION_READ_TOKEN:-}
       MAX_ARTIFACT_BYTES: ${MAX_ARTIFACT_BYTES:-5000000}
-    networks: [default, browser-sandbox]
+    networks: [default, browser-sandbox, verification-plane]
     ports: ["127.0.0.1:8000:8000"]
     volumes: ["artifacts:/app/artifacts"]
     shm_size: 256mb
     depends_on:
+      inventory-state: {condition: service_healthy}
       postgres: {condition: service_healthy}
       demo: {condition: service_healthy}
       browser-worker: {condition: service_healthy}
@@ -78,8 +117,10 @@ services:
       EXECUTION_MAX_NAVIGATION_COUNT: ${EXECUTION_MAX_NAVIGATION_COUNT:-3}
       EXECUTION_OBSERVATION_MAX_AGE_SECONDS: ${EXECUTION_OBSERVATION_MAX_AGE_SECONDS:-5}
       BROWSER_SESSION_TTL_SECONDS: ${BROWSER_SESSION_TTL_SECONDS:-180}
+      VERIFICATION_READONLY_URL: http://inventory-state:8003/
+      VERIFICATION_READ_TOKEN: ${VERIFICATION_READ_TOKEN:-}
       MAX_ARTIFACT_BYTES: ${MAX_ARTIFACT_BYTES:-5000000}
-    networks: [browser-sandbox]
+    networks: [browser-sandbox, verification-plane]
     read_only: true
     tmpfs: ["/tmp:size=268435456,mode=1777"]
     cap_drop: [ALL]
@@ -110,4 +151,6 @@ volumes:
   demo-data:
 networks:
   browser-sandbox:
+    internal: true
+  verification-plane:
     internal: true

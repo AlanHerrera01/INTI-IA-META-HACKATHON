@@ -13,6 +13,9 @@ import { SystemPage } from "../pages/SystemPage";
 import { ObservationPage } from "../pages/ObservationPage";
 import { PlanningPage } from "../pages/PlanningPage";
 import { ExecutionPage, ExecutionBoundary } from "../pages/ExecutionPage";
+import { VerificationPage } from "../pages/VerificationPage";
+import { RecoveryPage } from "../pages/RecoveryPage";
+import { FeatureBoundary } from "../components/FeatureBoundary";
 
 export function App() {
   return (
@@ -49,11 +52,19 @@ export function App() {
             <Activity size={18} />
             Live Execution
           </NavLink>
+          <NavLink to="/verification">
+            <Eye size={18} />
+            Verification Center
+          </NavLink>
+          <NavLink to="/recovery">
+            <Activity size={18} />
+            Recovery Center
+          </NavLink>
         </nav>
         <div className="sidebar-bottom">
           <div className="phase-card">
-            <span className="phase-badge">PHASE 03</span>
-            <h3>Authorized browser execution</h3>
+            <span className="phase-badge">PHASE 05</span>
+            <h3>Independent outcome verification</h3>
             <p>
               The first step toward
               <br />
@@ -94,6 +105,22 @@ export function App() {
                 <ExecutionBoundary>
                   <ExecutionPage />
                 </ExecutionBoundary>
+              }
+            />
+            <Route
+              path="/verification"
+              element={
+                <FeatureBoundary>
+                  <VerificationPage />
+                </FeatureBoundary>
+              }
+            />
+            <Route
+              path="/recovery"
+              element={
+                <FeatureBoundary>
+                  <RecoveryPage />
+                </FeatureBoundary>
               }
             />
             <Route

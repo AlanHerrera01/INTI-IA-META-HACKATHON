@@ -6,6 +6,8 @@ from inti.application.planning import (
     InterpretTaskIntentUseCase,
     InterpretVisualSceneUseCase,
 )
+from inti.application.recovery import RecoveryOrchestrator
+from inti.application.verification import IndependentVerificationOrchestrator
 from inti.domain.execution import ExecutionLimits
 from inti.domain.execution_policy import ExecutionPolicy
 from inti.domain.planning_policy import PlanningPolicy
@@ -16,19 +18,29 @@ from inti.domain.ports import (
     ObservationRepositoryPort,
     VisionModelPort,
 )
+from inti.domain.recovery import RecoveryBudget
 from inti.infrastructure.browser import PlaywrightBrowserAdapter
 from inti.infrastructure.browser.remote import RemoteBrowserWorker
 from inti.infrastructure.config import ConfigurationProvider
 from inti.infrastructure.grounding import VisualGroundingAdapter
 from inti.infrastructure.meta import MetaModelAPIAdapter
 from inti.infrastructure.meta.planning import MetaPlanningAdapter, MetaVisualReasoningAdapter
+from inti.infrastructure.meta.recovery import MetaRecoveryAdapter
 from inti.infrastructure.persistence import SQLAlchemyObservationRepository
 from inti.infrastructure.persistence.execution import SQLAlchemyExecutionRepository
 from inti.infrastructure.persistence.planning import (
     PlanningTelemetryAdapter,
     SQLAlchemyPlanRepository,
 )
+from inti.infrastructure.persistence.recovery import SQLAlchemyRecoveryRepository
+from inti.infrastructure.persistence.verification import SQLAlchemyVerificationRepository
 from inti.infrastructure.storage import LocalArtifactStorage
+from inti.infrastructure.verification_evidence import (
+    EvidenceIntegrityAdapter,
+    InventoryEvidenceCollector,
+    LocalEvidenceStorage,
+    ReadOnlyInventoryAdapter,
+)
 
 
 @dataclass
@@ -40,6 +52,8 @@ class Services:
     model: VisionModelPort
     planning: "PlanningServices | None" = None
     execution: ExecutionOrchestrator | None = None
+    verification: IndependentVerificationOrchestrator | None = None
+    recovery: RecoveryOrchestrator | None = None
 
 
 @dataclass
@@ -105,6 +119,53 @@ def build_services(settings: ConfigurationProvider) -> Services:
             MetaVisualReasoningAdapter(meta, storage, settings),
             settings.execution_max_concurrent_sessions,
         )
+    verification = None
+    if settings.verification_enabled:
+        verify_repository = SQLAlchemyVerificationRepository(repository.engine)
+        state = ReadOnlyInventoryAdapter(settings)
+        verify_storage = LocalEvidenceStorage(
+            settings.artifact_dir / "verification", settings.max_artifact_bytes
+        )
+        evidence_collector = InventoryEvidenceCollector(
+            state, RemoteBrowserWorker(settings), settings
+        )
+        verification = IndependentVerificationOrchestrator(
+            verify_repository,
+            SQLAlchemyExecutionRepository(repository.engine),
+            evidence_collector,
+            state,
+            verify_storage,
+            EvidenceIntegrityAdapter(settings),
+            verify_repository,
+            settings.verification_readonly_url,
+            settings.verification_timeout_seconds,
+            settings.verification_auto_trigger,
+        )
+        if execution:
+            execution.verification = verification
+    recovery = None
+    if execution and settings.recovery_enabled:
+        worker = RemoteBrowserWorker(settings)
+        recovery = RecoveryOrchestrator(
+            SQLAlchemyRecoveryRepository(repository.engine),
+            execution.repository,
+            plans,
+            repository,
+            storage,
+            worker,
+            worker,
+            execution.policy,
+            MetaRecoveryAdapter(meta, storage),
+            RecoveryBudget(
+                settings.recovery_max_attempts,
+                settings.recovery_max_duration_seconds,
+                settings.recovery_max_model_calls,
+                settings.recovery_max_actions,
+                settings.recovery_max_tokens,
+                settings.recovery_max_identical_failures,
+            ),
+        )
+        execution.recovery = recovery
     return Services(
         settings,
         repository,
@@ -113,4 +174,6 @@ def build_services(settings: ConfigurationProvider) -> Services:
         meta,
         planning,
         execution,
+        verification,
+        recovery,
     )

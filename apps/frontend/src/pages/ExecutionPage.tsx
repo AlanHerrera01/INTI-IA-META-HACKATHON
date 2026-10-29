@@ -3,6 +3,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Play, Pause, ShieldCheck, Square, RefreshCw } from "lucide-react";
 import { errorMessage } from "../services/api";
 import { executionApi, mergeEvents } from "../services/executionApi";
+import { Link } from "react-router-dom";
+import { verificationApi } from "../services/verificationApi";
+import { VerdictBadge } from "../features/verification/VerdictBadge";
 import {
   terminal,
   type ActionContract,
@@ -315,6 +318,7 @@ export function ExecutionPage() {
           ) : (
             <>
               <ExecutionDashboard bundle={bundle} />
+              <ExecutionVerification id={bundle.session.id} token={token} />
               <div
                 className="execution-panel execution-controls"
                 aria-label="Execution controls"
@@ -469,10 +473,43 @@ export function ExecutionPage() {
   );
 }
 
+function ExecutionVerification({ id, token }: { id: string; token: string }) {
+  const history = useQuery({
+    queryKey: ["execution-verifications", id, token],
+    queryFn: () => verificationApi.list(token, 0, id),
+    enabled: !!token,
+    refetchInterval: 3000,
+    retry: false,
+  });
+  const latest = history.data?.items[0];
+  const report = useQuery({
+    queryKey: ["execution-verification-report", latest?.session.id, token],
+    queryFn: () => verificationApi.report(latest!.session.id, token),
+    enabled: !!latest,
+    refetchInterval: 3000,
+    retry: false,
+  });
+  return (
+    <section className="execution-panel">
+      <h2>Independent task verification</h2>
+      <VerdictBadge verdict={report.data?.effective_verdict} />
+      <p>
+        {history.error || report.error
+          ? "Verification service unavailable. No outcome can be confirmed here."
+          : "The saved action result and the persisted task outcome are evaluated separately."}
+      </p>
+      <Link to={`/verification?execution=${id}`}>Open Verification Center</Link>
+      <p>
+        <Link to="/recovery">Review recovery history</Link>
+      </p>
+    </section>
+  );
+}
+
 export function ExecutionDashboard({ bundle }: { bundle: ExecutionBundle }) {
   const { session, manifest } = bundle;
   const completed = bundle.results.filter(
-    (r) => r.status === "SUCCEEDED",
+    (r) => r.status === "SUCCEEDED" || r.status === "SATISFIED",
   ).length;
   const elapsed = session.started_at
     ? Math.max(
@@ -523,11 +560,11 @@ export function ExecutionDashboard({ bundle }: { bundle: ExecutionBundle }) {
       />
       <p className="execution-help">
         Completed means the approved steps and immediate checks finished.
-        Overall goal verification:{" "}
+        Execution's goal-verification declaration:{" "}
         {session.overall_goal_verified
           ? "verified"
           : "not independently verified by this engine"}
-        .
+        . See the independent report below.
       </p>
       {session.error_summary && (
         <p role="alert" className="execution-error">

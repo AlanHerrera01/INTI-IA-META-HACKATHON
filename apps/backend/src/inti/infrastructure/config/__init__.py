@@ -40,8 +40,45 @@ class ConfigurationProvider(BaseSettings):
     execution_max_navigation_count: int = Field(default=3, ge=1, le=10)
     execution_observation_max_age_seconds: float = Field(default=5, ge=1, le=30)
     browser_session_ttl_seconds: float = Field(default=180, ge=2, le=600)
+    verification_enabled: bool = False
+    verification_auto_trigger: bool = True
+    verification_readonly_url: str = "http://127.0.0.1:8003/"
+    verification_read_token: SecretStr = SecretStr("")
+    verification_timeout_seconds: float = Field(default=30, ge=2, le=120)
+    verification_source_timeout_seconds: float = Field(default=3, ge=0.1, le=15)
+    verification_source_retries: int = Field(default=1, ge=0, le=3)
+    verification_evidence_max_age_seconds: float = Field(default=30, ge=2, le=120)
+    verification_max_response_bytes: int = Field(default=500000, ge=1024, le=1000000)
+    recovery_enabled: bool = False
+    recovery_max_attempts: int = Field(default=3, ge=1, le=10)
+    recovery_max_duration_seconds: float = Field(default=120, ge=1, le=600)
+    recovery_max_model_calls: int = Field(default=5, ge=1, le=20)
+    recovery_max_actions: int = Field(default=10, ge=1, le=30)
+    recovery_max_tokens: int | None = Field(default=None, ge=256, le=100000)
+    recovery_max_identical_failures: int = Field(default=2, ge=1, le=5)
 
-    @field_validator("execution_operator_token", "browser_worker_token")
+    @field_validator("recovery_max_tokens", mode="before")
+    @classmethod
+    def optional_token_budget(cls, value: object) -> object:
+        return None if value == "" else value
+
+    @field_validator("verification_readonly_url")
+    @classmethod
+    def readonly_target(cls, value: str) -> str:
+        url = urlsplit(value)
+        if (
+            url.scheme != "http"
+            or url.hostname not in {"localhost", "127.0.0.1", "inventory-state"}
+            or url.username
+            or url.password
+            or url.path not in {"", "/"}
+            or url.query
+            or url.fragment
+        ):
+            raise ValueError("Verification needs an explicit local read-only root URL")
+        return value.rstrip("/") + "/"
+
+    @field_validator("execution_operator_token", "browser_worker_token", "verification_read_token")
     @classmethod
     def execution_secret_length(cls, value: SecretStr) -> SecretStr:
         if value.get_secret_value() and len(value.get_secret_value()) < 24:

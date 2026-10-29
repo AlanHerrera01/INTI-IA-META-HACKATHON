@@ -214,7 +214,11 @@ class SQLAlchemyExecutionRepository:
                 rows = session.scalars(
                     select(ExecutionSessionRecord).where(
                         ExecutionSessionRecord.status.in_(
-                            [ExecutionStatus.RUNNING, ExecutionStatus.PAUSED]
+                            [
+                                ExecutionStatus.RUNNING,
+                                ExecutionStatus.PAUSED,
+                                ExecutionStatus.RECOVERING,
+                            ]
                         )
                     )
                 )

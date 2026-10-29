@@ -144,21 +144,40 @@ async def stream(websocket: WebSocket, id: UUID) -> None:
     await websocket.accept()
     try:
         auth = await asyncio.wait_for(websocket.receive_json(), timeout=5)
-        require_operator(services.settings, f"Bearer {auth.get('token', '')}")
+        require_operator(
+            services.settings,
+            f"Bearer {auth.get('token', '')}",
+            services.settings.execution_enabled or services.settings.verification_enabled,
+        )
         service = services.execution
-        if service is None:
+        reader = (
+            service.repository
+            if service
+            else services.verification.executions
+            if services.verification
+            else None
+        )
+        if reader is None:
             await websocket.close(code=4403)
             return
         cursor = max(0, int(auth.get("after", 0)))
-        await service.get(id)
+        if await reader.get(id) is None:
+            await websocket.close(code=4401)
+            return
         while True:
-            batch = await service.repository.events(id, cursor)
+            batch = await reader.events(id, cursor)
             for event in batch:
                 await websocket.send_json(
                     TypeAdapter(ExecutionEvent).dump_python(event, mode="json")
                 )
                 cursor = event.sequence
-            if (await service.get(id)).session.status in TERMINAL and not batch:
+            current = await reader.get(id)
+            verifying = (
+                await services.verification.active_for_execution(id)
+                if services.verification
+                else False
+            )
+            if current and current.session.status in TERMINAL and not batch and not verifying:
                 await websocket.close(code=1000)
                 return
             await asyncio.sleep(0.25)

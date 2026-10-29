@@ -5,6 +5,7 @@ export type ExecutionStatus =
   | "READY"
   | "RUNNING"
   | "PAUSED"
+  | "RECOVERING"
   | "COMPLETED"
   | "FAILED"
   | "CANCELLED"

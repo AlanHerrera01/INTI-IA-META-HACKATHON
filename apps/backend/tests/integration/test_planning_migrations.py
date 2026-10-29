@@ -40,6 +40,17 @@ def test_upgrade_downgrade_preserves_existing_observation(tmp_path, monkeypatch,
         "browser_sessions",
         "action_execution_results",
     } <= set(inspect(repository.engine).get_table_names())
+    assert {
+        "recovery_sessions",
+        "recovery_attempts",
+        "recovery_events",
+        "verification_sessions",
+        "criteria_versions",
+        "success_criteria",
+        "evidence_records",
+        "criterion_results",
+        "verification_events",
+    } <= set(inspect(repository.engine).get_table_names())
     command.downgrade(config, "0001")
     assert "action_plans" not in inspect(repository.engine).get_table_names()
     with repository.engine.connect() as connection:

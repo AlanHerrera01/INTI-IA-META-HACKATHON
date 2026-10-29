@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, expect, it, vi } from "vitest";
 import {
@@ -8,6 +9,12 @@ import {
 } from "../src/pages/ExecutionPage";
 import { executionApi, mergeEvents } from "../src/services/executionApi";
 import type { ExecutionBundle, ExecutionEvent } from "../src/types/execution";
+vi.mock("../src/services/verificationApi", () => ({
+  verificationApi: {
+    list: vi.fn().mockResolvedValue({ items: [], total: 0 }),
+    report: vi.fn(),
+  },
+}));
 
 vi.mock("../src/services/executionApi", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/services/executionApi")>()),
@@ -82,7 +89,9 @@ function workspace() {
         new QueryClient({ defaultOptions: { queries: { retry: false } } })
       }
     >
-      <ExecutionPage />
+      <MemoryRouter>
+        <ExecutionPage />
+      </MemoryRouter>
     </QueryClientProvider>,
   );
 }

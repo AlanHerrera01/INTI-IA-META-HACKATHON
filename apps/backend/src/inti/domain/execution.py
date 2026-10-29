@@ -39,6 +39,7 @@ class ExecutionStatus(StrEnum):
     READY = "READY"
     RUNNING = "RUNNING"
     PAUSED = "PAUSED"
+    RECOVERING = "RECOVERING"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
     CANCELLED = "CANCELLED"
@@ -59,7 +60,8 @@ TRANSITIONS = {
         ExecutionStatus.CANCELLED,
         ExecutionStatus.FAILED,
     },
-    ExecutionStatus.RUNNING: {ExecutionStatus.PAUSED, *TERMINAL},
+    ExecutionStatus.RUNNING: {ExecutionStatus.PAUSED, ExecutionStatus.RECOVERING, *TERMINAL},
+    ExecutionStatus.RECOVERING: {ExecutionStatus.RUNNING, *TERMINAL},
     ExecutionStatus.PAUSED: {
         ExecutionStatus.RUNNING,
         ExecutionStatus.CANCELLED,
@@ -83,6 +85,7 @@ class AuthorizationStatus(StrEnum):
 
 class CheckKind(StrEnum):
     VISIBLE = "visible"
+    NOT_VISIBLE = "not_visible"
     ENABLED = "enabled"
     INPUT_VALUE = "input_value"
     SELECTED_OPTION = "selected_option"

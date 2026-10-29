@@ -1,0 +1,2904 @@
+[
+  {
+    "recorded_at": "2026-10-29T20:57:38.585287+00:00",
+    "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+    "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+    "execution_status": "COMPLETED",
+    "all_immediate_postconditions_passed": true,
+    "goal_persisted_ground_truth": false,
+    "unrelated_assets_unchanged_ground_truth": true,
+    "expected_verdict": "VERIFIED_FAILURE",
+    "actual_verdict": "VERIFIED_FAILURE",
+    "verification_status": "COMPLETED",
+    "latency_ms": 3247.765099999924,
+    "evidence_count": 8,
+    "evidence_collection_failures": 0,
+    "integrity_failures": 0,
+    "verifier_changed_inventory": false,
+    "criterion_results": [
+      {
+        "criterion_id": "f40138b9-ea5c-5b1d-90ff-cfc772a616a5",
+        "expected": "PASS",
+        "observed": "PASS"
+      },
+      {
+        "criterion_id": "c9ba29ba-e701-5625-ba28-4791e6f76c52",
+        "expected": "FAIL",
+        "observed": "FAIL"
+      },
+      {
+        "criterion_id": "05b773fd-3020-556a-80e1-d335df19d2dd",
+        "expected": "FAIL",
+        "observed": "FAIL"
+      },
+      {
+        "criterion_id": "560e2477-b288-5511-aa12-68e35a5d0d80",
+        "expected": "FAIL",
+        "observed": "FAIL"
+      },
+      {
+        "criterion_id": "e073c228-4801-51dc-8ca8-56d0cfb1bfeb",
+        "expected": "PASS",
+        "observed": "PASS"
+      }
+    ],
+    "source_available": true,
+    "model_calls": 0,
+    "report": {
+      "project": "INTI AI",
+      "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+      "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+      "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+      "original_objective": "Find asset PC-104 and change its status to Operational.",
+      "criteria_version": {
+        "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+        "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+        "objective": "Find asset PC-104 and change its status to Operational.",
+        "original_manifest_digest": "abcde45c6a393a49fa232c7cc40e0d6b51a78b1132203d462cee36f71f3dc405",
+        "version": 1,
+        "criteria": [
+          {
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "description": "Asset PC-104 exists in the persisted store",
+            "assertion_type": "exists",
+            "expected_value": true,
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "id",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "f40138b9-ea5c-5b1d-90ff-cfc772a616a5"
+          },
+          {
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "description": "Asset PC-104 has persisted status Operational",
+            "assertion_type": "equals",
+            "expected_value": "Operational",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "c9ba29ba-e701-5625-ba28-4791e6f76c52"
+          },
+          {
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "description": "Asset PC-104 status is stable across fresh persisted reads",
+            "assertion_type": "record_persisted",
+            "expected_value": "Operational",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 2
+              }
+            ],
+            "required": true,
+            "id": "05b773fd-3020-556a-80e1-d335df19d2dd"
+          },
+          {
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "description": "Observed pre/post transition, when a pre-execution baseline exists",
+            "assertion_type": "state_transition",
+            "expected_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": false,
+            "id": "560e2477-b288-5511-aa12-68e35a5d0d80"
+          },
+          {
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "description": "No unrelated assets changed since the pre-execution baseline, when available",
+            "assertion_type": "equals",
+            "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "inventory_digest",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "e073c228-4801-51dc-8ca8-56d0cfb1bfeb"
+          }
+        ],
+        "approved_by": "benchmark-operator",
+        "approval_reason": "Persisted-state checks derived from the exact approved inventory objective",
+        "baseline": {
+          "artifact_id": "19073981-25eb-4690-885d-e8ec8abc5061",
+          "content_hash": "46ff45f37b841a5cb78a5728123de8eea50aa076c3cb1bb95347578682b116c2",
+          "captured_at": "2026-10-29 20:57:29.647770+00:00",
+          "source_store_id": "3a18b7a3-2e79-4631-abd9-c7d0d44cb109",
+          "collection_id": "7f6f5803-dfb7-40e9-836a-a1e1f2a33d86"
+        },
+        "id": "7f6f5803-dfb7-40e9-836a-a1e1f2a33d86",
+        "created_at": "2026-10-29 20:57:29.017587+00:00",
+        "digest": "2a744be03ba58412a2eff2af0727d77d36bebd75f17e2e8ce923b6b5ce2f7881"
+      },
+      "verification": {
+        "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+        "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+        "criteria_version_id": "7f6f5803-dfb7-40e9-836a-a1e1f2a33d86",
+        "idempotency_key": "terminal",
+        "id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+        "status": "COMPLETED",
+        "started_at": "2026-10-29 20:57:35.302570+00:00",
+        "completed_at": "2026-10-29 20:57:38.488691+00:00",
+        "final_verdict": "VERIFIED_FAILURE",
+        "evidence_ids": [
+          "13b4429b-9bcc-4718-859a-a45c8601f18b",
+          "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+          "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+          "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+          "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+          "9a5f7c06-a262-4e5c-b07f-681777a49282",
+          "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+          "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+        ],
+        "criteria_results": [
+          {
+            "criterion_id": "f40138b9-ea5c-5b1d-90ff-cfc772a616a5",
+            "status": "PASS",
+            "observed_value": true,
+            "expected_value": true,
+            "evidence_ids": [
+              "13b4429b-9bcc-4718-859a-a45c8601f18b",
+              "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+              "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+              "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+              "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+              "9a5f7c06-a262-4e5c-b07f-681777a49282",
+              "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+              "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+            ],
+            "explanation": "Record/field existence established by read-only database snapshots"
+          },
+          {
+            "criterion_id": "c9ba29ba-e701-5625-ba28-4791e6f76c52",
+            "status": "FAIL",
+            "observed_value": "Inactive",
+            "expected_value": "Operational",
+            "evidence_ids": [
+              "13b4429b-9bcc-4718-859a-a45c8601f18b",
+              "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+              "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+              "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+              "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+              "9a5f7c06-a262-4e5c-b07f-681777a49282",
+              "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+              "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+            ],
+            "explanation": "Deterministic assertion against fresh persisted state"
+          },
+          {
+            "criterion_id": "05b773fd-3020-556a-80e1-d335df19d2dd",
+            "status": "FAIL",
+            "observed_value": "Inactive",
+            "expected_value": "Operational",
+            "evidence_ids": [
+              "13b4429b-9bcc-4718-859a-a45c8601f18b",
+              "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+              "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+              "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+              "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+              "9a5f7c06-a262-4e5c-b07f-681777a49282",
+              "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+              "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+            ],
+            "explanation": "Two read-only SQLite snapshots agree on record identity, version and value"
+          },
+          {
+            "criterion_id": "560e2477-b288-5511-aa12-68e35a5d0d80",
+            "status": "FAIL",
+            "observed_value": {
+              "before": "Inactive",
+              "after": "Inactive"
+            },
+            "expected_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "evidence_ids": [
+              "13b4429b-9bcc-4718-859a-a45c8601f18b",
+              "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+              "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+              "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+              "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+              "9a5f7c06-a262-4e5c-b07f-681777a49282",
+              "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+              "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+            ],
+            "explanation": "Transition and record version compared; causal attribution is not inferred"
+          },
+          {
+            "criterion_id": "e073c228-4801-51dc-8ca8-56d0cfb1bfeb",
+            "status": "PASS",
+            "observed_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "evidence_ids": [
+              "13b4429b-9bcc-4718-859a-a45c8601f18b",
+              "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+              "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+              "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+              "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+              "9a5f7c06-a262-4e5c-b07f-681777a49282",
+              "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+              "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+            ],
+            "explanation": "Deterministic assertion against fresh persisted state"
+          }
+        ],
+        "version": 18,
+        "error_code": null,
+        "limitations": [],
+        "correlation_id": "620f8a48-dabe-421a-88fa-636a8bd4dccd"
+      },
+      "execution_summary": {
+        "status": "COMPLETED",
+        "declared_overall_goal_verified": false,
+        "action_count": 9,
+        "actions_executed": 9,
+        "immediate_postconditions_passed": 9
+      },
+      "evidence": [
+        {
+          "verification_session_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:29.647770+00:00",
+          "artifact_reference": "19073981-25eb-4690-885d-e8ec8abc5061",
+          "content_hash": "46ff45f37b841a5cb78a5728123de8eea50aa076c3cb1bb95347578682b116c2",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "Pre-execution read-only SQLite baseline",
+            "target_record_id": "PC-104",
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+            "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+            "role": "baseline",
+            "source_url": "http://127.0.0.1:50378/verification/v1/snapshot",
+            "nonce": "6e725387-fbd8-4e46-890d-1bf4db755427",
+            "source_store_id": "3a18b7a3-2e79-4631-abd9-c7d0d44cb109",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "13b4429b-9bcc-4718-859a-a45c8601f18b"
+        },
+        {
+          "verification_session_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+          "evidence_type": "READ_ONLY_API_RESPONSE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:36.025057+00:00",
+          "artifact_reference": "e11acf75-f952-4727-ab20-4f67de281464",
+          "content_hash": "60e1553509d6ea9690f60aaec09a34c38baade1839b85bd2663307a5a70e406a",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+            "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+            "role": "final",
+            "source_url": "http://127.0.0.1:50378/verification/v1/snapshot",
+            "nonce": "c97e0822-d459-493d-8ab8-00248c260a11",
+            "source_store_id": "3a18b7a3-2e79-4631-abd9-c7d0d44cb109",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "bd45c2ca-93cd-41be-85e4-7ed09571d2ab"
+        },
+        {
+          "verification_session_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:36.025057+00:00",
+          "artifact_reference": "e11acf75-f952-4727-ab20-4f67de281464",
+          "content_hash": "60e1553509d6ea9690f60aaec09a34c38baade1839b85bd2663307a5a70e406a",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+            "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+            "role": "final",
+            "source_url": "http://127.0.0.1:50378/verification/v1/snapshot",
+            "nonce": "c97e0822-d459-493d-8ab8-00248c260a11",
+            "source_store_id": "3a18b7a3-2e79-4631-abd9-c7d0d44cb109",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "26af637b-41e3-4924-87f6-e234eb4ce6a3"
+        },
+        {
+          "verification_session_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+          "evidence_type": "SCREENSHOT",
+          "source": "inventory-readonly-browser",
+          "captured_at": "2026-10-29 20:57:37.225231+00:00",
+          "artifact_reference": "a21f3a79-44d6-43ff-8e34-d1d8f2e96197",
+          "content_hash": "911f85a5624b1b4f6c49aa4912f0e1377092794db243180d5f8e30ecb021abdd",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.browser.v1",
+            "collection_method": "Fresh isolated GET-only Chromium context",
+            "target_record_id": "PC-104",
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+            "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+            "role": "final",
+            "source_url": "http://127.0.0.1:50378/",
+            "nonce": "5539436c-8217-4b4e-b88e-33a2f75f0ffe",
+            "source_store_id": "3a18b7a3-2e79-4631-abd9-c7d0d44cb109",
+            "content_type": "image/png",
+            "byte_count": 37999
+          },
+          "id": "f2dc559f-67cc-4db5-9731-effdc270aa1d"
+        },
+        {
+          "verification_session_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+          "evidence_type": "DOM_SNAPSHOT",
+          "source": "inventory-readonly-browser",
+          "captured_at": "2026-10-29 20:57:37.225231+00:00",
+          "artifact_reference": "419cc07f-525a-47ef-908a-1eea3ce4c6fa",
+          "content_hash": "1121d544ee082ca4046fa04adeee57f3bf11775fcc948d2ec33e4f067059f11c",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.browser.v1",
+            "collection_method": "Fixed read-only DOM fields",
+            "target_record_id": "PC-104",
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+            "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+            "role": "final",
+            "source_url": "http://127.0.0.1:50378/",
+            "nonce": "5539436c-8217-4b4e-b88e-33a2f75f0ffe",
+            "source_store_id": "3a18b7a3-2e79-4631-abd9-c7d0d44cb109",
+            "content_type": "application/json",
+            "byte_count": 136
+          },
+          "id": "b6c46afa-b120-4ecf-ab43-73108a2c7f6f"
+        },
+        {
+          "verification_session_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+          "evidence_type": "READ_ONLY_API_RESPONSE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:38.030404+00:00",
+          "artifact_reference": "78747711-fad4-40db-b95e-a79bc3aac42d",
+          "content_hash": "1f965de46076f85426917c8e90694c7aa3eb833c56785007b78b27e10e9de1f7",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+            "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+            "role": "final",
+            "source_url": "http://127.0.0.1:50378/verification/v1/snapshot",
+            "nonce": "935ea354-8542-4510-8cc4-cd23697a853a",
+            "source_store_id": "3a18b7a3-2e79-4631-abd9-c7d0d44cb109",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "9a5f7c06-a262-4e5c-b07f-681777a49282"
+        },
+        {
+          "verification_session_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:38.030404+00:00",
+          "artifact_reference": "78747711-fad4-40db-b95e-a79bc3aac42d",
+          "content_hash": "1f965de46076f85426917c8e90694c7aa3eb833c56785007b78b27e10e9de1f7",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+            "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+            "role": "final",
+            "source_url": "http://127.0.0.1:50378/verification/v1/snapshot",
+            "nonce": "935ea354-8542-4510-8cc4-cd23697a853a",
+            "source_store_id": "3a18b7a3-2e79-4631-abd9-c7d0d44cb109",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "213368f6-33aa-48f7-a08e-83da25e9a8f9"
+        },
+        {
+          "verification_session_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+          "evidence_type": "EXECUTION_TRACE",
+          "source": "execution-declaration",
+          "captured_at": "2026-10-29 20:57:38.049314+00:00",
+          "artifact_reference": "7e61ca3a-a4ec-4cd2-9c7a-e9094f897798",
+          "content_hash": "8ca03e1ce5b9a4d7adcb0fbf9005bcbc520d0122e1b9351ae0baeb4728a97da1",
+          "metadata": {
+            "source_system": "inti.execution.declared.v1",
+            "collection_method": "Stored execution trace; not outcome proof",
+            "target_record_id": "PC-104",
+            "task_id": "f99dc5a5-104e-4532-9182-8bb3e9f99df6",
+            "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+            "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+            "role": "supplementary",
+            "source_url": "execution:5d290815-b8f9-4138-87b5-72efdd210beb",
+            "nonce": "f067e6b2-a404-441c-96ba-3f207bd62780",
+            "source_store_id": "3a18b7a3-2e79-4631-abd9-c7d0d44cb109",
+            "content_type": "application/json",
+            "byte_count": 1324
+          },
+          "id": "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+        }
+      ],
+      "criteria_results": [
+        {
+          "criterion_id": "f40138b9-ea5c-5b1d-90ff-cfc772a616a5",
+          "status": "PASS",
+          "observed_value": true,
+          "expected_value": true,
+          "evidence_ids": [
+            "13b4429b-9bcc-4718-859a-a45c8601f18b",
+            "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+            "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+            "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+            "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+            "9a5f7c06-a262-4e5c-b07f-681777a49282",
+            "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+            "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+          ],
+          "explanation": "Record/field existence established by read-only database snapshots"
+        },
+        {
+          "criterion_id": "c9ba29ba-e701-5625-ba28-4791e6f76c52",
+          "status": "FAIL",
+          "observed_value": "Inactive",
+          "expected_value": "Operational",
+          "evidence_ids": [
+            "13b4429b-9bcc-4718-859a-a45c8601f18b",
+            "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+            "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+            "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+            "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+            "9a5f7c06-a262-4e5c-b07f-681777a49282",
+            "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+            "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+          ],
+          "explanation": "Deterministic assertion against fresh persisted state"
+        },
+        {
+          "criterion_id": "05b773fd-3020-556a-80e1-d335df19d2dd",
+          "status": "FAIL",
+          "observed_value": "Inactive",
+          "expected_value": "Operational",
+          "evidence_ids": [
+            "13b4429b-9bcc-4718-859a-a45c8601f18b",
+            "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+            "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+            "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+            "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+            "9a5f7c06-a262-4e5c-b07f-681777a49282",
+            "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+            "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+          ],
+          "explanation": "Two read-only SQLite snapshots agree on record identity, version and value"
+        },
+        {
+          "criterion_id": "560e2477-b288-5511-aa12-68e35a5d0d80",
+          "status": "FAIL",
+          "observed_value": {
+            "before": "Inactive",
+            "after": "Inactive"
+          },
+          "expected_value": {
+            "before": "Inactive",
+            "after": "Operational"
+          },
+          "evidence_ids": [
+            "13b4429b-9bcc-4718-859a-a45c8601f18b",
+            "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+            "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+            "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+            "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+            "9a5f7c06-a262-4e5c-b07f-681777a49282",
+            "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+            "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+          ],
+          "explanation": "Transition and record version compared; causal attribution is not inferred"
+        },
+        {
+          "criterion_id": "e073c228-4801-51dc-8ca8-56d0cfb1bfeb",
+          "status": "PASS",
+          "observed_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+          "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+          "evidence_ids": [
+            "13b4429b-9bcc-4718-859a-a45c8601f18b",
+            "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+            "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+            "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+            "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+            "9a5f7c06-a262-4e5c-b07f-681777a49282",
+            "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+            "56623c5e-e9f1-42bd-8e33-b2c70906e67e"
+          ],
+          "explanation": "Deterministic assertion against fresh persisted state"
+        }
+      ],
+      "final_verdict": "VERIFIED_FAILURE",
+      "effective_verdict": "VERIFIED_FAILURE",
+      "integrity_checks": [
+        {
+          "evidence_id": "13b4429b-9bcc-4718-859a-a45c8601f18b",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "bd45c2ca-93cd-41be-85e4-7ed09571d2ab",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "26af637b-41e3-4924-87f6-e234eb4ce6a3",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "f2dc559f-67cc-4db5-9731-effdc270aa1d",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "b6c46afa-b120-4ecf-ab43-73108a2c7f6f",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "9a5f7c06-a262-4e5c-b07f-681777a49282",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "213368f6-33aa-48f7-a08e-83da25e9a8f9",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "56623c5e-e9f1-42bd-8e33-b2c70906e67e",
+          "intact": true,
+          "error": null
+        }
+      ],
+      "limitations": [
+        "Hashes detect content changes against stored records; storage is not tamper-proof",
+        "Observed persisted state does not prove exclusive execution causality",
+        "Archived evidence is evaluated against its original collection-time freshness"
+      ]
+    },
+    "scenario": "save_rejected_with_confirmation",
+    "fault_seed": 42
+  },
+  {
+    "recorded_at": "2026-10-29T20:57:52.131538+00:00",
+    "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+    "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+    "execution_status": "COMPLETED",
+    "all_immediate_postconditions_passed": true,
+    "goal_persisted_ground_truth": false,
+    "unrelated_assets_unchanged_ground_truth": false,
+    "expected_verdict": "VERIFIED_FAILURE",
+    "actual_verdict": "VERIFIED_FAILURE",
+    "verification_status": "COMPLETED",
+    "latency_ms": 3424.2088000000876,
+    "evidence_count": 8,
+    "evidence_collection_failures": 0,
+    "integrity_failures": 0,
+    "verifier_changed_inventory": false,
+    "criterion_results": [
+      {
+        "criterion_id": "70d2bd68-48d4-52e3-b1ba-3c823c7da0c1",
+        "expected": "PASS",
+        "observed": "PASS"
+      },
+      {
+        "criterion_id": "3e2b64b6-11b1-56e3-bf60-91c422e002d0",
+        "expected": "FAIL",
+        "observed": "FAIL"
+      },
+      {
+        "criterion_id": "55c5b686-1d1e-560b-8aa3-abea82724080",
+        "expected": "FAIL",
+        "observed": "FAIL"
+      },
+      {
+        "criterion_id": "792a41d1-4a4c-53bc-ba8e-4493b73d7c67",
+        "expected": "FAIL",
+        "observed": "FAIL"
+      },
+      {
+        "criterion_id": "8b5e286f-b872-5d56-9f2a-82d9acf08b03",
+        "expected": "FAIL",
+        "observed": "FAIL"
+      }
+    ],
+    "source_available": true,
+    "model_calls": 0,
+    "report": {
+      "project": "INTI AI",
+      "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+      "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+      "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+      "original_objective": "Find asset PC-104 and change its status to Operational.",
+      "criteria_version": {
+        "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+        "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+        "objective": "Find asset PC-104 and change its status to Operational.",
+        "original_manifest_digest": "b37c9096d6a399cabd90a172d816a622c8b6deb99a22535f13105025aeecda35",
+        "version": 1,
+        "criteria": [
+          {
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "description": "Asset PC-104 exists in the persisted store",
+            "assertion_type": "exists",
+            "expected_value": true,
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "id",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "70d2bd68-48d4-52e3-b1ba-3c823c7da0c1"
+          },
+          {
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "description": "Asset PC-104 has persisted status Operational",
+            "assertion_type": "equals",
+            "expected_value": "Operational",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "3e2b64b6-11b1-56e3-bf60-91c422e002d0"
+          },
+          {
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "description": "Asset PC-104 status is stable across fresh persisted reads",
+            "assertion_type": "record_persisted",
+            "expected_value": "Operational",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 2
+              }
+            ],
+            "required": true,
+            "id": "55c5b686-1d1e-560b-8aa3-abea82724080"
+          },
+          {
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "description": "Observed pre/post transition, when a pre-execution baseline exists",
+            "assertion_type": "state_transition",
+            "expected_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": false,
+            "id": "792a41d1-4a4c-53bc-ba8e-4493b73d7c67"
+          },
+          {
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "description": "No unrelated assets changed since the pre-execution baseline, when available",
+            "assertion_type": "equals",
+            "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "inventory_digest",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "8b5e286f-b872-5d56-9f2a-82d9acf08b03"
+          }
+        ],
+        "approved_by": "benchmark-operator",
+        "approval_reason": "Persisted-state checks derived from the exact approved inventory objective",
+        "baseline": {
+          "artifact_id": "4159a93a-89e8-4e06-b7ab-5e3220d267ae",
+          "content_hash": "6107f5a8d25230094e1fac53dc79404c19ed617eb3a7880a77ccec4b7c686631",
+          "captured_at": "2026-10-29 20:57:43.113198+00:00",
+          "source_store_id": "0941dd44-7f30-4e3f-b3bf-5147dfa0842e",
+          "collection_id": "e4492de0-826e-4795-8adc-86d281538f4b"
+        },
+        "id": "e4492de0-826e-4795-8adc-86d281538f4b",
+        "created_at": "2026-10-29 20:57:42.444098+00:00",
+        "digest": "8a34c376ab88c81e5a289f87bc5db2e3366d3ae1d92b97aa8dbb403fc5bcaa83"
+      },
+      "verification": {
+        "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+        "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+        "criteria_version_id": "e4492de0-826e-4795-8adc-86d281538f4b",
+        "idempotency_key": "terminal",
+        "id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+        "status": "COMPLETED",
+        "started_at": "2026-10-29 20:57:48.678257+00:00",
+        "completed_at": "2026-10-29 20:57:52.047375+00:00",
+        "final_verdict": "VERIFIED_FAILURE",
+        "evidence_ids": [
+          "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+          "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+          "15494670-9aa5-4094-9ebc-255cd8531679",
+          "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+          "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+          "d31e5558-3959-4cc9-8732-db62e8737743",
+          "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+          "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+        ],
+        "criteria_results": [
+          {
+            "criterion_id": "70d2bd68-48d4-52e3-b1ba-3c823c7da0c1",
+            "status": "PASS",
+            "observed_value": true,
+            "expected_value": true,
+            "evidence_ids": [
+              "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+              "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+              "15494670-9aa5-4094-9ebc-255cd8531679",
+              "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+              "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+              "d31e5558-3959-4cc9-8732-db62e8737743",
+              "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+              "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+            ],
+            "explanation": "Record/field existence established by read-only database snapshots"
+          },
+          {
+            "criterion_id": "3e2b64b6-11b1-56e3-bf60-91c422e002d0",
+            "status": "FAIL",
+            "observed_value": "Inactive",
+            "expected_value": "Operational",
+            "evidence_ids": [
+              "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+              "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+              "15494670-9aa5-4094-9ebc-255cd8531679",
+              "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+              "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+              "d31e5558-3959-4cc9-8732-db62e8737743",
+              "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+              "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+            ],
+            "explanation": "Deterministic assertion against fresh persisted state"
+          },
+          {
+            "criterion_id": "55c5b686-1d1e-560b-8aa3-abea82724080",
+            "status": "FAIL",
+            "observed_value": "Inactive",
+            "expected_value": "Operational",
+            "evidence_ids": [
+              "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+              "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+              "15494670-9aa5-4094-9ebc-255cd8531679",
+              "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+              "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+              "d31e5558-3959-4cc9-8732-db62e8737743",
+              "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+              "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+            ],
+            "explanation": "Two read-only SQLite snapshots agree on record identity, version and value"
+          },
+          {
+            "criterion_id": "792a41d1-4a4c-53bc-ba8e-4493b73d7c67",
+            "status": "FAIL",
+            "observed_value": {
+              "before": "Inactive",
+              "after": "Inactive"
+            },
+            "expected_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "evidence_ids": [
+              "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+              "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+              "15494670-9aa5-4094-9ebc-255cd8531679",
+              "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+              "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+              "d31e5558-3959-4cc9-8732-db62e8737743",
+              "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+              "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+            ],
+            "explanation": "Transition and record version compared; causal attribution is not inferred"
+          },
+          {
+            "criterion_id": "8b5e286f-b872-5d56-9f2a-82d9acf08b03",
+            "status": "FAIL",
+            "observed_value": "05d6be1f8b07c9d6040b39614f546a79abc2aca5540481b80fb4359167ea918e",
+            "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "evidence_ids": [
+              "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+              "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+              "15494670-9aa5-4094-9ebc-255cd8531679",
+              "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+              "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+              "d31e5558-3959-4cc9-8732-db62e8737743",
+              "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+              "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+            ],
+            "explanation": "Deterministic assertion against fresh persisted state"
+          }
+        ],
+        "version": 18,
+        "error_code": null,
+        "limitations": [],
+        "correlation_id": "389f8301-032a-4cbf-86d3-dfb6c4e20f1f"
+      },
+      "execution_summary": {
+        "status": "COMPLETED",
+        "declared_overall_goal_verified": false,
+        "action_count": 9,
+        "actions_executed": 9,
+        "immediate_postconditions_passed": 9
+      },
+      "evidence": [
+        {
+          "verification_session_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:43.113198+00:00",
+          "artifact_reference": "4159a93a-89e8-4e06-b7ab-5e3220d267ae",
+          "content_hash": "6107f5a8d25230094e1fac53dc79404c19ed617eb3a7880a77ccec4b7c686631",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "Pre-execution read-only SQLite baseline",
+            "target_record_id": "PC-104",
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+            "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+            "role": "baseline",
+            "source_url": "http://127.0.0.1:59618/verification/v1/snapshot",
+            "nonce": "01139d3f-3813-4a92-815b-b94fbb269e45",
+            "source_store_id": "0941dd44-7f30-4e3f-b3bf-5147dfa0842e",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "4437e3f0-f76a-4ae2-9f62-4400b090d529"
+        },
+        {
+          "verification_session_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+          "evidence_type": "READ_ONLY_API_RESPONSE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:49.473890+00:00",
+          "artifact_reference": "110d0285-a35f-4c85-a732-9eaa49de8422",
+          "content_hash": "57868fb7459be9953fa77e6962d00e84372bdb3c995920c0954fb6b7bad38354",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+            "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+            "role": "final",
+            "source_url": "http://127.0.0.1:59618/verification/v1/snapshot",
+            "nonce": "11bea404-ae19-4b7a-be93-c7800ff41e2e",
+            "source_store_id": "0941dd44-7f30-4e3f-b3bf-5147dfa0842e",
+            "content_type": "application/json",
+            "byte_count": 1015
+          },
+          "id": "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527"
+        },
+        {
+          "verification_session_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:49.473890+00:00",
+          "artifact_reference": "110d0285-a35f-4c85-a732-9eaa49de8422",
+          "content_hash": "57868fb7459be9953fa77e6962d00e84372bdb3c995920c0954fb6b7bad38354",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+            "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+            "role": "final",
+            "source_url": "http://127.0.0.1:59618/verification/v1/snapshot",
+            "nonce": "11bea404-ae19-4b7a-be93-c7800ff41e2e",
+            "source_store_id": "0941dd44-7f30-4e3f-b3bf-5147dfa0842e",
+            "content_type": "application/json",
+            "byte_count": 1015
+          },
+          "id": "15494670-9aa5-4094-9ebc-255cd8531679"
+        },
+        {
+          "verification_session_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+          "evidence_type": "SCREENSHOT",
+          "source": "inventory-readonly-browser",
+          "captured_at": "2026-10-29 20:57:50.622422+00:00",
+          "artifact_reference": "4d276bc6-d936-4df5-a885-15a4f15f1199",
+          "content_hash": "dfef318c658b9677055d7789bc661858e3eb20c9c300f97a13d2f883900645f2",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.browser.v1",
+            "collection_method": "Fresh isolated GET-only Chromium context",
+            "target_record_id": "PC-104",
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+            "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+            "role": "final",
+            "source_url": "http://127.0.0.1:59618/",
+            "nonce": "88ad18e6-47d3-4465-9d45-aea9449641c9",
+            "source_store_id": "0941dd44-7f30-4e3f-b3bf-5147dfa0842e",
+            "content_type": "image/png",
+            "byte_count": 38174
+          },
+          "id": "98c9c739-5a38-43f0-8aad-0daf3a49a5ca"
+        },
+        {
+          "verification_session_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+          "evidence_type": "DOM_SNAPSHOT",
+          "source": "inventory-readonly-browser",
+          "captured_at": "2026-10-29 20:57:50.622422+00:00",
+          "artifact_reference": "65aed1f6-3a04-4bbc-a5ca-46c64e952f28",
+          "content_hash": "8dbfea919058ea548ed06c22209079e9fe7f0f86e0fc2edfda535b42874b4ef7",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.browser.v1",
+            "collection_method": "Fixed read-only DOM fields",
+            "target_record_id": "PC-104",
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+            "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+            "role": "final",
+            "source_url": "http://127.0.0.1:59618/",
+            "nonce": "88ad18e6-47d3-4465-9d45-aea9449641c9",
+            "source_store_id": "0941dd44-7f30-4e3f-b3bf-5147dfa0842e",
+            "content_type": "application/json",
+            "byte_count": 136
+          },
+          "id": "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c"
+        },
+        {
+          "verification_session_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+          "evidence_type": "READ_ONLY_API_RESPONSE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:51.496761+00:00",
+          "artifact_reference": "e1eacc6b-3ea8-4fb7-a44e-b9d859be05ea",
+          "content_hash": "7dc1716c28b6d2f0d6e010026ecfde90396212624a5910c870c965bfec724044",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+            "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+            "role": "final",
+            "source_url": "http://127.0.0.1:59618/verification/v1/snapshot",
+            "nonce": "c0403fcd-873d-43d3-86ba-807868afe3df",
+            "source_store_id": "0941dd44-7f30-4e3f-b3bf-5147dfa0842e",
+            "content_type": "application/json",
+            "byte_count": 1015
+          },
+          "id": "d31e5558-3959-4cc9-8732-db62e8737743"
+        },
+        {
+          "verification_session_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:51.496761+00:00",
+          "artifact_reference": "e1eacc6b-3ea8-4fb7-a44e-b9d859be05ea",
+          "content_hash": "7dc1716c28b6d2f0d6e010026ecfde90396212624a5910c870c965bfec724044",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+            "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+            "role": "final",
+            "source_url": "http://127.0.0.1:59618/verification/v1/snapshot",
+            "nonce": "c0403fcd-873d-43d3-86ba-807868afe3df",
+            "source_store_id": "0941dd44-7f30-4e3f-b3bf-5147dfa0842e",
+            "content_type": "application/json",
+            "byte_count": 1015
+          },
+          "id": "1d9c3a73-e591-4ad1-b881-4230fbc9a180"
+        },
+        {
+          "verification_session_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+          "evidence_type": "EXECUTION_TRACE",
+          "source": "execution-declaration",
+          "captured_at": "2026-10-29 20:57:51.517096+00:00",
+          "artifact_reference": "8a77d0b4-88a0-4645-942c-0129c7b40066",
+          "content_hash": "c47775329ea468c7795a472233e8eeeb41b0e68c4024d145d11fa5ccfea7f7c3",
+          "metadata": {
+            "source_system": "inti.execution.declared.v1",
+            "collection_method": "Stored execution trace; not outcome proof",
+            "target_record_id": "PC-104",
+            "task_id": "97ecc4b7-73db-4d7f-abcc-1320068f414a",
+            "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+            "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+            "role": "supplementary",
+            "source_url": "execution:f5769856-5321-4ff9-8ee7-8bc538d0d453",
+            "nonce": "ca099f8a-746b-4099-af64-2e9ab994e949",
+            "source_store_id": "0941dd44-7f30-4e3f-b3bf-5147dfa0842e",
+            "content_type": "application/json",
+            "byte_count": 1324
+          },
+          "id": "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+        }
+      ],
+      "criteria_results": [
+        {
+          "criterion_id": "70d2bd68-48d4-52e3-b1ba-3c823c7da0c1",
+          "status": "PASS",
+          "observed_value": true,
+          "expected_value": true,
+          "evidence_ids": [
+            "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+            "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+            "15494670-9aa5-4094-9ebc-255cd8531679",
+            "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+            "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+            "d31e5558-3959-4cc9-8732-db62e8737743",
+            "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+            "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+          ],
+          "explanation": "Record/field existence established by read-only database snapshots"
+        },
+        {
+          "criterion_id": "3e2b64b6-11b1-56e3-bf60-91c422e002d0",
+          "status": "FAIL",
+          "observed_value": "Inactive",
+          "expected_value": "Operational",
+          "evidence_ids": [
+            "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+            "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+            "15494670-9aa5-4094-9ebc-255cd8531679",
+            "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+            "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+            "d31e5558-3959-4cc9-8732-db62e8737743",
+            "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+            "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+          ],
+          "explanation": "Deterministic assertion against fresh persisted state"
+        },
+        {
+          "criterion_id": "55c5b686-1d1e-560b-8aa3-abea82724080",
+          "status": "FAIL",
+          "observed_value": "Inactive",
+          "expected_value": "Operational",
+          "evidence_ids": [
+            "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+            "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+            "15494670-9aa5-4094-9ebc-255cd8531679",
+            "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+            "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+            "d31e5558-3959-4cc9-8732-db62e8737743",
+            "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+            "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+          ],
+          "explanation": "Two read-only SQLite snapshots agree on record identity, version and value"
+        },
+        {
+          "criterion_id": "792a41d1-4a4c-53bc-ba8e-4493b73d7c67",
+          "status": "FAIL",
+          "observed_value": {
+            "before": "Inactive",
+            "after": "Inactive"
+          },
+          "expected_value": {
+            "before": "Inactive",
+            "after": "Operational"
+          },
+          "evidence_ids": [
+            "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+            "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+            "15494670-9aa5-4094-9ebc-255cd8531679",
+            "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+            "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+            "d31e5558-3959-4cc9-8732-db62e8737743",
+            "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+            "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+          ],
+          "explanation": "Transition and record version compared; causal attribution is not inferred"
+        },
+        {
+          "criterion_id": "8b5e286f-b872-5d56-9f2a-82d9acf08b03",
+          "status": "FAIL",
+          "observed_value": "05d6be1f8b07c9d6040b39614f546a79abc2aca5540481b80fb4359167ea918e",
+          "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+          "evidence_ids": [
+            "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+            "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+            "15494670-9aa5-4094-9ebc-255cd8531679",
+            "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+            "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+            "d31e5558-3959-4cc9-8732-db62e8737743",
+            "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+            "12cf9eac-9593-4739-8f7d-c871acb7c62a"
+          ],
+          "explanation": "Deterministic assertion against fresh persisted state"
+        }
+      ],
+      "final_verdict": "VERIFIED_FAILURE",
+      "effective_verdict": "VERIFIED_FAILURE",
+      "integrity_checks": [
+        {
+          "evidence_id": "4437e3f0-f76a-4ae2-9f62-4400b090d529",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "bfcd4c74-efeb-4e44-93f4-48cd7c5e7527",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "15494670-9aa5-4094-9ebc-255cd8531679",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "98c9c739-5a38-43f0-8aad-0daf3a49a5ca",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "90860f55-6a27-4fbf-8d80-cfe5a71f4b9c",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "d31e5558-3959-4cc9-8732-db62e8737743",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "1d9c3a73-e591-4ad1-b881-4230fbc9a180",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "12cf9eac-9593-4739-8f7d-c871acb7c62a",
+          "intact": true,
+          "error": null
+        }
+      ],
+      "limitations": [
+        "Hashes detect content changes against stored records; storage is not tamper-proof",
+        "Observed persisted state does not prove exclusive execution causality",
+        "Archived evidence is evaluated against its original collection-time freshness"
+      ]
+    },
+    "scenario": "wrong_record_updated",
+    "fault_seed": 42
+  },
+  {
+    "recorded_at": "2026-10-29T20:58:06.133890+00:00",
+    "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+    "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+    "execution_status": "COMPLETED",
+    "all_immediate_postconditions_passed": true,
+    "goal_persisted_ground_truth": false,
+    "unrelated_assets_unchanged_ground_truth": true,
+    "expected_verdict": "VERIFIED_FAILURE",
+    "actual_verdict": "VERIFIED_FAILURE",
+    "verification_status": "COMPLETED",
+    "latency_ms": 3231.02020000033,
+    "evidence_count": 8,
+    "evidence_collection_failures": 0,
+    "integrity_failures": 0,
+    "verifier_changed_inventory": false,
+    "criterion_results": [
+      {
+        "criterion_id": "0b6e9a92-9ca3-548e-bf65-1fd1b882582d",
+        "expected": "PASS",
+        "observed": "PASS"
+      },
+      {
+        "criterion_id": "5ffea81f-e625-5295-a64b-812ecd2d238f",
+        "expected": "FAIL",
+        "observed": "FAIL"
+      },
+      {
+        "criterion_id": "aac7e384-87fc-5d71-9b49-4de3a8f90a62",
+        "expected": "FAIL",
+        "observed": "FAIL"
+      },
+      {
+        "criterion_id": "1b1cf943-afb0-5d71-abd1-1ff962a989e3",
+        "expected": "FAIL",
+        "observed": "FAIL"
+      },
+      {
+        "criterion_id": "81fb5922-f23c-5758-b445-e3c528934bca",
+        "expected": "PASS",
+        "observed": "PASS"
+      }
+    ],
+    "source_available": true,
+    "model_calls": 0,
+    "report": {
+      "project": "INTI AI",
+      "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+      "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+      "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+      "original_objective": "Find asset PC-104 and change its status to Operational.",
+      "criteria_version": {
+        "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+        "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+        "objective": "Find asset PC-104 and change its status to Operational.",
+        "original_manifest_digest": "e3236f90d680e82cc504548cabd84432072db666a4d4454c7762a4dd69c0a4da",
+        "version": 1,
+        "criteria": [
+          {
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "description": "Asset PC-104 exists in the persisted store",
+            "assertion_type": "exists",
+            "expected_value": true,
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "id",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "0b6e9a92-9ca3-548e-bf65-1fd1b882582d"
+          },
+          {
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "description": "Asset PC-104 has persisted status Operational",
+            "assertion_type": "equals",
+            "expected_value": "Operational",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "5ffea81f-e625-5295-a64b-812ecd2d238f"
+          },
+          {
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "description": "Asset PC-104 status is stable across fresh persisted reads",
+            "assertion_type": "record_persisted",
+            "expected_value": "Operational",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 2
+              }
+            ],
+            "required": true,
+            "id": "aac7e384-87fc-5d71-9b49-4de3a8f90a62"
+          },
+          {
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "description": "Observed pre/post transition, when a pre-execution baseline exists",
+            "assertion_type": "state_transition",
+            "expected_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": false,
+            "id": "1b1cf943-afb0-5d71-abd1-1ff962a989e3"
+          },
+          {
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "description": "No unrelated assets changed since the pre-execution baseline, when available",
+            "assertion_type": "equals",
+            "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "inventory_digest",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "81fb5922-f23c-5758-b445-e3c528934bca"
+          }
+        ],
+        "approved_by": "benchmark-operator",
+        "approval_reason": "Persisted-state checks derived from the exact approved inventory objective",
+        "baseline": {
+          "artifact_id": "a6c4959c-dcda-46c7-b315-11b8dc778b2a",
+          "content_hash": "36cdfd9561415b1774a6a5070ee2218429448822e44ac822371d43e0c1318c84",
+          "captured_at": "2026-10-29 20:57:57.513233+00:00",
+          "source_store_id": "127521d5-842b-4f64-94c1-c9ca27737b49",
+          "collection_id": "9d4fd86c-a804-4e4f-a1a7-38acd6de8e00"
+        },
+        "id": "9d4fd86c-a804-4e4f-a1a7-38acd6de8e00",
+        "created_at": "2026-10-29 20:57:56.870215+00:00",
+        "digest": "fd6d248d84d81bf904be8bd0f6cef9c9387b3dfb6f06bfa3a009d355d6b34f63"
+      },
+      "verification": {
+        "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+        "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+        "criteria_version_id": "9d4fd86c-a804-4e4f-a1a7-38acd6de8e00",
+        "idempotency_key": "terminal",
+        "id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+        "status": "COMPLETED",
+        "started_at": "2026-10-29 20:58:02.869988+00:00",
+        "completed_at": "2026-10-29 20:58:06.058145+00:00",
+        "final_verdict": "VERIFIED_FAILURE",
+        "evidence_ids": [
+          "0eec61d6-957c-41ae-aafd-9037ff316974",
+          "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+          "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+          "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+          "c1ae963a-49dc-4e94-a165-7f56e0547537",
+          "700866fa-ca8c-4464-a8a4-90be877a3f58",
+          "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+          "461905f2-431f-43db-920a-9f068baa77ca"
+        ],
+        "criteria_results": [
+          {
+            "criterion_id": "0b6e9a92-9ca3-548e-bf65-1fd1b882582d",
+            "status": "PASS",
+            "observed_value": true,
+            "expected_value": true,
+            "evidence_ids": [
+              "0eec61d6-957c-41ae-aafd-9037ff316974",
+              "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+              "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+              "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+              "c1ae963a-49dc-4e94-a165-7f56e0547537",
+              "700866fa-ca8c-4464-a8a4-90be877a3f58",
+              "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+              "461905f2-431f-43db-920a-9f068baa77ca"
+            ],
+            "explanation": "Record/field existence established by read-only database snapshots"
+          },
+          {
+            "criterion_id": "5ffea81f-e625-5295-a64b-812ecd2d238f",
+            "status": "FAIL",
+            "observed_value": "Inactive",
+            "expected_value": "Operational",
+            "evidence_ids": [
+              "0eec61d6-957c-41ae-aafd-9037ff316974",
+              "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+              "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+              "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+              "c1ae963a-49dc-4e94-a165-7f56e0547537",
+              "700866fa-ca8c-4464-a8a4-90be877a3f58",
+              "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+              "461905f2-431f-43db-920a-9f068baa77ca"
+            ],
+            "explanation": "Deterministic assertion against fresh persisted state"
+          },
+          {
+            "criterion_id": "aac7e384-87fc-5d71-9b49-4de3a8f90a62",
+            "status": "FAIL",
+            "observed_value": "Inactive",
+            "expected_value": "Operational",
+            "evidence_ids": [
+              "0eec61d6-957c-41ae-aafd-9037ff316974",
+              "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+              "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+              "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+              "c1ae963a-49dc-4e94-a165-7f56e0547537",
+              "700866fa-ca8c-4464-a8a4-90be877a3f58",
+              "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+              "461905f2-431f-43db-920a-9f068baa77ca"
+            ],
+            "explanation": "Two read-only SQLite snapshots agree on record identity, version and value"
+          },
+          {
+            "criterion_id": "1b1cf943-afb0-5d71-abd1-1ff962a989e3",
+            "status": "FAIL",
+            "observed_value": {
+              "before": "Inactive",
+              "after": "Inactive"
+            },
+            "expected_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "evidence_ids": [
+              "0eec61d6-957c-41ae-aafd-9037ff316974",
+              "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+              "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+              "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+              "c1ae963a-49dc-4e94-a165-7f56e0547537",
+              "700866fa-ca8c-4464-a8a4-90be877a3f58",
+              "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+              "461905f2-431f-43db-920a-9f068baa77ca"
+            ],
+            "explanation": "Transition and record version compared; causal attribution is not inferred"
+          },
+          {
+            "criterion_id": "81fb5922-f23c-5758-b445-e3c528934bca",
+            "status": "PASS",
+            "observed_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "evidence_ids": [
+              "0eec61d6-957c-41ae-aafd-9037ff316974",
+              "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+              "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+              "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+              "c1ae963a-49dc-4e94-a165-7f56e0547537",
+              "700866fa-ca8c-4464-a8a4-90be877a3f58",
+              "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+              "461905f2-431f-43db-920a-9f068baa77ca"
+            ],
+            "explanation": "Deterministic assertion against fresh persisted state"
+          }
+        ],
+        "version": 18,
+        "error_code": null,
+        "limitations": [],
+        "correlation_id": "8f75adff-eaa6-4fc0-92e6-ee7db32d5160"
+      },
+      "execution_summary": {
+        "status": "COMPLETED",
+        "declared_overall_goal_verified": false,
+        "action_count": 9,
+        "actions_executed": 9,
+        "immediate_postconditions_passed": 9
+      },
+      "evidence": [
+        {
+          "verification_session_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:57:57.513233+00:00",
+          "artifact_reference": "a6c4959c-dcda-46c7-b315-11b8dc778b2a",
+          "content_hash": "36cdfd9561415b1774a6a5070ee2218429448822e44ac822371d43e0c1318c84",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "Pre-execution read-only SQLite baseline",
+            "target_record_id": "PC-104",
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+            "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+            "role": "baseline",
+            "source_url": "http://127.0.0.1:61325/verification/v1/snapshot",
+            "nonce": "da556121-9f83-4b6e-84ef-2e0ed6007f3e",
+            "source_store_id": "127521d5-842b-4f64-94c1-c9ca27737b49",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "0eec61d6-957c-41ae-aafd-9037ff316974"
+        },
+        {
+          "verification_session_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+          "evidence_type": "READ_ONLY_API_RESPONSE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:58:03.632047+00:00",
+          "artifact_reference": "96d9456b-ad02-4590-ab28-251d78fd32bf",
+          "content_hash": "376e5627f9dc890545e96b28e339ecc115f7d53e57c3b05dc44d242da6fddcbd",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+            "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61325/verification/v1/snapshot",
+            "nonce": "66857991-cb53-4685-b5b6-44f0737df847",
+            "source_store_id": "127521d5-842b-4f64-94c1-c9ca27737b49",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "382d902c-24c5-4861-bcd1-3f18cafc08b0"
+        },
+        {
+          "verification_session_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:58:03.632047+00:00",
+          "artifact_reference": "96d9456b-ad02-4590-ab28-251d78fd32bf",
+          "content_hash": "376e5627f9dc890545e96b28e339ecc115f7d53e57c3b05dc44d242da6fddcbd",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+            "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61325/verification/v1/snapshot",
+            "nonce": "66857991-cb53-4685-b5b6-44f0737df847",
+            "source_store_id": "127521d5-842b-4f64-94c1-c9ca27737b49",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "92b77125-36e4-4d7f-8ee9-0493dbdd386f"
+        },
+        {
+          "verification_session_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+          "evidence_type": "SCREENSHOT",
+          "source": "inventory-readonly-browser",
+          "captured_at": "2026-10-29 20:58:04.759317+00:00",
+          "artifact_reference": "235b6384-b184-472e-bfbd-344a4d340683",
+          "content_hash": "911f85a5624b1b4f6c49aa4912f0e1377092794db243180d5f8e30ecb021abdd",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.browser.v1",
+            "collection_method": "Fresh isolated GET-only Chromium context",
+            "target_record_id": "PC-104",
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+            "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61325/",
+            "nonce": "0502b608-4c7c-4e4f-bc6e-b43f07de6973",
+            "source_store_id": "127521d5-842b-4f64-94c1-c9ca27737b49",
+            "content_type": "image/png",
+            "byte_count": 37999
+          },
+          "id": "1daa7629-44bc-4eeb-8df9-17e52dc73ae7"
+        },
+        {
+          "verification_session_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+          "evidence_type": "DOM_SNAPSHOT",
+          "source": "inventory-readonly-browser",
+          "captured_at": "2026-10-29 20:58:04.759317+00:00",
+          "artifact_reference": "5249710a-bdee-4453-b8c1-77955259a440",
+          "content_hash": "c39768ad8fdf21140b0d17a30e59f9652c7734b14811b6fefd21da0960f33cf9",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.browser.v1",
+            "collection_method": "Fixed read-only DOM fields",
+            "target_record_id": "PC-104",
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+            "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61325/",
+            "nonce": "0502b608-4c7c-4e4f-bc6e-b43f07de6973",
+            "source_store_id": "127521d5-842b-4f64-94c1-c9ca27737b49",
+            "content_type": "application/json",
+            "byte_count": 136
+          },
+          "id": "c1ae963a-49dc-4e94-a165-7f56e0547537"
+        },
+        {
+          "verification_session_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+          "evidence_type": "READ_ONLY_API_RESPONSE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:58:05.629825+00:00",
+          "artifact_reference": "5a0dab87-f5c5-48da-86e1-724a991ce1d1",
+          "content_hash": "53a8936bb371e196fdad0f8f5bd50358ecd5a04bf0fee0d35f8cb0d984be0234",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+            "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61325/verification/v1/snapshot",
+            "nonce": "b3c86a18-5c22-4c5c-a002-9d29aad1b02a",
+            "source_store_id": "127521d5-842b-4f64-94c1-c9ca27737b49",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "700866fa-ca8c-4464-a8a4-90be877a3f58"
+        },
+        {
+          "verification_session_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:58:05.629825+00:00",
+          "artifact_reference": "5a0dab87-f5c5-48da-86e1-724a991ce1d1",
+          "content_hash": "53a8936bb371e196fdad0f8f5bd50358ecd5a04bf0fee0d35f8cb0d984be0234",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+            "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61325/verification/v1/snapshot",
+            "nonce": "b3c86a18-5c22-4c5c-a002-9d29aad1b02a",
+            "source_store_id": "127521d5-842b-4f64-94c1-c9ca27737b49",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52"
+        },
+        {
+          "verification_session_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+          "evidence_type": "EXECUTION_TRACE",
+          "source": "execution-declaration",
+          "captured_at": "2026-10-29 20:58:05.644802+00:00",
+          "artifact_reference": "f835d447-bfae-4d14-9659-89f2c655bf09",
+          "content_hash": "5b21eb3c4260ce5280fefd17d82656b659b04d43802fdf7941a505628d2022f8",
+          "metadata": {
+            "source_system": "inti.execution.declared.v1",
+            "collection_method": "Stored execution trace; not outcome proof",
+            "target_record_id": "PC-104",
+            "task_id": "63799fbb-6f01-477c-9352-2791d510630b",
+            "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+            "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+            "role": "supplementary",
+            "source_url": "execution:6527356c-f694-4a43-a7e2-89d188322e52",
+            "nonce": "ba948d38-6917-49fc-b961-31c4e962e390",
+            "source_store_id": "127521d5-842b-4f64-94c1-c9ca27737b49",
+            "content_type": "application/json",
+            "byte_count": 1324
+          },
+          "id": "461905f2-431f-43db-920a-9f068baa77ca"
+        }
+      ],
+      "criteria_results": [
+        {
+          "criterion_id": "0b6e9a92-9ca3-548e-bf65-1fd1b882582d",
+          "status": "PASS",
+          "observed_value": true,
+          "expected_value": true,
+          "evidence_ids": [
+            "0eec61d6-957c-41ae-aafd-9037ff316974",
+            "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+            "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+            "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+            "c1ae963a-49dc-4e94-a165-7f56e0547537",
+            "700866fa-ca8c-4464-a8a4-90be877a3f58",
+            "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+            "461905f2-431f-43db-920a-9f068baa77ca"
+          ],
+          "explanation": "Record/field existence established by read-only database snapshots"
+        },
+        {
+          "criterion_id": "5ffea81f-e625-5295-a64b-812ecd2d238f",
+          "status": "FAIL",
+          "observed_value": "Inactive",
+          "expected_value": "Operational",
+          "evidence_ids": [
+            "0eec61d6-957c-41ae-aafd-9037ff316974",
+            "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+            "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+            "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+            "c1ae963a-49dc-4e94-a165-7f56e0547537",
+            "700866fa-ca8c-4464-a8a4-90be877a3f58",
+            "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+            "461905f2-431f-43db-920a-9f068baa77ca"
+          ],
+          "explanation": "Deterministic assertion against fresh persisted state"
+        },
+        {
+          "criterion_id": "aac7e384-87fc-5d71-9b49-4de3a8f90a62",
+          "status": "FAIL",
+          "observed_value": "Inactive",
+          "expected_value": "Operational",
+          "evidence_ids": [
+            "0eec61d6-957c-41ae-aafd-9037ff316974",
+            "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+            "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+            "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+            "c1ae963a-49dc-4e94-a165-7f56e0547537",
+            "700866fa-ca8c-4464-a8a4-90be877a3f58",
+            "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+            "461905f2-431f-43db-920a-9f068baa77ca"
+          ],
+          "explanation": "Two read-only SQLite snapshots agree on record identity, version and value"
+        },
+        {
+          "criterion_id": "1b1cf943-afb0-5d71-abd1-1ff962a989e3",
+          "status": "FAIL",
+          "observed_value": {
+            "before": "Inactive",
+            "after": "Inactive"
+          },
+          "expected_value": {
+            "before": "Inactive",
+            "after": "Operational"
+          },
+          "evidence_ids": [
+            "0eec61d6-957c-41ae-aafd-9037ff316974",
+            "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+            "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+            "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+            "c1ae963a-49dc-4e94-a165-7f56e0547537",
+            "700866fa-ca8c-4464-a8a4-90be877a3f58",
+            "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+            "461905f2-431f-43db-920a-9f068baa77ca"
+          ],
+          "explanation": "Transition and record version compared; causal attribution is not inferred"
+        },
+        {
+          "criterion_id": "81fb5922-f23c-5758-b445-e3c528934bca",
+          "status": "PASS",
+          "observed_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+          "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+          "evidence_ids": [
+            "0eec61d6-957c-41ae-aafd-9037ff316974",
+            "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+            "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+            "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+            "c1ae963a-49dc-4e94-a165-7f56e0547537",
+            "700866fa-ca8c-4464-a8a4-90be877a3f58",
+            "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+            "461905f2-431f-43db-920a-9f068baa77ca"
+          ],
+          "explanation": "Deterministic assertion against fresh persisted state"
+        }
+      ],
+      "final_verdict": "VERIFIED_FAILURE",
+      "effective_verdict": "VERIFIED_FAILURE",
+      "integrity_checks": [
+        {
+          "evidence_id": "0eec61d6-957c-41ae-aafd-9037ff316974",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "382d902c-24c5-4861-bcd1-3f18cafc08b0",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "92b77125-36e4-4d7f-8ee9-0493dbdd386f",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "1daa7629-44bc-4eeb-8df9-17e52dc73ae7",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "c1ae963a-49dc-4e94-a165-7f56e0547537",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "700866fa-ca8c-4464-a8a4-90be877a3f58",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "115ecc84-b692-4fd4-a1d0-40c7fdf2fd52",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "461905f2-431f-43db-920a-9f068baa77ca",
+          "intact": true,
+          "error": null
+        }
+      ],
+      "limitations": [
+        "Hashes detect content changes against stored records; storage is not tamper-proof",
+        "Observed persisted state does not prove exclusive execution causality",
+        "Archived evidence is evaluated against its original collection-time freshness"
+      ]
+    },
+    "scenario": "optimistic_ui_without_persistence",
+    "fault_seed": 42
+  },
+  {
+    "recorded_at": "2026-10-29T20:58:19.604070+00:00",
+    "execution_id": "ebf9805b-4a80-4d20-acb4-2bf89ef2a040",
+    "verification_id": "d2de3578-847a-4a5a-b8c9-d3894ee85541",
+    "execution_status": "COMPLETED",
+    "all_immediate_postconditions_passed": true,
+    "goal_persisted_ground_truth": true,
+    "unrelated_assets_unchanged_ground_truth": true,
+    "expected_verdict": "INCONCLUSIVE",
+    "actual_verdict": "INCONCLUSIVE",
+    "verification_status": "INCONCLUSIVE",
+    "latency_ms": 3135.624999999891,
+    "evidence_count": 2,
+    "evidence_collection_failures": 3,
+    "integrity_failures": 0,
+    "verifier_changed_inventory": false,
+    "criterion_results": [
+      {
+        "criterion_id": "abbeeb4d-1999-59ea-9572-b8a770155132",
+        "expected": "UNKNOWN",
+        "observed": "UNKNOWN"
+      },
+      {
+        "criterion_id": "e3ce9727-d097-56f1-9e36-d31b1f0d9e2a",
+        "expected": "UNKNOWN",
+        "observed": "UNKNOWN"
+      },
+      {
+        "criterion_id": "2323439f-0b0c-522f-98d0-af50476c4205",
+        "expected": "UNKNOWN",
+        "observed": "UNKNOWN"
+      },
+      {
+        "criterion_id": "e27f3cb2-665f-528a-9409-152056d677bf",
+        "expected": "UNKNOWN",
+        "observed": "UNKNOWN"
+      },
+      {
+        "criterion_id": "a31b7edd-e313-504b-87c6-543653470218",
+        "expected": "UNKNOWN",
+        "observed": "UNKNOWN"
+      }
+    ],
+    "source_available": false,
+    "model_calls": 0,
+    "report": {
+      "project": "INTI AI",
+      "task_id": "43af466e-a0a1-47e5-8dfd-c266e9557643",
+      "execution_id": "ebf9805b-4a80-4d20-acb4-2bf89ef2a040",
+      "verification_id": "d2de3578-847a-4a5a-b8c9-d3894ee85541",
+      "original_objective": "Find asset PC-104 and change its status to Operational.",
+      "criteria_version": {
+        "task_id": "43af466e-a0a1-47e5-8dfd-c266e9557643",
+        "execution_id": "ebf9805b-4a80-4d20-acb4-2bf89ef2a040",
+        "objective": "Find asset PC-104 and change its status to Operational.",
+        "original_manifest_digest": "70118fd61f91b0a6d1dc86940a6c9b1098ccd0516d821b00b693d02ac92a7a13",
+        "version": 1,
+        "criteria": [
+          {
+            "task_id": "43af466e-a0a1-47e5-8dfd-c266e9557643",
+            "description": "Asset PC-104 exists in the persisted store",
+            "assertion_type": "exists",
+            "expected_value": true,
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "id",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "abbeeb4d-1999-59ea-9572-b8a770155132"
+          },
+          {
+            "task_id": "43af466e-a0a1-47e5-8dfd-c266e9557643",
+            "description": "Asset PC-104 has persisted status Operational",
+            "assertion_type": "equals",
+            "expected_value": "Operational",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "e3ce9727-d097-56f1-9e36-d31b1f0d9e2a"
+          },
+          {
+            "task_id": "43af466e-a0a1-47e5-8dfd-c266e9557643",
+            "description": "Asset PC-104 status is stable across fresh persisted reads",
+            "assertion_type": "record_persisted",
+            "expected_value": "Operational",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 2
+              }
+            ],
+            "required": true,
+            "id": "2323439f-0b0c-522f-98d0-af50476c4205"
+          },
+          {
+            "task_id": "43af466e-a0a1-47e5-8dfd-c266e9557643",
+            "description": "Observed pre/post transition, when a pre-execution baseline exists",
+            "assertion_type": "state_transition",
+            "expected_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": false,
+            "id": "e27f3cb2-665f-528a-9409-152056d677bf"
+          },
+          {
+            "task_id": "43af466e-a0a1-47e5-8dfd-c266e9557643",
+            "description": "No unrelated assets changed since the pre-execution baseline, when available",
+            "assertion_type": "equals",
+            "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "inventory_digest",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "a31b7edd-e313-504b-87c6-543653470218"
+          }
+        ],
+        "approved_by": "benchmark-operator",
+        "approval_reason": "Persisted-state checks derived from the exact approved inventory objective",
+        "baseline": {
+          "artifact_id": "4546f992-6396-4fac-b4e1-fc177fdf4475",
+          "content_hash": "656778f46d249c137672009ba5746587268e969c237a8601a598e487dfa4a83f",
+          "captured_at": "2026-10-29 20:58:10.878977+00:00",
+          "source_store_id": "3b961756-7251-4e7d-8a70-55f136cc2c25",
+          "collection_id": "783d8948-7e55-42b3-8d0a-3892e3e387c7"
+        },
+        "id": "783d8948-7e55-42b3-8d0a-3892e3e387c7",
+        "created_at": "2026-10-29 20:58:10.205399+00:00",
+        "digest": "7b55f765dc541cbebe804aada4a89fe72610950739095351c08679833ad6de07"
+      },
+      "verification": {
+        "task_id": "43af466e-a0a1-47e5-8dfd-c266e9557643",
+        "execution_id": "ebf9805b-4a80-4d20-acb4-2bf89ef2a040",
+        "criteria_version_id": "783d8948-7e55-42b3-8d0a-3892e3e387c7",
+        "idempotency_key": "terminal",
+        "id": "d2de3578-847a-4a5a-b8c9-d3894ee85541",
+        "status": "INCONCLUSIVE",
+        "started_at": "2026-10-29 20:58:16.465123+00:00",
+        "completed_at": "2026-10-29 20:58:19.545111+00:00",
+        "final_verdict": "INCONCLUSIVE",
+        "evidence_ids": [
+          "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+          "fa898c82-f127-4434-900c-ebd07548ffff"
+        ],
+        "criteria_results": [
+          {
+            "criterion_id": "abbeeb4d-1999-59ea-9572-b8a770155132",
+            "status": "UNKNOWN",
+            "observed_value": null,
+            "expected_value": true,
+            "evidence_ids": [
+              "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+              "fa898c82-f127-4434-900c-ebd07548ffff"
+            ],
+            "explanation": "Required fresh, trustworthy evidence is unavailable"
+          },
+          {
+            "criterion_id": "e3ce9727-d097-56f1-9e36-d31b1f0d9e2a",
+            "status": "UNKNOWN",
+            "observed_value": null,
+            "expected_value": "Operational",
+            "evidence_ids": [
+              "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+              "fa898c82-f127-4434-900c-ebd07548ffff"
+            ],
+            "explanation": "Required fresh, trustworthy evidence is unavailable"
+          },
+          {
+            "criterion_id": "2323439f-0b0c-522f-98d0-af50476c4205",
+            "status": "UNKNOWN",
+            "observed_value": null,
+            "expected_value": "Operational",
+            "evidence_ids": [
+              "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+              "fa898c82-f127-4434-900c-ebd07548ffff"
+            ],
+            "explanation": "Required fresh, trustworthy evidence is unavailable"
+          },
+          {
+            "criterion_id": "e27f3cb2-665f-528a-9409-152056d677bf",
+            "status": "UNKNOWN",
+            "observed_value": null,
+            "expected_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "evidence_ids": [
+              "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+              "fa898c82-f127-4434-900c-ebd07548ffff"
+            ],
+            "explanation": "Required fresh, trustworthy evidence is unavailable"
+          },
+          {
+            "criterion_id": "a31b7edd-e313-504b-87c6-543653470218",
+            "status": "UNKNOWN",
+            "observed_value": null,
+            "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "evidence_ids": [
+              "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+              "fa898c82-f127-4434-900c-ebd07548ffff"
+            ],
+            "explanation": "Required fresh, trustworthy evidence is unavailable"
+          }
+        ],
+        "version": 12,
+        "error_code": null,
+        "limitations": [
+          "READ_ONLY_STATE_SAMPLE_1_UNAVAILABLE",
+          "READ_ONLY_BROWSER_UNAVAILABLE",
+          "READ_ONLY_STATE_SAMPLE_2_UNAVAILABLE"
+        ],
+        "correlation_id": "6ae62bef-8ddc-4eca-b61e-a66305e09f24"
+      },
+      "execution_summary": {
+        "status": "COMPLETED",
+        "declared_overall_goal_verified": false,
+        "action_count": 9,
+        "actions_executed": 9,
+        "immediate_postconditions_passed": 9
+      },
+      "evidence": [
+        {
+          "verification_session_id": "d2de3578-847a-4a5a-b8c9-d3894ee85541",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:58:10.878977+00:00",
+          "artifact_reference": "4546f992-6396-4fac-b4e1-fc177fdf4475",
+          "content_hash": "656778f46d249c137672009ba5746587268e969c237a8601a598e487dfa4a83f",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "Pre-execution read-only SQLite baseline",
+            "target_record_id": "PC-104",
+            "task_id": "43af466e-a0a1-47e5-8dfd-c266e9557643",
+            "execution_id": "ebf9805b-4a80-4d20-acb4-2bf89ef2a040",
+            "verification_id": "d2de3578-847a-4a5a-b8c9-d3894ee85541",
+            "role": "baseline",
+            "source_url": "http://127.0.0.1:61370/verification/v1/snapshot",
+            "nonce": "662a33c1-1085-4583-ac99-ca8047c2623f",
+            "source_store_id": "3b961756-7251-4e7d-8a70-55f136cc2c25",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "3998b97c-f989-4f33-b9a4-0a66c1971db0"
+        },
+        {
+          "verification_session_id": "d2de3578-847a-4a5a-b8c9-d3894ee85541",
+          "evidence_type": "EXECUTION_TRACE",
+          "source": "execution-declaration",
+          "captured_at": "2026-10-29 20:58:19.351036+00:00",
+          "artifact_reference": "3e31b924-9c3e-4055-a5f2-c3414bd0e962",
+          "content_hash": "4a5243e0274f18f5e25b6775a7279589e3b1d267cf5756daed9b6f40540b1cf2",
+          "metadata": {
+            "source_system": "inti.execution.declared.v1",
+            "collection_method": "Stored execution trace; not outcome proof",
+            "target_record_id": "PC-104",
+            "task_id": "43af466e-a0a1-47e5-8dfd-c266e9557643",
+            "execution_id": "ebf9805b-4a80-4d20-acb4-2bf89ef2a040",
+            "verification_id": "d2de3578-847a-4a5a-b8c9-d3894ee85541",
+            "role": "supplementary",
+            "source_url": "execution:ebf9805b-4a80-4d20-acb4-2bf89ef2a040",
+            "nonce": "174937d4-4265-41de-979c-e3be477483db",
+            "source_store_id": null,
+            "content_type": "application/json",
+            "byte_count": 1324
+          },
+          "id": "fa898c82-f127-4434-900c-ebd07548ffff"
+        }
+      ],
+      "criteria_results": [
+        {
+          "criterion_id": "abbeeb4d-1999-59ea-9572-b8a770155132",
+          "status": "UNKNOWN",
+          "observed_value": null,
+          "expected_value": true,
+          "evidence_ids": [
+            "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+            "fa898c82-f127-4434-900c-ebd07548ffff"
+          ],
+          "explanation": "Required fresh, trustworthy evidence is unavailable"
+        },
+        {
+          "criterion_id": "e3ce9727-d097-56f1-9e36-d31b1f0d9e2a",
+          "status": "UNKNOWN",
+          "observed_value": null,
+          "expected_value": "Operational",
+          "evidence_ids": [
+            "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+            "fa898c82-f127-4434-900c-ebd07548ffff"
+          ],
+          "explanation": "Required fresh, trustworthy evidence is unavailable"
+        },
+        {
+          "criterion_id": "2323439f-0b0c-522f-98d0-af50476c4205",
+          "status": "UNKNOWN",
+          "observed_value": null,
+          "expected_value": "Operational",
+          "evidence_ids": [
+            "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+            "fa898c82-f127-4434-900c-ebd07548ffff"
+          ],
+          "explanation": "Required fresh, trustworthy evidence is unavailable"
+        },
+        {
+          "criterion_id": "e27f3cb2-665f-528a-9409-152056d677bf",
+          "status": "UNKNOWN",
+          "observed_value": null,
+          "expected_value": {
+            "before": "Inactive",
+            "after": "Operational"
+          },
+          "evidence_ids": [
+            "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+            "fa898c82-f127-4434-900c-ebd07548ffff"
+          ],
+          "explanation": "Required fresh, trustworthy evidence is unavailable"
+        },
+        {
+          "criterion_id": "a31b7edd-e313-504b-87c6-543653470218",
+          "status": "UNKNOWN",
+          "observed_value": null,
+          "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+          "evidence_ids": [
+            "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+            "fa898c82-f127-4434-900c-ebd07548ffff"
+          ],
+          "explanation": "Required fresh, trustworthy evidence is unavailable"
+        }
+      ],
+      "final_verdict": "INCONCLUSIVE",
+      "effective_verdict": "INCONCLUSIVE",
+      "integrity_checks": [
+        {
+          "evidence_id": "3998b97c-f989-4f33-b9a4-0a66c1971db0",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "fa898c82-f127-4434-900c-ebd07548ffff",
+          "intact": true,
+          "error": null
+        }
+      ],
+      "limitations": [
+        "READ_ONLY_STATE_SAMPLE_1_UNAVAILABLE",
+        "READ_ONLY_BROWSER_UNAVAILABLE",
+        "READ_ONLY_STATE_SAMPLE_2_UNAVAILABLE",
+        "Hashes detect content changes against stored records; storage is not tamper-proof",
+        "Observed persisted state does not prove exclusive execution causality",
+        "Archived evidence is evaluated against its original collection-time freshness"
+      ]
+    },
+    "scenario": "read_only_source_unavailable",
+    "fault_seed": 42
+  },
+  {
+    "recorded_at": "2026-10-29T20:58:32.917940+00:00",
+    "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+    "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+    "execution_status": "COMPLETED",
+    "all_immediate_postconditions_passed": true,
+    "goal_persisted_ground_truth": true,
+    "unrelated_assets_unchanged_ground_truth": true,
+    "expected_verdict": "VERIFIED_SUCCESS",
+    "actual_verdict": "VERIFIED_SUCCESS",
+    "verification_status": "COMPLETED",
+    "latency_ms": 3413.3292000001347,
+    "evidence_count": 8,
+    "evidence_collection_failures": 0,
+    "integrity_failures": 0,
+    "verifier_changed_inventory": false,
+    "criterion_results": [
+      {
+        "criterion_id": "3bd09698-0447-5eda-87ef-1c1e889b7a66",
+        "expected": "PASS",
+        "observed": "PASS"
+      },
+      {
+        "criterion_id": "1fdde974-c514-5993-b24d-7b887b75e6c0",
+        "expected": "PASS",
+        "observed": "PASS"
+      },
+      {
+        "criterion_id": "1d9518c2-d41c-5ae3-989e-df9a51325c31",
+        "expected": "PASS",
+        "observed": "PASS"
+      },
+      {
+        "criterion_id": "b6a2f291-ac40-5db6-85b7-c364567f087a",
+        "expected": "PASS",
+        "observed": "PASS"
+      },
+      {
+        "criterion_id": "0d0b4a63-8b57-582c-a4f9-97d5f7505d6a",
+        "expected": "PASS",
+        "observed": "PASS"
+      }
+    ],
+    "source_available": true,
+    "model_calls": 0,
+    "report": {
+      "project": "INTI AI",
+      "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+      "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+      "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+      "original_objective": "Find asset PC-104 and change its status to Operational.",
+      "criteria_version": {
+        "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+        "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+        "objective": "Find asset PC-104 and change its status to Operational.",
+        "original_manifest_digest": "757602a93c2a237a5cf5e04ded75f3f207cfcf7472999ec23947eaeb036421ed",
+        "version": 1,
+        "criteria": [
+          {
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "description": "Asset PC-104 exists in the persisted store",
+            "assertion_type": "exists",
+            "expected_value": true,
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "id",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "3bd09698-0447-5eda-87ef-1c1e889b7a66"
+          },
+          {
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "description": "Asset PC-104 has persisted status Operational",
+            "assertion_type": "equals",
+            "expected_value": "Operational",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "1fdde974-c514-5993-b24d-7b887b75e6c0"
+          },
+          {
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "description": "Asset PC-104 status is stable across fresh persisted reads",
+            "assertion_type": "record_persisted",
+            "expected_value": "Operational",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 2
+              }
+            ],
+            "required": true,
+            "id": "1d9518c2-d41c-5ae3-989e-df9a51325c31"
+          },
+          {
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "description": "Observed pre/post transition, when a pre-execution baseline exists",
+            "assertion_type": "state_transition",
+            "expected_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "status",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": false,
+            "id": "b6a2f291-ac40-5db6-85b7-c364567f087a"
+          },
+          {
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "description": "No unrelated assets changed since the pre-execution baseline, when available",
+            "assertion_type": "equals",
+            "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "target_reference": {
+              "record_id": "PC-104",
+              "field": "inventory_digest",
+              "application": "inventory"
+            },
+            "evidence_requirements": [
+              {
+                "evidence_type": "DATABASE_STATE",
+                "min_count": 1
+              }
+            ],
+            "required": true,
+            "id": "0d0b4a63-8b57-582c-a4f9-97d5f7505d6a"
+          }
+        ],
+        "approved_by": "benchmark-operator",
+        "approval_reason": "Persisted-state checks derived from the exact approved inventory objective",
+        "baseline": {
+          "artifact_id": "94ef2484-0697-4f5e-874c-f64d72135c58",
+          "content_hash": "466826f990ca62b41a98d31acf0af204a9e20ae3dcde884677ca7160221522fe",
+          "captured_at": "2026-10-29 20:58:23.940967+00:00",
+          "source_store_id": "b0d6db86-6ea2-4512-83ac-b74fde033e3a",
+          "collection_id": "a44e7ec3-aedb-4838-82ed-08a83028debd"
+        },
+        "id": "a44e7ec3-aedb-4838-82ed-08a83028debd",
+        "created_at": "2026-10-29 20:58:23.284369+00:00",
+        "digest": "e83a77bd2ad887e33a354485b1bb11c8e4e8f0088589f99bc3b987dac7cb3a81"
+      },
+      "verification": {
+        "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+        "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+        "criteria_version_id": "a44e7ec3-aedb-4838-82ed-08a83028debd",
+        "idempotency_key": "terminal",
+        "id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+        "status": "COMPLETED",
+        "started_at": "2026-10-29 20:58:29.469573+00:00",
+        "completed_at": "2026-10-29 20:58:32.816449+00:00",
+        "final_verdict": "VERIFIED_SUCCESS",
+        "evidence_ids": [
+          "4235f796-65db-4006-a032-3d46be1ce672",
+          "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+          "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+          "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+          "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+          "365b98b5-83a0-445e-add0-bb1942c3476f",
+          "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+          "fce7666f-95fa-412d-a486-14cd4711ab72"
+        ],
+        "criteria_results": [
+          {
+            "criterion_id": "3bd09698-0447-5eda-87ef-1c1e889b7a66",
+            "status": "PASS",
+            "observed_value": true,
+            "expected_value": true,
+            "evidence_ids": [
+              "4235f796-65db-4006-a032-3d46be1ce672",
+              "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+              "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+              "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+              "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+              "365b98b5-83a0-445e-add0-bb1942c3476f",
+              "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+              "fce7666f-95fa-412d-a486-14cd4711ab72"
+            ],
+            "explanation": "Record/field existence established by read-only database snapshots"
+          },
+          {
+            "criterion_id": "1fdde974-c514-5993-b24d-7b887b75e6c0",
+            "status": "PASS",
+            "observed_value": "Operational",
+            "expected_value": "Operational",
+            "evidence_ids": [
+              "4235f796-65db-4006-a032-3d46be1ce672",
+              "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+              "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+              "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+              "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+              "365b98b5-83a0-445e-add0-bb1942c3476f",
+              "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+              "fce7666f-95fa-412d-a486-14cd4711ab72"
+            ],
+            "explanation": "Deterministic assertion against fresh persisted state"
+          },
+          {
+            "criterion_id": "1d9518c2-d41c-5ae3-989e-df9a51325c31",
+            "status": "PASS",
+            "observed_value": "Operational",
+            "expected_value": "Operational",
+            "evidence_ids": [
+              "4235f796-65db-4006-a032-3d46be1ce672",
+              "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+              "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+              "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+              "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+              "365b98b5-83a0-445e-add0-bb1942c3476f",
+              "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+              "fce7666f-95fa-412d-a486-14cd4711ab72"
+            ],
+            "explanation": "Two read-only SQLite snapshots agree on record identity, version and value"
+          },
+          {
+            "criterion_id": "b6a2f291-ac40-5db6-85b7-c364567f087a",
+            "status": "PASS",
+            "observed_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "expected_value": {
+              "before": "Inactive",
+              "after": "Operational"
+            },
+            "evidence_ids": [
+              "4235f796-65db-4006-a032-3d46be1ce672",
+              "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+              "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+              "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+              "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+              "365b98b5-83a0-445e-add0-bb1942c3476f",
+              "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+              "fce7666f-95fa-412d-a486-14cd4711ab72"
+            ],
+            "explanation": "Transition and record version compared; causal attribution is not inferred"
+          },
+          {
+            "criterion_id": "0d0b4a63-8b57-582c-a4f9-97d5f7505d6a",
+            "status": "PASS",
+            "observed_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+            "evidence_ids": [
+              "4235f796-65db-4006-a032-3d46be1ce672",
+              "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+              "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+              "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+              "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+              "365b98b5-83a0-445e-add0-bb1942c3476f",
+              "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+              "fce7666f-95fa-412d-a486-14cd4711ab72"
+            ],
+            "explanation": "Deterministic assertion against fresh persisted state"
+          }
+        ],
+        "version": 18,
+        "error_code": null,
+        "limitations": [],
+        "correlation_id": "29c5bedb-1424-4c47-8cd6-97320aad3d32"
+      },
+      "execution_summary": {
+        "status": "COMPLETED",
+        "declared_overall_goal_verified": false,
+        "action_count": 9,
+        "actions_executed": 9,
+        "immediate_postconditions_passed": 9
+      },
+      "evidence": [
+        {
+          "verification_session_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:58:23.940967+00:00",
+          "artifact_reference": "94ef2484-0697-4f5e-874c-f64d72135c58",
+          "content_hash": "466826f990ca62b41a98d31acf0af204a9e20ae3dcde884677ca7160221522fe",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "Pre-execution read-only SQLite baseline",
+            "target_record_id": "PC-104",
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+            "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+            "role": "baseline",
+            "source_url": "http://127.0.0.1:61408/verification/v1/snapshot",
+            "nonce": "edfa3ef0-60d8-4fd6-a5f4-c0bdfa199f59",
+            "source_store_id": "b0d6db86-6ea2-4512-83ac-b74fde033e3a",
+            "content_type": "application/json",
+            "byte_count": 1012
+          },
+          "id": "4235f796-65db-4006-a032-3d46be1ce672"
+        },
+        {
+          "verification_session_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+          "evidence_type": "READ_ONLY_API_RESPONSE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:58:30.264605+00:00",
+          "artifact_reference": "5ae6f0ee-9474-490c-8e2c-542af7bfc364",
+          "content_hash": "cb5d062b382a9b4a3814b22fc1c7c23596a3faee0d0f878d5675a097b0771e45",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+            "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61408/verification/v1/snapshot",
+            "nonce": "3e9470e0-ff72-4157-8581-850fe740dfc8",
+            "source_store_id": "b0d6db86-6ea2-4512-83ac-b74fde033e3a",
+            "content_type": "application/json",
+            "byte_count": 1015
+          },
+          "id": "4988659e-cb1b-4313-a0b0-a64a4f326f6e"
+        },
+        {
+          "verification_session_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:58:30.264605+00:00",
+          "artifact_reference": "5ae6f0ee-9474-490c-8e2c-542af7bfc364",
+          "content_hash": "cb5d062b382a9b4a3814b22fc1c7c23596a3faee0d0f878d5675a097b0771e45",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+            "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61408/verification/v1/snapshot",
+            "nonce": "3e9470e0-ff72-4157-8581-850fe740dfc8",
+            "source_store_id": "b0d6db86-6ea2-4512-83ac-b74fde033e3a",
+            "content_type": "application/json",
+            "byte_count": 1015
+          },
+          "id": "a60ef5ac-4d2f-485a-955d-f8effda5f8a8"
+        },
+        {
+          "verification_session_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+          "evidence_type": "SCREENSHOT",
+          "source": "inventory-readonly-browser",
+          "captured_at": "2026-10-29 20:58:31.521207+00:00",
+          "artifact_reference": "39634378-9d5a-4382-b2cd-f59dafc7f88b",
+          "content_hash": "52adc91da6dc13e84ff368aa78fa7b73cb9f82800cf373aa3dd4dc21e9889f08",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.browser.v1",
+            "collection_method": "Fresh isolated GET-only Chromium context",
+            "target_record_id": "PC-104",
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+            "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61408/",
+            "nonce": "e84ced09-6b84-43e8-97bc-8a5262c38e3b",
+            "source_store_id": "b0d6db86-6ea2-4512-83ac-b74fde033e3a",
+            "content_type": "image/png",
+            "byte_count": 38275
+          },
+          "id": "66661e40-78b1-49f0-a4ed-b01f78513a4d"
+        },
+        {
+          "verification_session_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+          "evidence_type": "DOM_SNAPSHOT",
+          "source": "inventory-readonly-browser",
+          "captured_at": "2026-10-29 20:58:31.521207+00:00",
+          "artifact_reference": "18077df7-8b48-483d-ab37-c923f8bd8115",
+          "content_hash": "f78e2bb755fd6ef7199b36bf24fdbf78497928fb814c5f0c5b57066980e5f927",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.browser.v1",
+            "collection_method": "Fixed read-only DOM fields",
+            "target_record_id": "PC-104",
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+            "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61408/",
+            "nonce": "e84ced09-6b84-43e8-97bc-8a5262c38e3b",
+            "source_store_id": "b0d6db86-6ea2-4512-83ac-b74fde033e3a",
+            "content_type": "application/json",
+            "byte_count": 139
+          },
+          "id": "a9c189e8-cf7c-4a83-b43f-9ec4753e9972"
+        },
+        {
+          "verification_session_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+          "evidence_type": "READ_ONLY_API_RESPONSE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:58:32.366079+00:00",
+          "artifact_reference": "39d414b4-951d-49e4-8558-ef9d2d678ac7",
+          "content_hash": "49cb334eabf68efd59657d03c106258d25649ee5ca509d44613d087292be07a3",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+            "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61408/verification/v1/snapshot",
+            "nonce": "b9ca635c-6423-4daf-a075-052513b0e09a",
+            "source_store_id": "b0d6db86-6ea2-4512-83ac-b74fde033e3a",
+            "content_type": "application/json",
+            "byte_count": 1015
+          },
+          "id": "365b98b5-83a0-445e-add0-bb1942c3476f"
+        },
+        {
+          "verification_session_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+          "evidence_type": "DATABASE_STATE",
+          "source": "inventory-readonly-api",
+          "captured_at": "2026-10-29 20:58:32.366079+00:00",
+          "artifact_reference": "39d414b4-951d-49e4-8558-ef9d2d678ac7",
+          "content_hash": "49cb334eabf68efd59657d03c106258d25649ee5ca509d44613d087292be07a3",
+          "metadata": {
+            "source_system": "inti.inventory.readonly.sqlite.v1",
+            "collection_method": "GET:SQLite mode=ro,query_only",
+            "target_record_id": "PC-104",
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+            "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+            "role": "final",
+            "source_url": "http://127.0.0.1:61408/verification/v1/snapshot",
+            "nonce": "b9ca635c-6423-4daf-a075-052513b0e09a",
+            "source_store_id": "b0d6db86-6ea2-4512-83ac-b74fde033e3a",
+            "content_type": "application/json",
+            "byte_count": 1015
+          },
+          "id": "1cd86155-6c54-4d26-8b78-d54f8e4a6b46"
+        },
+        {
+          "verification_session_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+          "evidence_type": "EXECUTION_TRACE",
+          "source": "execution-declaration",
+          "captured_at": "2026-10-29 20:58:32.383977+00:00",
+          "artifact_reference": "cef6311f-ed33-4e18-abea-50cb39c79485",
+          "content_hash": "e4bc4f9f8ca9ecc2f44976babe9ab08053104501709c2e7ff77acb286610e7c0",
+          "metadata": {
+            "source_system": "inti.execution.declared.v1",
+            "collection_method": "Stored execution trace; not outcome proof",
+            "target_record_id": "PC-104",
+            "task_id": "ddb50fb3-7564-4648-8649-cf6d16335a85",
+            "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+            "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+            "role": "supplementary",
+            "source_url": "execution:f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+            "nonce": "7fcb5e44-fba7-4a5c-b994-4778c3714caa",
+            "source_store_id": "b0d6db86-6ea2-4512-83ac-b74fde033e3a",
+            "content_type": "application/json",
+            "byte_count": 1324
+          },
+          "id": "fce7666f-95fa-412d-a486-14cd4711ab72"
+        }
+      ],
+      "criteria_results": [
+        {
+          "criterion_id": "3bd09698-0447-5eda-87ef-1c1e889b7a66",
+          "status": "PASS",
+          "observed_value": true,
+          "expected_value": true,
+          "evidence_ids": [
+            "4235f796-65db-4006-a032-3d46be1ce672",
+            "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+            "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+            "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+            "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+            "365b98b5-83a0-445e-add0-bb1942c3476f",
+            "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+            "fce7666f-95fa-412d-a486-14cd4711ab72"
+          ],
+          "explanation": "Record/field existence established by read-only database snapshots"
+        },
+        {
+          "criterion_id": "1fdde974-c514-5993-b24d-7b887b75e6c0",
+          "status": "PASS",
+          "observed_value": "Operational",
+          "expected_value": "Operational",
+          "evidence_ids": [
+            "4235f796-65db-4006-a032-3d46be1ce672",
+            "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+            "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+            "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+            "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+            "365b98b5-83a0-445e-add0-bb1942c3476f",
+            "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+            "fce7666f-95fa-412d-a486-14cd4711ab72"
+          ],
+          "explanation": "Deterministic assertion against fresh persisted state"
+        },
+        {
+          "criterion_id": "1d9518c2-d41c-5ae3-989e-df9a51325c31",
+          "status": "PASS",
+          "observed_value": "Operational",
+          "expected_value": "Operational",
+          "evidence_ids": [
+            "4235f796-65db-4006-a032-3d46be1ce672",
+            "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+            "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+            "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+            "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+            "365b98b5-83a0-445e-add0-bb1942c3476f",
+            "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+            "fce7666f-95fa-412d-a486-14cd4711ab72"
+          ],
+          "explanation": "Two read-only SQLite snapshots agree on record identity, version and value"
+        },
+        {
+          "criterion_id": "b6a2f291-ac40-5db6-85b7-c364567f087a",
+          "status": "PASS",
+          "observed_value": {
+            "before": "Inactive",
+            "after": "Operational"
+          },
+          "expected_value": {
+            "before": "Inactive",
+            "after": "Operational"
+          },
+          "evidence_ids": [
+            "4235f796-65db-4006-a032-3d46be1ce672",
+            "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+            "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+            "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+            "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+            "365b98b5-83a0-445e-add0-bb1942c3476f",
+            "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+            "fce7666f-95fa-412d-a486-14cd4711ab72"
+          ],
+          "explanation": "Transition and record version compared; causal attribution is not inferred"
+        },
+        {
+          "criterion_id": "0d0b4a63-8b57-582c-a4f9-97d5f7505d6a",
+          "status": "PASS",
+          "observed_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+          "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+          "evidence_ids": [
+            "4235f796-65db-4006-a032-3d46be1ce672",
+            "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+            "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+            "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+            "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+            "365b98b5-83a0-445e-add0-bb1942c3476f",
+            "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+            "fce7666f-95fa-412d-a486-14cd4711ab72"
+          ],
+          "explanation": "Deterministic assertion against fresh persisted state"
+        }
+      ],
+      "final_verdict": "VERIFIED_SUCCESS",
+      "effective_verdict": "VERIFIED_SUCCESS",
+      "integrity_checks": [
+        {
+          "evidence_id": "4235f796-65db-4006-a032-3d46be1ce672",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "4988659e-cb1b-4313-a0b0-a64a4f326f6e",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "a60ef5ac-4d2f-485a-955d-f8effda5f8a8",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "66661e40-78b1-49f0-a4ed-b01f78513a4d",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "a9c189e8-cf7c-4a83-b43f-9ec4753e9972",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "365b98b5-83a0-445e-add0-bb1942c3476f",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "1cd86155-6c54-4d26-8b78-d54f8e4a6b46",
+          "intact": true,
+          "error": null
+        },
+        {
+          "evidence_id": "fce7666f-95fa-412d-a486-14cd4711ab72",
+          "intact": true,
+          "error": null
+        }
+      ],
+      "limitations": [
+        "Hashes detect content changes against stored records; storage is not tamper-proof",
+        "Observed persisted state does not prove exclusive execution causality",
+        "Archived evidence is evaluated against its original collection-time freshness"
+      ]
+    },
+    "scenario": "correct_persisted_update",
+    "fault_seed": 42
+  }
+]

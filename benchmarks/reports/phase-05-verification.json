@@ -1,0 +1,280 @@
+{
+  "mode": "actual_chromium_sqlite_readonly_verification_no_model",
+  "recorded_at": "2026-10-29T20:58:33.879637+00:00",
+  "fault_seed": 42,
+  "scenarios": 5,
+  "verification_success_rate": {
+    "numerator": 1,
+    "denominator": 5
+  },
+  "verdict_accuracy": {
+    "numerator": 5,
+    "denominator": 5
+  },
+  "false_positive_detection_rate": {
+    "numerator": 3,
+    "denominator": 3
+  },
+  "false_negative_rate": {
+    "numerator": 0,
+    "denominator": 1
+  },
+  "inconclusive_rate": {
+    "numerator": 1,
+    "denominator": 5
+  },
+  "mean_verification_latency_ms": 3290.3896600000735,
+  "evidence_collection_failures": 3,
+  "criteria_evaluation_accuracy": {
+    "numerator": 25,
+    "denominator": 25
+  },
+  "evidence_integrity_validation_failures": 0,
+  "observed_inventory_mutations_by_verifier": 0,
+  "model_calls": 0,
+  "model_assisted_evaluation": false,
+  "ground_truth": "Separate harness read-only SQLite connection; verifier is not given the fault configuration",
+  "scope": "One trial per deterministic fault; coordinator repositories use isolated SQLite. Not a statistical reliability estimate.",
+  "results": [
+    {
+      "recorded_at": "2026-10-29T20:57:38.585287+00:00",
+      "execution_id": "5d290815-b8f9-4138-87b5-72efdd210beb",
+      "verification_id": "e9321d00-1e5b-4c28-a396-9d0f06be0de7",
+      "execution_status": "COMPLETED",
+      "all_immediate_postconditions_passed": true,
+      "goal_persisted_ground_truth": false,
+      "unrelated_assets_unchanged_ground_truth": true,
+      "expected_verdict": "VERIFIED_FAILURE",
+      "actual_verdict": "VERIFIED_FAILURE",
+      "verification_status": "COMPLETED",
+      "latency_ms": 3247.765099999924,
+      "evidence_count": 8,
+      "evidence_collection_failures": 0,
+      "integrity_failures": 0,
+      "verifier_changed_inventory": false,
+      "criterion_results": [
+        {
+          "criterion_id": "f40138b9-ea5c-5b1d-90ff-cfc772a616a5",
+          "expected": "PASS",
+          "observed": "PASS"
+        },
+        {
+          "criterion_id": "c9ba29ba-e701-5625-ba28-4791e6f76c52",
+          "expected": "FAIL",
+          "observed": "FAIL"
+        },
+        {
+          "criterion_id": "05b773fd-3020-556a-80e1-d335df19d2dd",
+          "expected": "FAIL",
+          "observed": "FAIL"
+        },
+        {
+          "criterion_id": "560e2477-b288-5511-aa12-68e35a5d0d80",
+          "expected": "FAIL",
+          "observed": "FAIL"
+        },
+        {
+          "criterion_id": "e073c228-4801-51dc-8ca8-56d0cfb1bfeb",
+          "expected": "PASS",
+          "observed": "PASS"
+        }
+      ],
+      "source_available": true,
+      "model_calls": 0,
+      "scenario": "save_rejected_with_confirmation",
+      "fault_seed": 42
+    },
+    {
+      "recorded_at": "2026-10-29T20:57:52.131538+00:00",
+      "execution_id": "f5769856-5321-4ff9-8ee7-8bc538d0d453",
+      "verification_id": "bb328725-93ce-4a3d-81eb-d079d46c2753",
+      "execution_status": "COMPLETED",
+      "all_immediate_postconditions_passed": true,
+      "goal_persisted_ground_truth": false,
+      "unrelated_assets_unchanged_ground_truth": false,
+      "expected_verdict": "VERIFIED_FAILURE",
+      "actual_verdict": "VERIFIED_FAILURE",
+      "verification_status": "COMPLETED",
+      "latency_ms": 3424.2088000000876,
+      "evidence_count": 8,
+      "evidence_collection_failures": 0,
+      "integrity_failures": 0,
+      "verifier_changed_inventory": false,
+      "criterion_results": [
+        {
+          "criterion_id": "70d2bd68-48d4-52e3-b1ba-3c823c7da0c1",
+          "expected": "PASS",
+          "observed": "PASS"
+        },
+        {
+          "criterion_id": "3e2b64b6-11b1-56e3-bf60-91c422e002d0",
+          "expected": "FAIL",
+          "observed": "FAIL"
+        },
+        {
+          "criterion_id": "55c5b686-1d1e-560b-8aa3-abea82724080",
+          "expected": "FAIL",
+          "observed": "FAIL"
+        },
+        {
+          "criterion_id": "792a41d1-4a4c-53bc-ba8e-4493b73d7c67",
+          "expected": "FAIL",
+          "observed": "FAIL"
+        },
+        {
+          "criterion_id": "8b5e286f-b872-5d56-9f2a-82d9acf08b03",
+          "expected": "FAIL",
+          "observed": "FAIL"
+        }
+      ],
+      "source_available": true,
+      "model_calls": 0,
+      "scenario": "wrong_record_updated",
+      "fault_seed": 42
+    },
+    {
+      "recorded_at": "2026-10-29T20:58:06.133890+00:00",
+      "execution_id": "6527356c-f694-4a43-a7e2-89d188322e52",
+      "verification_id": "9b57b340-d1ca-4fa6-869a-ccafc7aa47f3",
+      "execution_status": "COMPLETED",
+      "all_immediate_postconditions_passed": true,
+      "goal_persisted_ground_truth": false,
+      "unrelated_assets_unchanged_ground_truth": true,
+      "expected_verdict": "VERIFIED_FAILURE",
+      "actual_verdict": "VERIFIED_FAILURE",
+      "verification_status": "COMPLETED",
+      "latency_ms": 3231.02020000033,
+      "evidence_count": 8,
+      "evidence_collection_failures": 0,
+      "integrity_failures": 0,
+      "verifier_changed_inventory": false,
+      "criterion_results": [
+        {
+          "criterion_id": "0b6e9a92-9ca3-548e-bf65-1fd1b882582d",
+          "expected": "PASS",
+          "observed": "PASS"
+        },
+        {
+          "criterion_id": "5ffea81f-e625-5295-a64b-812ecd2d238f",
+          "expected": "FAIL",
+          "observed": "FAIL"
+        },
+        {
+          "criterion_id": "aac7e384-87fc-5d71-9b49-4de3a8f90a62",
+          "expected": "FAIL",
+          "observed": "FAIL"
+        },
+        {
+          "criterion_id": "1b1cf943-afb0-5d71-abd1-1ff962a989e3",
+          "expected": "FAIL",
+          "observed": "FAIL"
+        },
+        {
+          "criterion_id": "81fb5922-f23c-5758-b445-e3c528934bca",
+          "expected": "PASS",
+          "observed": "PASS"
+        }
+      ],
+      "source_available": true,
+      "model_calls": 0,
+      "scenario": "optimistic_ui_without_persistence",
+      "fault_seed": 42
+    },
+    {
+      "recorded_at": "2026-10-29T20:58:19.604070+00:00",
+      "execution_id": "ebf9805b-4a80-4d20-acb4-2bf89ef2a040",
+      "verification_id": "d2de3578-847a-4a5a-b8c9-d3894ee85541",
+      "execution_status": "COMPLETED",
+      "all_immediate_postconditions_passed": true,
+      "goal_persisted_ground_truth": true,
+      "unrelated_assets_unchanged_ground_truth": true,
+      "expected_verdict": "INCONCLUSIVE",
+      "actual_verdict": "INCONCLUSIVE",
+      "verification_status": "INCONCLUSIVE",
+      "latency_ms": 3135.624999999891,
+      "evidence_count": 2,
+      "evidence_collection_failures": 3,
+      "integrity_failures": 0,
+      "verifier_changed_inventory": false,
+      "criterion_results": [
+        {
+          "criterion_id": "abbeeb4d-1999-59ea-9572-b8a770155132",
+          "expected": "UNKNOWN",
+          "observed": "UNKNOWN"
+        },
+        {
+          "criterion_id": "e3ce9727-d097-56f1-9e36-d31b1f0d9e2a",
+          "expected": "UNKNOWN",
+          "observed": "UNKNOWN"
+        },
+        {
+          "criterion_id": "2323439f-0b0c-522f-98d0-af50476c4205",
+          "expected": "UNKNOWN",
+          "observed": "UNKNOWN"
+        },
+        {
+          "criterion_id": "e27f3cb2-665f-528a-9409-152056d677bf",
+          "expected": "UNKNOWN",
+          "observed": "UNKNOWN"
+        },
+        {
+          "criterion_id": "a31b7edd-e313-504b-87c6-543653470218",
+          "expected": "UNKNOWN",
+          "observed": "UNKNOWN"
+        }
+      ],
+      "source_available": false,
+      "model_calls": 0,
+      "scenario": "read_only_source_unavailable",
+      "fault_seed": 42
+    },
+    {
+      "recorded_at": "2026-10-29T20:58:32.917940+00:00",
+      "execution_id": "f68acdbb-3cba-4f22-bbe3-7dab939150f1",
+      "verification_id": "faa42233-9b3d-429d-b4d4-319578495ee1",
+      "execution_status": "COMPLETED",
+      "all_immediate_postconditions_passed": true,
+      "goal_persisted_ground_truth": true,
+      "unrelated_assets_unchanged_ground_truth": true,
+      "expected_verdict": "VERIFIED_SUCCESS",
+      "actual_verdict": "VERIFIED_SUCCESS",
+      "verification_status": "COMPLETED",
+      "latency_ms": 3413.3292000001347,
+      "evidence_count": 8,
+      "evidence_collection_failures": 0,
+      "integrity_failures": 0,
+      "verifier_changed_inventory": false,
+      "criterion_results": [
+        {
+          "criterion_id": "3bd09698-0447-5eda-87ef-1c1e889b7a66",
+          "expected": "PASS",
+          "observed": "PASS"
+        },
+        {
+          "criterion_id": "1fdde974-c514-5993-b24d-7b887b75e6c0",
+          "expected": "PASS",
+          "observed": "PASS"
+        },
+        {
+          "criterion_id": "1d9518c2-d41c-5ae3-989e-df9a51325c31",
+          "expected": "PASS",
+          "observed": "PASS"
+        },
+        {
+          "criterion_id": "b6a2f291-ac40-5db6-85b7-c364567f087a",
+          "expected": "PASS",
+          "observed": "PASS"
+        },
+        {
+          "criterion_id": "0d0b4a63-8b57-582c-a4f9-97d5f7505d6a",
+          "expected": "PASS",
+          "observed": "PASS"
+        }
+      ],
+      "source_available": true,
+      "model_calls": 0,
+      "scenario": "correct_persisted_update",
+      "fault_seed": 42
+    }
+  ]
+}
