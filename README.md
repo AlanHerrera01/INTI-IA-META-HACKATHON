@@ -4,6 +4,8 @@
 
 **See. Reason. Act. Verify.** · Built in Ecuador
 
+[Public repository](https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON)
+
 An autonomous multimodal visual agent foundation for the **Meta Global AI Developer
 Hackathon 2026**, **Push the Frontier**, **Indie Developer** track.
 

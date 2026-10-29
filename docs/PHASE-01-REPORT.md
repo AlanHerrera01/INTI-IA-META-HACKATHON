@@ -39,13 +39,15 @@ deliberately outside this phase.
   verified artifact 61,991 bytes. This is functional evidence, not a performance metric.
 - Existing GitHub origin independently confirmed public through the unauthenticated
   GitHub repository API. No settings were modified.
+- Reviewed source and descriptive commits published to the existing public
+  [GitHub repository](https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON).
 
 ## IMPLEMENTED BUT NOT VERIFIED
 
 - Actual Meta inference with a valid account key: adapter exists and documentation
   was checked, but no valid key was available; no successful model call is claimed.
-- GitHub Actions workflow is committed as configuration; no hosted CI execution
-  occurred during local implementation.
+- GitHub Actions workflow was triggered by publication. Hosted results are tracked
+  in the publication verification note below; local results are independently recorded.
 - PostgreSQL migration downgrade and cross-platform native installation beyond
   this Windows environment were not exercised.
 - Python dependency snapshot records the verified Windows environment. It is not
@@ -64,8 +66,6 @@ deliberately outside this phase.
 - Autonomous actions, goal planner, task execution loop, recovery/self-healing,
   task-outcome verifier, production deployment, authentication and multi-user access.
 - Model performance benchmarks; no fabricated metrics exist in the UI or reports.
-- Public GitHub publication/hosted CI execution of these local changes. Existing
-  origin was preserved; read-only remote inspection returned no branch refs.
 
 ## Architecture decisions
 
@@ -143,6 +143,17 @@ Start: `docker compose up --build -d`. Dashboard: `http://localhost:5173`.
 Stop while retaining records: `docker compose down`. Full Windows/native/test
 commands are in [README](../README.md) and [development](DEVELOPMENT.md).
 
+## Publication verification
+
+Source commits were pushed successfully to `origin/main`, preserving the existing
+public repository and its settings. The published implementation revision
+`84e1035` triggered [GitHub Actions run 40799636311](https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON/actions/runs/40799636311).
+The hosted frontend job completed successfully (install, lint, typecheck, five
+tests and production build). At the last check the backend job was still
+installing dependencies; its hosted conclusion is **not yet verified**. Local
+backend tests/lint/type checks and the Docker-backed E2E results above passed.
+This publication note is a documentation-only follow-up; it changes no executable source.
+
 ## Limitations and Phase 2 prerequisites
 
 Trusted local single-operator development only. No authentication, queue, global
@@ -157,4 +168,5 @@ Before Phase 2: verify real Meta access; define task authorization and explicit
 action contracts; introduce isolated execution sessions, evidence-based outcome
 verification, recovery policies, approval gates, prompt-injection tests, retention,
 and scenario-based model evaluation with measured results. Confirm official event
-eligibility and publish the reviewed repository before submission.
+eligibility before submission. The source repository is public; model access
+remains an external prerequisite.
