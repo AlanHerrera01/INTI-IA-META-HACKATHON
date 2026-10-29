@@ -1,0 +1,35 @@
+name: Phase 1 checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e 'apps/backend[dev]'
+      - run: ruff check apps/backend
+      - run: ruff format --check apps/backend
+      - run: mypy
+        working-directory: apps/backend
+      - run: pytest apps/backend/tests -m 'not e2e' --cov=inti.domain --cov=inti.application --cov-fail-under=80
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
