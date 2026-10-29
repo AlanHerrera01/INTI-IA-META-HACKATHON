@@ -13,9 +13,9 @@ Interfaces change. Conventional automation breaks silently. INTI AI's long-term
 goal is to perceive an interface, reason about an authorized objective, act,
 verify the outcome, and recover when the interface changes.
 
-Phase 1 implements observation and optional real Meta interpretation. It does
-not implement autonomous actions, verification of task completion, or recovery.
-The loop in the dashboard describes the roadmap; only perception is operational.
+Phase 2 adds screenshot reasoning, intent interpretation and inspectable typed
+plans to the Phase 1 observation foundation. It does not execute generated
+actions. The full roadmap is PERCEIVE → REASON → PLAN → ACT → VERIFY → RECOVER.
 
 ## Current functionality
 
@@ -27,8 +27,12 @@ The loop in the dashboard describes the roadmap; only perception is operational.
   bounded retries, safe errors, and explicit missing-credential status.
 - Synthetic inventory sandbox with search, editable equipment and session-only save.
 - Docker Compose, automated tests, lint/type checks and GitHub Actions configuration.
+- AI Planning workspace: goals, constraints, estimated visual overlays, action
+  timelines, uncertainty, risk, validation, paginated history and correlated events.
+- Deterministic policy: bounded steps, exact URL restrictions, fresh-observation
+  checkpoints, prohibited-operation rejection and screenshot-based plan expiry.
 
-See [the implementation report](docs/PHASE-01-REPORT.md) for measured results and
+See [the Phase 2 implementation report](docs/PHASE-02-REPORT.md) for measured results and
 the distinction between verified, unverified, blocked, and excluded functionality.
 
 ## Start with Docker Desktop
@@ -72,6 +76,40 @@ The adapter follows Meta's official [authentication/model documentation](https:/
 [Chat Completions](https://dev.meta.ai/docs/protocols/chat-completions), and
 [structured output](https://dev.meta.ai/docs/structured-output).
 Never commit `.env` or paste credentials into issues. The API exposes no keys.
+
+## Planning-only workflow
+
+Capture a fresh observation, open **AI Planning**, select the observation and
+enter an objective/constraints. **Interpret scene** requests visual understanding;
+**Generate Plan** requests scene interpretation, intent and action decomposition,
+then applies deterministic validation. Inspect visual overlays, explicit
+requirements, assumptions, ambiguities, risk, preconditions and expected evidence.
+Review persisted history or revalidate without another model request.
+
+Meta credentials are required for real reasoning. Without them, the workspace
+shows configuration guidance and APIs return explicit errors, not sample plans.
+`valid` means the proposal passed structural/policy checks; it never grants
+execution authorization or proves model coordinates are correct. Future targets
+and stale screenshots require clarification or a fresh observation.
+
+Limits: `PLANNING_MAX_STEPS=20`, `PLANNING_MAX_RETRIES=2` per model call,
+`PLANNING_MAX_TOKENS=4096` output tokens per call,
+`PLANNING_TIMEOUT_SECONDS=120` for the generation pipeline,
+`PLANNING_TTL_SECONDS=900` measured against screenshot age,
+`PLANNING_MIN_CONFIDENCE=0.6`, `META_MAX_RESPONSE_BYTES=262144` per response.
+At most three successful model stages occur per generation; retry bounds also
+apply. Missing usage counters remain unavailable; no cost estimate is fabricated.
+
+```powershell
+# Offline synthetic policy fixtures, no paid calls:
+.\.venv\Scripts\python.exe scripts/benchmark_planning.py
+# Explicit opt-in with a configured Meta account; API charges can apply:
+$env:INTI_LIVE_MODEL_TESTS='1'
+.\.venv\Scripts\python.exe -m pytest apps/backend/tests/e2e/test_live_planning.py -v
+```
+
+Offline benchmark figures measure policy regression, not Muse Spark accuracy or
+task-execution success. See [methodology](benchmarks/scenarios/PLANNING.md).
 
 ## Native development and checks
 
@@ -138,9 +176,9 @@ Screenshots are limited to 1920 × 1080 and 5 MB. History returns the latest 20
 records by default, up to 100. Meta access and hackathon eligibility must be verified
 against the organizer/account before submission. No benchmark result is implied.
 
-Phase 2 prerequisites: verify real Meta access, define explicit task authorization,
-action schemas, deterministic outcome evidence, isolated browser sessions,
-recovery policies, human approval gates, and adversarial prompt-injection tests.
+Phase 3 prerequisites: verify real Meta access and localization quality, define
+execution authorization, isolated browser sessions, deterministic outcome evidence,
+human approval gates, recovery and prompt-injection policies.
 
 All project source in this repository was authored for this implementation session.
 No proprietary assets or application source were copied. Third-party packages

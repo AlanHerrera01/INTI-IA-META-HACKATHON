@@ -1,5 +1,7 @@
 # Development
 
+Current version: 0.2.0, planning only. Existing observation setup remains valid.
+
 Run commands from the repository root. Recommended: Docker Desktop Linux engine
 and `docker compose up --build -d`. See [README](../README.md) for native commands.
 Native Python 3.12+ and Node 22.12+ are supported; the backend Docker image uses
@@ -103,3 +105,47 @@ dates/eligibility and Meta account access independently. CI is configured but
 cannot run on GitHub until the repository is pushed. Do not publish credentials,
 artifacts containing sensitive data, or claim verified model access without a
 real call. No image push or deployment is included.
+
+## Phase 2 development and verification
+
+Rebuild/restart: `docker compose up --build -d`. Backend startup upgrades Alembic
+0001 → 0002, adding visual_scenes, action_plans, planned_actions and planning_events.
+Native migration command remains `python -m alembic -c apps/backend/alembic.ini upgrade head`.
+Do not downgrade a populated live planning database: downgrade removes Phase 2
+tables. Automated downgrade tests use an isolated temporary database and preserve
+Phase 1 observations.
+
+The backend Dockerfile caches dependency/Chromium installation before copying
+application source, reducing repeat rebuild cost without changing dependency
+declarations. Python/frontend package and API versions are now 0.2.0.
+
+Planning settings are in `.env.example` and forwarded by Compose. Tokens/retries
+are bounded per model call; an overall timeout bounds the three-stage pipeline.
+Screenshot age controls expiry, so capture a fresh observation before generating
+an inspection plan. The default threshold is not a calibrated probability of
+successful localization. No new infrastructure dependencies were introduced.
+
+Run `python scripts/benchmark_planning.py` for clearly labeled synthetic policy
+fixtures. This is also checked by CI without credentials. For billable live
+integration, explicitly set `INTI_LIVE_MODEL_TESTS=1` and run
+`pytest apps/backend/tests/e2e/test_live_planning.py -v` with the full stack running.
+Missing configuration skips that test and remains an external blocker.
+
+Real PostgreSQL planning persistence can be checked without a paid model call:
+set `INTI_POSTGRES_TESTS=1` and run
+`pytest apps/backend/tests/e2e/test_postgres_planning.py -v`. The test uses explicitly
+mocked model ports and a newly generated temporary schema, then removes only that
+schema. It never writes synthetic plans into the application's normal history.
+
+`python scripts/verify_planning_workspace.py` first checks the real local planning
+page/configuration, then intercepts HTTP responses inside the test browser to
+exercise successful plan visualization. Fixture screenshots say TEST FIXTURE and
+are stored under `artifacts/verification/phase-02/`; no fake plan is written into
+the runtime service/database. No generated action is executed by this script.
+
+Planning telemetry logs structured UUID/event/usage data, never prompts or raw
+provider failures. Supply `X-Correlation-ID` as a UUID for cross-request tracing.
+Failure events without a completed plan are stored by task/correlation ID; they
+are not shown in successful-plan history. Revalidation appends trace events but
+does not invoke Meta. Repeated generation requests are distinct, potentially
+billable operations; there is no server idempotency key or durable job queue.

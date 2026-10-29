@@ -1,5 +1,18 @@
 # Meta integration verification record
 
+Phase 2 rechecked the official references during implementation. The existing
+transport now serves screenshot scene interpretation, task intent and typed plan
+generation as three strict-schema calls. Image input is only used for the scene
+stage; subsequent stages receive explicit structured scene/intent data. Each call
+has bounded retries, output tokens and decoded response bytes. Token usage is
+normalized when supplied, including responses containing nested token details.
+Compressed HTTP responses are decoded once and tested with explicit fixtures.
+The current screenshot cap remains 5 MB, below the documented 50 MB inline-image
+limit. No real model inference was performed in Phase 2: META_API_KEY was not
+configured. Optional Muse Wonder and SAM 3.1 are not integrated or claimed tested.
+
+The following original Phase 1 verification record remains applicable:
+
 Documentation inspected on 2026-10-28 (America/Bogota). This record distinguishes
 verified documentation/request contracts from unverified account access.
 

@@ -1,5 +1,7 @@
 # REST API v1
 
+Application version: 0.2.0. Existing observation routes retain their contracts.
+
 Base URL: `http://localhost:8000/api/v1`. Interactive OpenAPI: `/docs`.
 Local single-operator service; no authentication. Keep it bound to loopback.
 JSON timestamps use timezone-aware ISO 8601; IDs are UUIDs.
@@ -64,3 +66,53 @@ Invoke-RestMethod http://localhost:8000/api/v1/system/status
 $observation = Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/v1/observations/capture -ContentType application/json -Body '{}'
 Invoke-RestMethod "http://localhost:8000/api/v1/observations/$($observation.id)"
 ```
+
+## Planning-only endpoints
+
+| Method | Route | Behavior |
+|---|---|---|
+| POST | `/scenes/interpret` | Stored observation → real Meta structured screenshot scene |
+| POST | `/plans/generate` | Scene + intent + typed proposal + deterministic validation; 201 |
+| POST | `/plans/{id}/validate` | Revalidate persisted proposal; no model call or execution |
+| GET | `/plans/{id}` | Persisted PlanningResult or 404 |
+| GET | `/plans?offset=0&limit=20` | Paginated `{items,total,offset,limit}`, limit 1–100 |
+| GET | `/plans/{id}/events` | Prompt-free trace for the plan's task |
+
+All routes use `/api/v1`. Scene input: `observation_id` UUID and optional `goal`
+(1–2000 characters). Generate input:
+
+```json
+{"observation_id":"00000000-0000-0000-0000-000000000001","user_goal":"Find EQ-001 and inspect its current status.","constraints":["Do not change records."]}
+```
+
+The UUID above is illustrative; use an existing capture ID. Goal is 1–2000
+characters; up to 20 constraints of 1–500 characters. Extra fields, including
+`execute`, are rejected. No execute route exists.
+
+Scene output: scene ID, observation ID, viewport, elements, summary, uncertainties,
+generated/captured times and optional model usage. Elements contain type, label,
+description, visibility, enabled state, optional confidence/box and provenance.
+Boxes explicitly declare `pixels` or `normalized_1000`. Source is model_visual or
+unresolved; the current adapters never use DOM-assisted grounding.
+
+Generate/get/validate return `PlanningResult`: `plan`, `scene`, `intent`,
+`assumptions`, `unresolved_ambiguities`, `warnings`, `model_usage`,
+`validation_summary`, `started_at`, `ended_at`, `correlation_id`. Plan includes
+UUIDs, original goal, ordered typed actions, status, findings and model metadata.
+Each action includes target provenance, whether it needs fresh observation,
+typed parameters, preconditions, expected postconditions, explanation and risk.
+Risk is LOW/MEDIUM/HIGH/PROHIBITED. Status never authorizes execution.
+
+An unsafe typed proposal can return 201 with status=rejected: creation succeeded
+and its rejection is persisted for inspection. Invalid model schemas produce 502
+without a fabricated plan. Missing credentials produce 503; missing captures/
+artifacts/plans produce 404; invalid user requests produce 422; total model/
+planning timeout produces a safe 502. Revalidation can expire a plan based on the
+original screenshot age. History/get preserve the last persisted validation;
+use revalidation to refresh its age/policy assessment.
+
+Every normal request returns `X-Correlation-ID`; clients may supply a UUID in the
+same header to correlate a request. Malformed correlation IDs return 400.
+Events expose timestamp, task/plan/correlation IDs, kind, safe code and optional
+usage. Token counts absent from provider output remain null. No cost is estimated.
+Generation is not idempotent; retrying can create another plan and inference cost.

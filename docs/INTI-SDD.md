@@ -1,6 +1,6 @@
 # INTI AI — Software Design Document
 
-Version 0.1.0 · Phase 1 · Ecuador · Meta Global AI Developer Hackathon 2026
+Version 0.2.0 · Phase 2 · Ecuador · Meta Global AI Developer Hackathon 2026
 
 ## System overview
 
@@ -99,3 +99,43 @@ reload persistence, navigation and mobile overflow and writes screenshots.
 Frontend component tests cover empty/loading/error/observation/capture states.
 CI uses mocks for model requests and requires no production API credentials.
 Measured results and exceptions belong in [PHASE-01-REPORT](PHASE-01-REPORT.md).
+
+## Phase 2 design extension
+
+Phase 2 covers PERCEIVE → REASON → PLAN. Observation contracts/routes are preserved
+with version 0.2.0. No generated navigation, click, typing or selection is executed.
+New domain types model viewport/coordinates, visual elements/scenes, intent,
+typed targets/parameters/actions/plans, validation findings, model usage and events.
+Normalized coordinates use Meta's documented 0–1000 grid; pixels are validated
+against the captured viewport. Finite/positive coordinates and unique IDs are
+required. Allowed statuses are draft, valid, requires_clarification, rejected,
+expired. No execution status or transition exists.
+
+Three Meta stages use strict JSON schemas with required object fields and
+additionalProperties=false. Invalid JSON, unsupported actions, incomplete
+completions and invalid boxes fail explicitly. Intent distinguishes explicit
+requirements, assumptions, unverified inferences and ambiguities; these are
+model-reported distinctions, not independent semantic truth. Screenshot-only
+adapters cannot claim DOM assistance.
+
+Deterministic policy checks types, parameters, target references, visible/enabled
+state, preconditions, expected postconditions, evidence criteria, URLs, unsafe
+payload patterns and fresh-observation checkpoints. Confidence cannot override
+policy. Text evidence criteria are required but not executed or semantically
+proven complete. Typed unsafe plans persist as rejected; malformed model output
+fails before plan creation. Uncertain targets require clarification. Plans expire
+relative to screenshot age, even when generated from a newly interpreted scene.
+
+Planning endpoints and UI use backend/persisted state. Mocked responses exist only
+in explicitly labeled automated tests. Generation bounds duration, retries,
+steps, output tokens and response bytes. Structured events record correlation,
+task/plan UUIDs, timestamps, model/response identifiers and supplied token/retry
+metadata. No sensitive prompts, keys or provider error bodies are logged. Goals
+and scene/plan snapshots persist locally as task data for user inspection.
+
+Alembic 0002 adds four FK-linked tables without altering Phase 1 records or
+duplicating screenshots. Upgrade/downgrade preservation is tested in isolation;
+PostgreSQL upgrade is checked separately. Plan/action/completion persistence is
+transactional. History is offset/limit paginated. Redis and distributed frameworks
+remain unnecessary. Wonder and SAM are not integrated because no measured need
+or verified account entitlement justifies them. See [Phase 2 report](PHASE-02-REPORT.md).

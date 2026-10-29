@@ -1,5 +1,7 @@
 # Architecture
 
+Current milestone: Phase 2, planning only. Phase 1 observation is preserved.
+
 Dependencies point inward: presentation → application → domain. Infrastructure
 implements domain ports. Domain imports only the Python standard library.
 The composition root wires concrete adapters in `presentation/dependencies`.
@@ -57,3 +59,63 @@ Tradeoffs: no queue, no distributed lock, one local operator, short history wind
 no authentication. PostgreSQL is required in the live stack; SQLite is only an
 isolated repository/API test fixture. A filesystem and database backup must remain
 consistent. Production hardening and autonomous actions are out of Phase 1 scope.
+
+## Reasoning and planning extensions
+
+`domain/planning.py` contains framework-independent dataclasses for viewport,
+bounding boxes, visual elements/scenes, task intent, action targets/parameters,
+planned actions, plans, findings, usage and events. `planning_ports.py` isolates
+reasoning, intent, planning, grounding, policy, repository and telemetry behavior.
+No action executor is defined or injected into planning use cases.
+
+Generation composes scene interpretation, task interpretation, plan proposal and
+deterministic validation within one total timeout. The original goal/constraints
+are retained even if the model tries to rewrite them. Visual and planning Meta
+adapters share the Phase 1 authenticated transport, retries, timeout, response cap
+and usage normalization. Wire schemas/JSON codecs stay outside the domain.
+
+Visual grounding checks screenshot identity, viewport and estimated box bounds.
+All model-based results explicitly say model_visual or unresolved. DOM-assisted
+claims are rejected because no independent DOM matcher is implemented. Confidence
+is uncalibrated; valid bounds do not prove correct localization.
+
+The deterministic policy enforces parameter allowlists, known target references,
+element types, visible/enabled state, preconditions, expected evidence, URL scope,
+unsafe-operation restrictions and fresh-observation checkpoints. High-risk steps
+carry future-human-approval findings. Expiry is based on screenshot/plan age.
+`valid` is a planning judgment, never an execution authorization.
+
+The plan repository shares the existing SQLAlchemy engine. `visual_scenes` stores
+scene snapshots; `action_plans` stores complete inspection results;
+`planned_actions` indexes ordered action type/risk; `planning_events` stores
+prompt-free correlated traces. Plan, action index and completion event commit in
+one transaction. Revalidation updates the same plan row and appends an event.
+Failure events before a plan exists remain correlated by task/request in logs/DB.
+
+```mermaid
+flowchart TD
+    R[Observation ID + goal + constraints] --> O[Load stored observation and PNG]
+    O --> V[Meta screenshot interpretation]
+    V --> G[Validate viewport and estimated grounding]
+    G --> S[(Persist scene)]
+    S --> I[Meta intent interpretation]
+    I --> P[Meta typed action proposal]
+    P --> D[Deterministic policy validation]
+    D --> Status{Planning status}
+    Status --> Valid[valid]
+    Status --> Clarify[requires_clarification]
+    Status --> Reject[rejected]
+    Status --> Expired[expired]
+    Valid --> DB[(Atomic plan + action index + completion event)]
+    Clarify --> DB
+    Reject --> DB
+    Expired --> DB
+    DB --> UI[Inspect timeline, grounding, uncertainty and trace]
+    UI --> Stop[Stop: no execution capability]
+```
+
+This remains local synchronous HTTP orchestration, not a durable job queue.
+Generation is non-idempotent: repeated requests create distinct plans and can
+incur additional inference cost. Revalidation is state-idempotent and intentionally
+appends audit events. Cancellation stops coroutine orchestration, but cannot
+forcibly interrupt a database write already running in a worker thread.
