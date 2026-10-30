@@ -1,0 +1,272 @@
+{
+  "scenario": "INTI-DEMO-001",
+  "recorded_at": "2026-10-30T13:26:26.718435+00:00",
+  "api": "http://127.0.0.1:8000",
+  "objective": "Find asset PC-104, change its status to Operational, and verify the persisted result.",
+  "mode": "authored_demo",
+  "plan_source": "explicit authored sandbox recipe; no model reasoning",
+  "live_model_recovery_claimed": false,
+  "backend": {
+    "version": "0.7.0",
+    "capabilities": {
+      "version": "0.7.0",
+      "execution_enabled": true,
+      "verification_enabled": true,
+      "recovery_enabled": true,
+      "model_calls_enabled": false,
+      "demo_controls_enabled": true,
+      "model_configured": false
+    }
+  },
+  "meta_dependency": {
+    "checked": true,
+    "http_status": 409,
+    "error_code": "MODEL_CALLS_DISABLED",
+    "message": "Real model calls are disabled. Authored demo is a separate explicit mode",
+    "mission_id": "1dcbb90c-9d07-4fd7-83ee-2060adc90ad0"
+  },
+  "reset": {
+    "store_id": "0ab5dcb0-9a7f-4407-be4c-936b2ee035b3",
+    "synthetic": true,
+    "asset": {
+      "id": "PC-104",
+      "name": "Accounting Workstation",
+      "location": "Quito Lab",
+      "status": "Inactive",
+      "version": 10
+    },
+    "faults_active": false
+  },
+  "mission": {
+    "id": "a6dcf6df-ca9b-47ae-83b9-e4f0f98a6eda",
+    "plan_id": "6d7483c5-14d0-4e4b-90af-7cd566e019bf",
+    "execution_id": "3a4cf293-7f14-4f33-a742-0d04ccc0a3ba",
+    "observation_id": "c8c0d790-099f-4611-b05f-a7e537af31c3",
+    "plan_actions": 9
+  },
+  "authorization": {
+    "plan_approved": true,
+    "high_risk_action_ids": [
+      "c88bcdf0-3ecf-4f1a-a898-3dcbdce3b2d4"
+    ]
+  },
+  "fault": {
+    "requested": false,
+    "armed": false
+  },
+  "execution": {
+    "status": "COMPLETED",
+    "results": [
+      {
+        "action_id": "527b6dda-6a39-4bd4-9135-7fc66e89fc0b",
+        "status": "SUCCEEDED",
+        "duration_ms": 241.37896499996714
+      },
+      {
+        "action_id": "865e64c1-3ec7-4931-901f-916d75d8c40c",
+        "status": "SUCCEEDED",
+        "duration_ms": 280.3297949994885
+      },
+      {
+        "action_id": "12025627-b3d4-4e71-9529-cf77aa86d6cc",
+        "status": "SUCCEEDED",
+        "duration_ms": 210.86874000138778
+      },
+      {
+        "action_id": "8bdd8bfb-c4d7-4d3b-a919-31036bb3f76b",
+        "status": "SUCCEEDED",
+        "duration_ms": 288.1994229992415
+      },
+      {
+        "action_id": "4433af57-d125-4cfb-9c3b-d3618cd8f384",
+        "status": "SUCCEEDED",
+        "duration_ms": 181.87116499939293
+      },
+      {
+        "action_id": "30ceeae1-8670-4536-9bbe-895ebe5922ad",
+        "status": "SUCCEEDED",
+        "duration_ms": 542.7171020000969
+      },
+      {
+        "action_id": "d2af284f-5140-4f72-89e8-8332803ddfbc",
+        "status": "SUCCEEDED",
+        "duration_ms": 269.983959999081
+      },
+      {
+        "action_id": "c88bcdf0-3ecf-4f1a-a898-3dcbdce3b2d4",
+        "status": "SUCCEEDED",
+        "duration_ms": 341.31000600064
+      },
+      {
+        "action_id": "b3cdf0eb-0039-4e72-823c-fe1460079d41",
+        "status": "SUCCEEDED",
+        "duration_ms": 245.5437910011824
+      }
+    ]
+  },
+  "verification": {
+    "id": "99164881-287d-422f-a5a6-5513a865caad",
+    "effective_verdict": "VERIFIED_SUCCESS",
+    "declared_overall_goal_verified": false,
+    "evidence_count": 8,
+    "criteria_results": [
+      {
+        "criterion_id": "eb7b1fa2-37d1-5806-96f7-89f247621b5e",
+        "status": "PASS",
+        "observed_value": true,
+        "expected_value": true,
+        "evidence_ids": [
+          "3650f6da-d5e6-4275-aa7b-4fa2ad8047d9",
+          "921e4da4-7a43-4087-a755-d9e1da2387bc",
+          "4d83d905-e95d-4ac5-ae0b-798e460f68c1",
+          "3a1eab17-a8dc-4177-abeb-c991c750aedb",
+          "4464f5e7-5ecc-42ed-8f8d-321e4136f323",
+          "ed8eda18-909a-475b-9074-c77ec13b69a9",
+          "83cc46dc-c5fa-46fa-ab1d-35ef3d429958",
+          "528f7fae-4d60-4cf0-9b90-ebe7e147f39c"
+        ],
+        "explanation": "Record/field existence established by read-only database snapshots"
+      },
+      {
+        "criterion_id": "ca17f6c8-8ce8-54eb-b767-0116aa25df2f",
+        "status": "PASS",
+        "observed_value": "Operational",
+        "expected_value": "Operational",
+        "evidence_ids": [
+          "3650f6da-d5e6-4275-aa7b-4fa2ad8047d9",
+          "921e4da4-7a43-4087-a755-d9e1da2387bc",
+          "4d83d905-e95d-4ac5-ae0b-798e460f68c1",
+          "3a1eab17-a8dc-4177-abeb-c991c750aedb",
+          "4464f5e7-5ecc-42ed-8f8d-321e4136f323",
+          "ed8eda18-909a-475b-9074-c77ec13b69a9",
+          "83cc46dc-c5fa-46fa-ab1d-35ef3d429958",
+          "528f7fae-4d60-4cf0-9b90-ebe7e147f39c"
+        ],
+        "explanation": "Deterministic assertion against fresh persisted state"
+      },
+      {
+        "criterion_id": "92597427-a5fb-51e5-86ae-e456af55ec04",
+        "status": "PASS",
+        "observed_value": "Operational",
+        "expected_value": "Operational",
+        "evidence_ids": [
+          "3650f6da-d5e6-4275-aa7b-4fa2ad8047d9",
+          "921e4da4-7a43-4087-a755-d9e1da2387bc",
+          "4d83d905-e95d-4ac5-ae0b-798e460f68c1",
+          "3a1eab17-a8dc-4177-abeb-c991c750aedb",
+          "4464f5e7-5ecc-42ed-8f8d-321e4136f323",
+          "ed8eda18-909a-475b-9074-c77ec13b69a9",
+          "83cc46dc-c5fa-46fa-ab1d-35ef3d429958",
+          "528f7fae-4d60-4cf0-9b90-ebe7e147f39c"
+        ],
+        "explanation": "Two read-only SQLite snapshots agree on record identity, version and value"
+      },
+      {
+        "criterion_id": "b1d58466-8f89-51a9-9689-46f05c7c6032",
+        "status": "PASS",
+        "observed_value": {
+          "before": "Inactive",
+          "after": "Operational"
+        },
+        "expected_value": {
+          "before": "Inactive",
+          "after": "Operational"
+        },
+        "evidence_ids": [
+          "3650f6da-d5e6-4275-aa7b-4fa2ad8047d9",
+          "921e4da4-7a43-4087-a755-d9e1da2387bc",
+          "4d83d905-e95d-4ac5-ae0b-798e460f68c1",
+          "3a1eab17-a8dc-4177-abeb-c991c750aedb",
+          "4464f5e7-5ecc-42ed-8f8d-321e4136f323",
+          "ed8eda18-909a-475b-9074-c77ec13b69a9",
+          "83cc46dc-c5fa-46fa-ab1d-35ef3d429958",
+          "528f7fae-4d60-4cf0-9b90-ebe7e147f39c"
+        ],
+        "explanation": "Transition and record version compared; causal attribution is not inferred"
+      },
+      {
+        "criterion_id": "91d81bdd-e1a3-51bf-bfe2-841b99949b76",
+        "status": "PASS",
+        "observed_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+        "expected_value": "7eb814d77504a042729e594b64c776fa0d5659bb6f8a43c66b02efc6bcadc5b6",
+        "evidence_ids": [
+          "3650f6da-d5e6-4275-aa7b-4fa2ad8047d9",
+          "921e4da4-7a43-4087-a755-d9e1da2387bc",
+          "4d83d905-e95d-4ac5-ae0b-798e460f68c1",
+          "3a1eab17-a8dc-4177-abeb-c991c750aedb",
+          "4464f5e7-5ecc-42ed-8f8d-321e4136f323",
+          "ed8eda18-909a-475b-9074-c77ec13b69a9",
+          "83cc46dc-c5fa-46fa-ab1d-35ef3d429958",
+          "528f7fae-4d60-4cf0-9b90-ebe7e147f39c"
+        ],
+        "explanation": "Deterministic assertion against fresh persisted state"
+      }
+    ],
+    "integrity_checks": [
+      {
+        "evidence_id": "3650f6da-d5e6-4275-aa7b-4fa2ad8047d9",
+        "intact": true,
+        "error": null
+      },
+      {
+        "evidence_id": "921e4da4-7a43-4087-a755-d9e1da2387bc",
+        "intact": true,
+        "error": null
+      },
+      {
+        "evidence_id": "4d83d905-e95d-4ac5-ae0b-798e460f68c1",
+        "intact": true,
+        "error": null
+      },
+      {
+        "evidence_id": "3a1eab17-a8dc-4177-abeb-c991c750aedb",
+        "intact": true,
+        "error": null
+      },
+      {
+        "evidence_id": "4464f5e7-5ecc-42ed-8f8d-321e4136f323",
+        "intact": true,
+        "error": null
+      },
+      {
+        "evidence_id": "ed8eda18-909a-475b-9074-c77ec13b69a9",
+        "intact": true,
+        "error": null
+      },
+      {
+        "evidence_id": "83cc46dc-c5fa-46fa-ab1d-35ef3d429958",
+        "intact": true,
+        "error": null
+      },
+      {
+        "evidence_id": "528f7fae-4d60-4cf0-9b90-ebe7e147f39c",
+        "intact": true,
+        "error": null
+      }
+    ]
+  },
+  "recovery": "No recovery was triggered in the authored path.",
+  "persisted_asset": {
+    "id": "PC-104",
+    "name": "Accounting Workstation",
+    "location": "Quito Lab",
+    "status": "Operational",
+    "version": 11
+  },
+  "benchmark": {
+    "report_id": "verification",
+    "sha256": "1e405c6a3fd050b6cc3a79b0b6050f3f030b34ab334cdfb30a460b555f74cbad",
+    "scenarios": 5,
+    "verdict_accuracy": {
+      "numerator": 5,
+      "denominator": 5
+    }
+  },
+  "limitations": [
+    "The authored recipe is not Meta-generated planning.",
+    "The default authored path makes no model calls; --arm-fault requires live Meta recovery.",
+    "The rename/relocate recovery path remains gated on configured Meta recovery access."
+  ],
+  "ok": true,
+  "status": "PASSED"
+}

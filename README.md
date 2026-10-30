@@ -13,9 +13,11 @@ Interfaces change. Conventional automation breaks silently. INTI AI's long-term
 goal is to perceive an interface, reason about an authorized objective, act,
 verify the outcome, and recover when the interface changes.
 
-Version 0.5 adds bounded recovery and independent outcome verification. Approved
-typed plans run in an isolated Chromium worker; a separate read-only source checks
-what the application actually persisted. The lifecycle is
+Version 0.7 completes the product experience. Mission Control turns an objective
+into one inspectable mission: observation, plan, explicit approvals, real browser
+execution, bounded recovery, independent verification and evidence. Approved typed
+plans run in an isolated Chromium worker; a separate read-only source checks what
+the application actually persisted. The lifecycle is
 PERCEIVE → REASON → PLAN → ACT → RECOVER → VERIFY.
 
 Execution completion, immediate UI checks and VERIFIED_SUCCESS are separate
@@ -23,6 +25,7 @@ results. Five actual browser/database fault trials produced the expected verdict
 three VERIFIED_FAILURE, one INCONCLUSIVE and one VERIFIED_SUCCESS. No live Meta
 calls were made for these phases, as requested. Recovery diagnosis is implemented
 but evaluated with explicit test fixtures; live-model performance remains blocked.
+Phase 6 comparative evaluation does not exist and is not claimed.
 
 ## Recovery and independent verification
 
@@ -34,20 +37,49 @@ but evaluated with explicit test fixtures; live-model performance remains blocke
 - [Phase 4 report](docs/PHASE-04-REPORT.md), [Phase 5 report](docs/PHASE-05-REPORT.md),
   [measured benchmark](benchmarks/reports/phase-05-verification.json).
 
-Generate distinct random capabilities in ignored `.env`: existing
-`EXECUTION_OPERATOR_TOKEN`, `BROWSER_WORKER_TOKEN` and new `VERIFICATION_READ_TOKEN`
-(at least 24 characters each). Enable `EXECUTION_ENABLED=true` and
-`VERIFICATION_ENABLED=true`; optional `RECOVERY_ENABLED=true` needs configured Meta
-credentials for real diagnosis. `docker compose up --build -d` preserves existing
-volumes and runs migrations through 0005. The new `inventory-state` service has no
-published port and mounts application data read-only. Fault administration is
-disabled unless a separate `DEMO_FAULT_CONTROL_TOKEN` is configured.
+Generate distinct random capabilities in ignored `.env`:
+`EXECUTION_OPERATOR_TOKEN`, `BROWSER_WORKER_TOKEN`, `VERIFICATION_READ_TOKEN` and
+`DEMO_FAULT_CONTROL_TOKEN` (at least 24 characters each). `scripts/start_demo.ps1`
+enables `EXECUTION_ENABLED`, `VERIFICATION_ENABLED`, `RECOVERY_ENABLED` and
+`DEMO_CONTROLS_ENABLED`, and copies `DEMO_FAULT_CONTROL_TOKEN` into
+`DEMO_CONTROL_TOKEN` for the restricted demo admin plane. Compose preserves existing
+volumes and runs migrations through `0006`. The `inventory-state` service has no
+published port and mounts application data read-only.
 
 Connect with the operator token in Live Execution, review and approve the authored
 sandbox plan and its HIGH save action, then start. Automatic verification defines
 criteria/baseline before execution and evaluates fresh persisted state afterward.
 Historical terminal runs can also be verified; missing historical baselines remain
 explicitly unknown. The authored recipe is not represented as model reasoning.
+
+## Mission Control and the Phase 7 experience
+
+- [Mission Control](http://localhost:5173): create a task, follow one mission ID,
+  inspect plan provenance, approve execution, review recovery, and read the latest
+  independent verdict.
+- **Guided demo** (`/?guided=1`) derives an eight-step tracker from backend state.
+  Completed steps, the next step and blocked dependencies are real states; the guide
+  cannot approve or start anything.
+- [Benchmark Lab](http://localhost:5173/benchmarks) shows committed reports with
+  denominators and explicit `Unavailable` metrics. It does not invent comparative
+  scores.
+- Synthetic reset is restricted to the marked demo store, requires confirmation and
+  refuses while execution or verification is active.
+- A public [capabilities endpoint](http://localhost:8000/api/v1/capabilities)
+  reports feature switches without exposing secrets.
+
+Real Phase 7 evidence:
+
+- [live demo evidence](docs/evidence/phase7-live-demo.json): authored mission,
+  nine real browser actions, independent `VERIFIED_SUCCESS`, eight intact evidence
+  items, persisted `PC-104 = Operational`, and an explicit
+  `MODEL_CALLS_DISABLED` Meta dependency check.
+- [Phase 7 report](docs/PHASE-07-REPORT.md), [final architecture](docs/FINAL-ARCHITECTURE.md),
+  [judge guide](docs/JUDGE-DEMO-GUIDE.md), [QA checklist](docs/QA-CHECKLIST.md),
+  [submission notes](docs/SUBMISSION.md), [video script](docs/DEMO-VIDEO-SCRIPT.md)
+  and [storyboard](docs/DEMO-STORYBOARD.md).
+- Genuine screenshots from the running stack are in
+  [`docs/screenshots/`](docs/screenshots/).
 
 ## Current functionality
 
@@ -66,6 +98,12 @@ explicitly unknown. The authored recipe is not represented as model reasoning.
 
 - Live Execution workspace with exact-manifest approval, separate HIGH confirmation,
   pause/resume/cancel, private screenshot evidence, history and persisted WebSocket events.
+- Mission Control product shell with one mission identity, backend-derived guided
+  tracker, latest verdict, capability status and source-labeled activity.
+- Benchmark Lab for allowlisted, shape-validated local reports with computed SHA-256 with explicit
+  unavailable metrics and no inferred scores.
+- Restricted synthetic reset and an explicitly gated live-fault path. No fixture is
+  substituted when Meta access is missing.
 
 See [the Phase 3 implementation report](docs/PHASE-03-REPORT.md) for measured results and
 the distinction between verified, unverified, blocked, and excluded functionality.
@@ -73,19 +111,33 @@ the distinction between verified, unverified, blocked, and excluded functionalit
 ## Start with Docker Desktop
 
 Requirements: Docker Desktop running Linux containers, Docker Compose v2, and
-ports 5173, 8000, 8001, 5432 available. Run from the repository root:
+ports 5173, 8000, 8001, 8002, 5432 available. Run from the repository root:
 
 ```powershell
 Copy-Item .env.example .env
-docker compose up --build -d
+# Fill in distinct random capabilities in .env (at least 24 characters each):
+# EXECUTION_OPERATOR_TOKEN, BROWSER_WORKER_TOKEN, VERIFICATION_READ_TOKEN,
+# DEMO_FAULT_CONTROL_TOKEN
+powershell -ExecutionPolicy Bypass -File .\scripts\start_demo.ps1
 docker compose ps
 ```
 
-Open the [dashboard](http://localhost:5173), [API docs](http://localhost:8000/docs),
-or [synthetic demo](http://localhost:8001). Click **Capture observation**. The
-backend opens `http://demo:8001/` over the internal Docker network. The host
-browser sees the screenshot through the backend; the `demo` hostname does not
-need to resolve on Windows. Reload the dashboard to inspect persisted metadata.
+On a network with TLS interception, pass the trusted CA explicitly:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\start_demo.ps1 -BuildCaPem .\.tmp\build-ca.pem
+```
+
+Open the [dashboard](http://localhost:5173/?guided=1), [API docs](http://localhost:8000/docs),
+or [synthetic demo](http://localhost:8001). Connect with `EXECUTION_OPERATOR_TOKEN`,
+then follow **Guided demo**. The backend opens `http://demo:8001/` over the internal
+Docker network. The host browser sees screenshots through the backend; the `demo`
+hostname does not need to resolve on Windows.
+
+`start_demo.ps1` enables execution, verification, recovery mechanics and restricted
+demo controls, generates missing capabilities, and checks backend version `0.7.0`.
+It preserves existing volumes; reset explicitly in Mission Control when you want a
+fresh synthetic state.
 
 All published ports bind to loopback. PostgreSQL, artifacts and demo data use named volumes.
 `docker compose down` stops the stack and retains those volumes.
@@ -110,8 +162,9 @@ The deterministic demo recipe is explicitly authored, uses actual accessible DOM
 observations and calls no model. It is not presented as a Meta-generated plan.
 PC-104 starts Inactive in a new demo database and is saved as Operational by browser
 interaction. Repeating the original recipe after that change fails its Inactive
-precondition; it never silently resets user data. To repeat, edit PC-104 back to
-Inactive explicitly in the demo UI. Ordinary automated tests use fresh temporary stores.
+precondition; it never silently resets user data. Use **Reset demo** in Mission
+Control (or the restricted API) to restore the marked synthetic store. Ordinary
+automated tests use fresh temporary stores.
 
 Existing Phase 2 plans can be loaded with typed target/precondition/postcondition
 contracts in the advanced editor or API. Business ambiguity, stale plans and rejected
@@ -210,6 +263,10 @@ npm --prefix apps/frontend run build
 $env:INTI_E2E="1"
 .\.venv\Scripts\python.exe -m pytest apps/backend/tests/e2e -v
 .\.venv\Scripts\python.exe scripts/verify_dashboard.py
+# Real authored mission + independent verification (no model calls):
+.\.venv\Scripts\python.exe scripts/live_demo_check.py
+# Genuine screenshots from the running app:
+.\.venv\Scripts\python.exe scripts/capture_demo_screenshots.py
 ```
 
 On systems with Make: `make setup`, `make dev`, `make test`, `make lint`,
@@ -220,11 +277,11 @@ Detailed setup/troubleshooting: [DEVELOPMENT](docs/DEVELOPMENT.md).
 
 ```text
 apps/backend/       Python domain, application, adapters, REST API, migrations, tests
-apps/frontend/      React/TypeScript dashboard and component tests
-apps/demo-app/      Original synthetic inventory sandbox
-docs/              Design, API, development and evidence report
-benchmarks/         Acceptance scenario and measured verification report
-scripts/           Real dashboard verification
+apps/frontend/      React/TypeScript Mission Control workspace and component tests
+apps/demo-app/      Synthetic inventory sandbox with restricted fault administration
+docs/              Architecture, API, demo guides, evidence and phase reports
+benchmarks/         Acceptance scenarios and measured verification reports
+scripts/           Startup, live demo check, screenshot capture and verifiers
 .github/workflows/  CI checks without production credentials
 ```
 
@@ -244,9 +301,16 @@ records by default, up to 100. Meta access and hackathon eligibility must be ver
 against the organizer/account before submission. Local deterministic benchmarks
 do not establish live-model performance.
 
-Phase 6 prerequisites: evaluate real Meta recovery quality, add explicit criterion
+Phase 7 delivered the product shell, Mission Control workflow, restricted demo
+reset, benchmark inspection, live demo evidence and submission documentation. The
+Phase 6 comparative evaluation remains unimplemented. Remaining work: evaluate real
+Meta planning/recovery quality with configured access, add explicit criterion
 authoring for additional applications, distributed ownership, artifact retention
 and stronger prompt-injection/concurrent-writer evaluations.
+
+Submission status: no demo video URL or hackathon form submission is claimed. See
+[docs/SUBMISSION.md](docs/SUBMISSION.md). Local evidence does not prove organizer
+eligibility or acceptance.
 
 All project source in this repository was authored for this implementation session.
 No proprietary assets or application source were copied. Third-party packages

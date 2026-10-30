@@ -1,0 +1,80 @@
+{
+  "recorded_at": "2026-10-30T13:33:57.383488+00:00",
+  "release": "0.7.0",
+  "implementation_commit": "a4c85d6146390b4e61e84fa8b2305d788e58a2a9",
+  "backend": {
+    "passed": 223,
+    "deselected": 5,
+    "coverage_percent": 89.66,
+    "warning": "Upstream Starlette test-client deprecation"
+  },
+  "opt_in_e2e": {
+    "passed": 4,
+    "skipped": 1,
+    "skip_reason": "Live-model test deliberately disabled"
+  },
+  "frontend": {
+    "passed": 33,
+    "files": 6,
+    "typecheck": "PASSED",
+    "lint": "PASSED",
+    "production_build": "PASSED"
+  },
+  "static": {
+    "mypy_source_files": 63,
+    "mypy": "PASSED",
+    "ruff": "PASSED",
+    "formatted_files": 108
+  },
+  "ci": {
+    "run_id": 41063431939,
+    "status": "completed",
+    "conclusion": "success",
+    "backend": "success",
+    "frontend": "success",
+    "url": "https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON/actions/runs/41063431939"
+  },
+  "authored_demo": "PASSED",
+  "fresh_data_startup": "PASSED",
+  "live_meta_recovery": "BLOCKED",
+  "real_model_calls": 0,
+  "in_app_browser": "Unavailable: missing sandbox policy metadata; used project Playwright",
+  "submission_performed": false,
+  "video_published": false,
+  "limitations": [
+    "No live Meta planning or recovery",
+    "No Phase 6 comparative evaluation",
+    "Fresh-data test used built images; no empty-cache/public-clone build claim",
+    "No physical-device or screen-reader session"
+  ],
+  "screenshots": [
+    {
+      "path": "docs/screenshots/phase7-active-mission.png",
+      "sha256": "bb47be2c06d07e88dddca8a6a0dd9e7337efd6abe898c5bfa832e0c00fa7cc21"
+    },
+    {
+      "path": "docs/screenshots/phase7-benchmark-lab.png",
+      "sha256": "714e4366db8cd0ce53c1a03b925c4726db59a26a84754adffef31ab6cad6b9bf"
+    },
+    {
+      "path": "docs/screenshots/phase7-mission-control.png",
+      "sha256": "a5490c85858767dd949032d1f05587d7d77c11ee1be8d76977d498d76deda755"
+    },
+    {
+      "path": "docs/screenshots/phase7-mission-mobile.png",
+      "sha256": "b46e64af3c8df720b6d2322e1c3e5cf5363e48c65fb42b511d6888cede70fa21"
+    },
+    {
+      "path": "docs/screenshots/phase7-mission-tablet.png",
+      "sha256": "8bc5d9e1ef20be13797dde01dad67c56ee78263ac18115e0716e4610a451f6e3"
+    },
+    {
+      "path": "docs/screenshots/phase7-recovery-center.png",
+      "sha256": "e64d6268c40c782fc83faea8021af060b524f61f788399e64ec3b2aaf77dfded"
+    },
+    {
+      "path": "docs/screenshots/phase7-verification.png",
+      "sha256": "77fc7d81c911c58e1c4d3ed4a6d9544cfc2b074d7f2e7db86cb15ec38d78e63d"
+    }
+  ]
+}

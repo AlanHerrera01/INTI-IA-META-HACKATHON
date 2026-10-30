@@ -1,0 +1,19 @@
+{
+  "source": "Actual local running application; project Playwright",
+  "model_calls": 0,
+  "page_errors": [],
+  "responsive_checks": [
+    {
+      "width": 1024,
+      "height": 900,
+      "horizontal_overflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "horizontal_overflow": false
+    }
+  ],
+  "mission_id": "a6dcf6df-ca9b-47ae-83b9-e4f0f98a6eda",
+  "in_app_browser": "Unavailable: missing sandbox policy metadata"
+}

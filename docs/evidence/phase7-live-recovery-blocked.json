@@ -1,0 +1,29 @@
+{
+  "scenario": "INTI-DEMO-001",
+  "recorded_at": "2026-10-30T13:26:40.277147+00:00",
+  "api": "http://127.0.0.1:8000",
+  "objective": "Find asset PC-104, change its status to Operational, and verify the persisted result.",
+  "mode": "authored_demo",
+  "plan_source": "explicit authored sandbox recipe; no model reasoning",
+  "live_model_recovery_claimed": false,
+  "backend": {
+    "version": "0.7.0",
+    "capabilities": {
+      "version": "0.7.0",
+      "execution_enabled": true,
+      "verification_enabled": true,
+      "recovery_enabled": true,
+      "model_calls_enabled": false,
+      "demo_controls_enabled": true,
+      "model_configured": false
+    }
+  },
+  "ok": false,
+  "status": "BLOCKED",
+  "blocker": "LIVE_RECOVERY_BLOCKED",
+  "fault": {
+    "requested": true,
+    "armed": false
+  },
+  "message": "Live recovery requires enabled Meta access; no reset or substitute run was performed."
+}

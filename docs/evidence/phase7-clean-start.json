@@ -1,0 +1,22 @@
+﻿{
+    "recorded_at":  "2026-10-30T13:25:46.1045753Z",
+    "status":  "PASSED",
+    "project":  "inti-phase7-check-5be24f71",
+    "source":  "Release-file export, fresh random capabilities and named volumes; existing built images",
+    "backend_version":  "0.7.0",
+    "initial_mission_count":  0,
+    "initial_asset":  {
+                          "id":  "PC-104",
+                          "name":  "Accounting Workstation",
+                          "location":  "Quito Lab",
+                          "status":  "Inactive",
+                          "version":  1
+                      },
+    "frontend_http_status":  200,
+    "execution_status":  "COMPLETED",
+    "verification_verdict":  "VERIFIED_SUCCESS",
+    "evidence_count":  8,
+    "real_model_calls":  0,
+    "main_project_data_touched":  false,
+    "dependency_install_from_empty_cache":  false
+}
