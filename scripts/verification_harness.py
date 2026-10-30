@@ -62,7 +62,7 @@ class VerificationHarness:
             "127.0.0.1", 0, self.root / "inventory.db", self.controller
         )
         self.admin = demo["create_fault_server"](
-            "127.0.0.1", 0, self.controller, FAULT_TOKEN
+            "127.0.0.1", 0, self.controller, FAULT_TOKEN, self.root / "inventory.db"
         )
         self.readonly = readonly["create_verification_server"](
             "127.0.0.1", 0, self.root / "inventory.db", READ_TOKEN

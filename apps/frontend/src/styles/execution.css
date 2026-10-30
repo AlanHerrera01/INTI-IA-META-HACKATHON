@@ -1,5 +1,5 @@
 .execution-workspace {
-  color: #f8fafc;
+  color: var(--text-primary);
 }
 .execution-workspace h1 {
   margin: 8px 0;
@@ -10,14 +10,14 @@
 }
 .execution-workspace small,
 .execution-help {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 .execution-chip,
 .execution-status {
-  border: 1px solid #06b6d455;
-  background: #06b6d411;
-  color: #06b6d4;
+  border: 1px solid color-mix(in srgb, var(--primary) 33.3%, transparent);
+  background: color-mix(in srgb, var(--primary) 6.7%, transparent);
+  color: var(--primary);
   padding: 7px 12px;
   border-radius: 6px;
   font-size: 12px;
@@ -57,8 +57,8 @@
 .execution-workspace input,
 .execution-workspace select,
 .execution-workspace textarea {
-  background: #0b1220;
-  color: #f8fafc;
+  background: var(--bg);
+  color: var(--text-primary);
   padding: 10px;
   border: 1px solid #334155;
   border-radius: 6px;
@@ -76,12 +76,12 @@
   border: 1px solid #334155;
   border-radius: 6px;
   background: #16283b;
-  color: #f8fafc;
+  color: var(--text-primary);
   cursor: pointer;
   font-size: 12px;
 }
 .execution-workspace button:hover:not(:disabled) {
-  border-color: #06b6d4;
+  border-color: var(--primary);
 }
 .execution-workspace button:disabled {
   opacity: 0.4;
@@ -104,7 +104,7 @@
   gap: 8px;
 }
 .execution-history button[aria-pressed="true"] {
-  border-color: #06b6d4;
+  border-color: var(--primary);
 }
 .execution-history span {
   font-size: 12px;
@@ -115,14 +115,14 @@
 }
 .execution-workspace summary {
   cursor: pointer;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 .execution-workspace pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-size: 11px;
-  background: #0b1220;
+  background: var(--bg);
   padding: 14px;
   border-radius: 6px;
   max-height: 350px;
@@ -150,24 +150,24 @@
 .execution-workspace progress {
   width: 100%;
   height: 7px;
-  accent-color: #06b6d4;
+  accent-color: var(--primary);
 }
 .state-completed {
-  color: #06b6d4;
-  border-color: #06b6d466;
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 40%, transparent);
 }
 .state-failed,
 .state-timed_out,
 .execution-error {
-  color: #ef4444;
+  color: var(--error);
 }
 .state-awaiting_approval,
 .state-paused {
-  color: #f59e0b;
+  color: var(--solar);
 }
 .execution-url {
   font: 12px monospace;
-  color: #94a3b8;
+  color: var(--text-secondary);
   overflow-wrap: anywhere;
 }
 .execution-screen {
@@ -183,8 +183,8 @@
 }
 .execution-target {
   position: absolute;
-  border: 2px solid #06b6d4;
-  background: #06b6d422;
+  border: 2px solid var(--primary);
+  background: color-mix(in srgb, var(--primary) 13.3%, transparent);
   pointer-events: none;
 }
 .execution-actions,
@@ -205,14 +205,14 @@
   font-size: 12px;
 }
 .execution-action-heading strong {
-  color: #06b6d4;
+  color: var(--primary);
 }
 .execution-action-heading b {
   margin-left: auto;
 }
 .execution-actions p {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .execution-events {
   max-height: 280px;
@@ -226,7 +226,7 @@
   font-size: 12px;
 }
 .execution-events time {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .execution-inspector {
   display: grid;
@@ -235,7 +235,7 @@
   font-size: 12px;
 }
 .execution-inspector dt {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .execution-inspector dd {
   margin: 0;
@@ -260,7 +260,7 @@
 .execution-modal code {
   font-size: 11px;
   overflow-wrap: anywhere;
-  color: #f59e0b;
+  color: var(--solar);
 }
 @media (max-width: 1100px) {
   .execution-layout {

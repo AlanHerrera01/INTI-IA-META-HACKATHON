@@ -1,12 +1,14 @@
 from dataclasses import dataclass
 
 from inti.application.execution import ExecutionOrchestrator
+from inti.application.missions import MissionService
 from inti.application.planning import (
     GenerateActionPlanUseCase,
     InterpretTaskIntentUseCase,
     InterpretVisualSceneUseCase,
 )
 from inti.application.recovery import RecoveryOrchestrator
+from inti.application.use_cases import CaptureObservationUseCase
 from inti.application.verification import IndependentVerificationOrchestrator
 from inti.domain.execution import ExecutionLimits
 from inti.domain.execution_policy import ExecutionPolicy
@@ -22,12 +24,14 @@ from inti.domain.recovery import RecoveryBudget
 from inti.infrastructure.browser import PlaywrightBrowserAdapter
 from inti.infrastructure.browser.remote import RemoteBrowserWorker
 from inti.infrastructure.config import ConfigurationProvider
+from inti.infrastructure.demo_control import LocalDemoControl
 from inti.infrastructure.grounding import VisualGroundingAdapter
 from inti.infrastructure.meta import MetaModelAPIAdapter
 from inti.infrastructure.meta.planning import MetaPlanningAdapter, MetaVisualReasoningAdapter
 from inti.infrastructure.meta.recovery import MetaRecoveryAdapter
 from inti.infrastructure.persistence import SQLAlchemyObservationRepository
 from inti.infrastructure.persistence.execution import SQLAlchemyExecutionRepository
+from inti.infrastructure.persistence.missions import SQLAlchemyMissionRepository
 from inti.infrastructure.persistence.planning import (
     PlanningTelemetryAdapter,
     SQLAlchemyPlanRepository,
@@ -54,6 +58,7 @@ class Services:
     execution: ExecutionOrchestrator | None = None
     verification: IndependentVerificationOrchestrator | None = None
     recovery: RecoveryOrchestrator | None = None
+    missions: MissionService | None = None
 
 
 @dataclass
@@ -166,6 +171,23 @@ def build_services(settings: ConfigurationProvider) -> Services:
             ),
         )
         execution.recovery = recovery
+    missions = None
+    if execution:
+        missions = MissionService(
+            SQLAlchemyMissionRepository(repository.engine),
+            execution,
+            CaptureObservationUseCase(
+                PlaywrightBrowserAdapter(settings, storage), repository, storage
+            ),
+            planning.generate,
+            meta,
+            LocalDemoControl(settings) if settings.demo_controls_enabled else None,
+            settings.demo_url,
+            settings.mission_model_calls_enabled,
+            verification.repository if verification else None,
+        )
+        if settings.demo_controls_enabled:
+            execution.demo_controller = missions
     return Services(
         settings,
         repository,
@@ -176,4 +198,5 @@ def build_services(settings: ConfigurationProvider) -> Services:
         execution,
         verification,
         recovery,
+        missions,
     )

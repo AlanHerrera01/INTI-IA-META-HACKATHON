@@ -12,8 +12,10 @@ from inti.application.context import correlation_id
 from inti.domain.exceptions import IntiError
 from inti.infrastructure.config import ConfigurationProvider
 from inti.presentation.api import router
+from inti.presentation.benchmark_api import router as benchmark_router
 from inti.presentation.dependencies import Services, build_services
 from inti.presentation.execution_api import router as execution_router
+from inti.presentation.mission_api import router as mission_router
 from inti.presentation.planning_api import router as planning_router
 from inti.presentation.recovery_api import router as recovery_router
 from inti.presentation.verification_api import router as verification_router
@@ -40,6 +42,8 @@ def create_app(services: Services | None = None) -> FastAPI:
         recovery = app.state.services.recovery
         if recovery:
             await recovery.recover_interrupted()
+        if app.state.services.missions:
+            await app.state.services.missions.recover_interrupted()
         yield
         if execution:
             await execution.shutdown()
@@ -110,6 +114,8 @@ def create_app(services: Services | None = None) -> FastAPI:
     app.include_router(execution_router)
     app.include_router(verification_router)
     app.include_router(recovery_router)
+    app.include_router(mission_router)
+    app.include_router(benchmark_router)
     return app
 
 

@@ -66,6 +66,11 @@ services:
       META_MAX_RESPONSE_BYTES: ${META_MAX_RESPONSE_BYTES:-262144}
       EXECUTION_ENABLED: ${EXECUTION_ENABLED:-false}
       EXECUTION_OPERATOR_TOKEN: ${EXECUTION_OPERATOR_TOKEN:-}
+      MISSION_MODEL_CALLS_ENABLED: ${MISSION_MODEL_CALLS_ENABLED:-false}
+      DEMO_CONTROLS_ENABLED: ${DEMO_CONTROLS_ENABLED:-false}
+      DEMO_CONTROL_URL: http://demo:8002/
+      DEMO_CONTROL_TOKEN: ${DEMO_FAULT_CONTROL_TOKEN:-}
+      BENCHMARK_REPORT_DIR: /app/benchmarks
       VERIFICATION_ENABLED: ${VERIFICATION_ENABLED:-false}
       VERIFICATION_AUTO_TRIGGER: ${VERIFICATION_AUTO_TRIGGER:-true}
       VERIFICATION_TIMEOUT_SECONDS: ${VERIFICATION_TIMEOUT_SECONDS:-30}
@@ -92,7 +97,7 @@ services:
       MAX_ARTIFACT_BYTES: ${MAX_ARTIFACT_BYTES:-5000000}
     networks: [default, browser-sandbox, verification-plane]
     ports: ["127.0.0.1:8000:8000"]
-    volumes: ["artifacts:/app/artifacts"]
+    volumes: ["artifacts:/app/artifacts", "./benchmarks/reports:/app/benchmarks:ro"]
     shm_size: 256mb
     depends_on:
       inventory-state: {condition: service_healthy}

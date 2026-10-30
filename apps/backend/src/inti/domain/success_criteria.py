@@ -3,6 +3,7 @@ from dataclasses import asdict, replace
 from uuid import uuid5
 
 from inti.domain.execution import AuthorizationStatus, ExecutionBundle, ExecutionError, fingerprint
+from inti.domain.inventory_objective import matches_inventory_objective
 from inti.domain.planning import PlannedActionType
 from inti.domain.verification import (
     AssertionType,
@@ -61,12 +62,7 @@ class SuccessCriteriaEngine:
                 "A unique approved inventory record and status are required",
             )
         record, expected = next(iter(record_ids)), next(iter(options))
-        record_re, status_re = re.escape(record), re.escape(expected)
-        pattern = (
-            rf"(?:Find (?:asset )?{record_re} and change its status to {status_re}|"
-            rf"(?:Change|Set) (?:asset )?{record_re}(?:'s)? status to {status_re})\.?\s*"
-        )
-        if not re.fullmatch(pattern, goal, re.IGNORECASE):
+        if not matches_inventory_objective(goal, record, expected):
             raise ExecutionError(
                 "CRITERIA_REQUIRE_DEFINITION",
                 "This objective needs an explicit approved criteria definition",

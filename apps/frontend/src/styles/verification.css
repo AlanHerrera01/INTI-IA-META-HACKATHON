@@ -8,25 +8,25 @@
 }
 .verdict-pass,
 .criterion-pass {
-  color: #22c55e;
-  background: #22c55e0c;
-  border-color: #22c55e66 !important;
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 4.7%, transparent);
+  border-color: color-mix(in srgb, var(--success) 40%, transparent) !important;
 }
 .verdict-fail,
 .criterion-fail {
-  color: #ef4444;
-  background: #ef44440c;
-  border-color: #ef444466 !important;
+  color: var(--error);
+  background: color-mix(in srgb, var(--error) 4.7%, transparent);
+  border-color: color-mix(in srgb, var(--error) 40%, transparent) !important;
 }
 .verdict-unknown,
 .criterion-unknown {
-  color: #f59e0b;
-  background: #f59e0b0c;
-  border-color: #f59e0b66 !important;
+  color: var(--solar);
+  background: color-mix(in srgb, var(--solar) 4.7%, transparent);
+  border-color: color-mix(in srgb, var(--solar) 40%, transparent) !important;
 }
 .verdict-pending,
 .criterion-pending {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .verification-criteria {
   list-style: none;
@@ -38,7 +38,7 @@
   border-top: 1px solid #243449;
 }
 .verification-criteria .execution-action-heading strong {
-  color: #f8fafc;
+  color: var(--text-primary);
   flex: 1;
 }
 .criterion-status {
@@ -54,7 +54,7 @@
   font-size: 12px;
 }
 .verification-values dt {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .verification-values dd {
   margin: 0;
@@ -67,7 +67,7 @@
 }
 .verification-comparison > div {
   padding: 16px;
-  background: #0b1220;
+  background: var(--bg);
   border: 1px solid #243449;
   border-radius: 8px;
 }
@@ -77,7 +77,7 @@
 }
 .verification-comparison span {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .verification-final {
   display: flex;
@@ -97,14 +97,14 @@
   gap: 5px;
 }
 .verification-evidence-list button[aria-pressed="true"] {
-  border-color: #06b6d4;
+  border-color: var(--primary);
 }
 .verification-json {
   max-height: 420px !important;
 }
 .verification-limitations {
   padding-left: 20px;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 12px;
   line-height: 1.7;
 }

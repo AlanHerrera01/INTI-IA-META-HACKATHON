@@ -86,7 +86,14 @@ fetch('/api/inventory').then(response => { if (!response.ok) throw new Error('In
 
 function applyVisibleState(state) {
   if (state.version === uiState.version) return;
+  const wasReset = uiState.reset_generation !== undefined && state.reset_generation !== uiState.reset_generation;
   uiState = state;
+  if (wasReset) {
+    selected = null;
+    document.querySelector('#asset-dialog').close();
+    document.querySelector('#search').value = '';
+    fetch('/api/inventory',{cache:'no-store'}).then(r=>r.json()).then(data=>{items=data;render();notice.textContent='Synthetic demo reset. PC-104 is Inactive.';}).catch(()=>{notice.textContent='Reload to inspect the reset state.';});
+  }
   const version = state.version;
   const button = document.querySelector('#record-save');
   button.textContent = state.save_label || (selected ? `Save ${selected.id}` : 'Save');

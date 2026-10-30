@@ -26,6 +26,7 @@ def create_server(host: str, port: int, database: Path, faults: FaultController 
     with closing(sqlite3.connect(database)) as connection, connection:
         connection.execute("CREATE TABLE IF NOT EXISTS application_metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
         connection.execute("INSERT OR IGNORE INTO application_metadata(key,value) VALUES ('store_id',?)",(str(uuid4()),))
+        connection.execute("INSERT OR IGNORE INTO application_metadata(key,value) VALUES ('synthetic','inti.inventory.demo.v1')")
         connection.execute("CREATE TABLE IF NOT EXISTS assets (id TEXT PRIMARY KEY, name TEXT NOT NULL, location TEXT NOT NULL, status TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 1)")
         connection.executemany("INSERT OR IGNORE INTO assets(id,name,location,status) VALUES (?,?,?,?)", SAMPLE)
 
@@ -105,6 +106,10 @@ if __name__ == "__main__":
     controller = FaultController()
     admin_token = os.environ.get("DEMO_FAULT_CONTROL_TOKEN","")
     if admin_token:
-        admin = create_fault_server(args.fault_host,args.fault_port,controller,admin_token)
+        # Create/mark the synthetic store before exposing its reset control.
+        demo_server = create_server(args.host,args.port,args.db,controller)
+        admin = create_fault_server(args.fault_host,args.fault_port,controller,admin_token,args.db)
         threading.Thread(target=admin.serve_forever,daemon=True).start()
-    create_server(args.host, args.port, args.db,controller).serve_forever()
+    else:
+        demo_server = create_server(args.host,args.port,args.db,controller)
+    demo_server.serve_forever()

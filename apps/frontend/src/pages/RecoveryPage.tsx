@@ -5,6 +5,7 @@ import { recoveryApi } from "../services/recoveryApi";
 import { executionApi } from "../services/executionApi";
 import { errorMessage } from "../services/api";
 import { useRecordEvents } from "../hooks/useRecordEvents";
+import { useOperator } from "../hooks/useOperator";
 import type { RecoveryBundle } from "../types/recovery";
 import "../styles/execution.css";
 import "../styles/verification.css";
@@ -12,8 +13,10 @@ import "../styles/verification.css";
 const stopped = new Set(["RECOVERED", "FAILED", "CANCELLED", "ESCALATED"]);
 export function RecoveryPage() {
   const [draft, setDraft] = useState("");
-  const [token, setToken] = useState("");
-  const [id, setId] = useState("");
+  const { token, setToken } = useOperator();
+  const [id, setId] = useState(
+    () => new URLSearchParams(location.search).get("recovery") || "",
+  );
   const [offset, setOffset] = useState(0);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

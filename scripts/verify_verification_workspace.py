@@ -27,7 +27,7 @@ async def verify() -> None:
     ):
         before = (await public.get("http://127.0.0.1:8001/api/inventory")).json()
         health = (await api.get("/api/v1/health")).json()
-        assert health["version"] == "0.5.0", health
+        assert health["version"] == "0.7.0", health
         history = (await api.get("/api/v1/executions")).json()
         execution = next(
             b for b in history["items"] if b["session"]["status"] == "COMPLETED"

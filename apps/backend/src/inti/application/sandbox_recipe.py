@@ -1,7 +1,7 @@
 """Explicit authored sandbox workflow, never represented as a Meta response."""
 
 from datetime import UTC, datetime
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from inti.application.execution import ExecutionOrchestrator
 from inti.domain.execution import (
@@ -13,6 +13,7 @@ from inti.domain.execution import (
     GroundingMode,
     TargetQuery,
 )
+from inti.domain.inventory_objective import matches_inventory_objective
 from inti.domain.planning import (
     ActionParameters,
     ActionPlan,
@@ -33,7 +34,13 @@ class SandboxRecipe:
     def __init__(self, executions: ExecutionOrchestrator, url: str) -> None:
         self.executions, self.url = executions, url
 
-    async def prepare(self) -> ExecutionBundle:
+    async def prepare(
+        self,
+        task_id: UUID | None = None,
+        goal: str = "Find asset PC-104 and change its status to Operational.",
+    ) -> ExecutionBundle:
+        if not matches_inventory_objective(goal, "PC-104", "Operational"):
+            raise ValueError("The authored recipe supports only PC-104 to Operational")
         service = self.executions
         preparation_id = uuid4()
         started = datetime.now(UTC)
@@ -190,7 +197,6 @@ class SandboxRecipe:
             ActionParameters(evidence="Saved PC-104: Operational receipt is visibly displayed"),
             [BrowserCheck(CheckKind.TEXT, notice, "Saved PC-104: Operational")],
         )
-        goal = "Find asset PC-104 and change its status to Operational."
         intent = TaskIntent(
             goal,
             "INTI synthetic inventory sandbox",
@@ -200,7 +206,7 @@ class SandboxRecipe:
             (goal,),
         )
         plan = service.policy.planning.validate(
-            ActionPlan(uuid4(), observation.id, goal, tuple(actions)), scene, intent
+            ActionPlan(task_id or uuid4(), observation.id, goal, tuple(actions)), scene, intent
         )
         result = PlanningResult(
             plan,

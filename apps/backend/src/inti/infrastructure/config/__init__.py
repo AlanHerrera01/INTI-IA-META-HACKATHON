@@ -56,6 +56,27 @@ class ConfigurationProvider(BaseSettings):
     recovery_max_actions: int = Field(default=10, ge=1, le=30)
     recovery_max_tokens: int | None = Field(default=None, ge=256, le=100000)
     recovery_max_identical_failures: int = Field(default=2, ge=1, le=5)
+    mission_model_calls_enabled: bool = False
+    demo_controls_enabled: bool = False
+    demo_control_url: str = "http://127.0.0.1:8002/"
+    demo_control_token: SecretStr = SecretStr("")
+    benchmark_report_dir: Path = Path("benchmarks/reports")
+
+    @field_validator("demo_control_url")
+    @classmethod
+    def local_demo_control(cls, value: str) -> str:
+        url = urlsplit(value)
+        if (
+            url.scheme != "http"
+            or url.hostname not in {"localhost", "127.0.0.1", "demo"}
+            or url.username
+            or url.password
+            or url.path not in {"", "/"}
+            or url.query
+            or url.fragment
+        ):
+            raise ValueError("Demo control must use an explicit local root URL")
+        return value.rstrip("/") + "/"
 
     @field_validator("recovery_max_tokens", mode="before")
     @classmethod
@@ -78,7 +99,12 @@ class ConfigurationProvider(BaseSettings):
             raise ValueError("Verification needs an explicit local read-only root URL")
         return value.rstrip("/") + "/"
 
-    @field_validator("execution_operator_token", "browser_worker_token", "verification_read_token")
+    @field_validator(
+        "execution_operator_token",
+        "browser_worker_token",
+        "verification_read_token",
+        "demo_control_token",
+    )
     @classmethod
     def execution_secret_length(cls, value: SecretStr) -> SecretStr:
         if value.get_secret_value() and len(value.get_secret_value()) < 24:

@@ -58,3 +58,7 @@ class ActionExecutorPort(Protocol):
         screenshot_digest: str,
         visual_resolution: ResolvedTarget | None = None,
     ) -> ActionDispatchOutcome: ...
+
+
+class BeforeDispatchPort(Protocol):
+    async def before_dispatch(self, bundle: ExecutionBundle, action: ExecutableAction) -> None: ...

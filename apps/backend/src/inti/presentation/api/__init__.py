@@ -40,6 +40,21 @@ async def system_status(svc: Container) -> dict[str, str | bool]:
     return await GetSystemStatusUseCase(svc.repository, svc.browser).execute()
 
 
+@router.get("/capabilities")
+async def capabilities(svc: Container) -> dict[str, str | bool]:
+    """Public feature switches. Never exposes credentials or secret values."""
+    settings = svc.settings
+    return {
+        "version": __version__,
+        "execution_enabled": settings.execution_enabled,
+        "verification_enabled": settings.verification_enabled,
+        "recovery_enabled": settings.recovery_enabled,
+        "model_calls_enabled": settings.mission_model_calls_enabled,
+        "demo_controls_enabled": settings.demo_controls_enabled,
+        "model_configured": bool(settings.meta_api_key.get_secret_value()),
+    }
+
+
 @router.get("/models/status")
 async def model_status(svc: Container) -> dict[str, str | bool | None]:
     return await svc.model.status()

@@ -79,9 +79,14 @@ class GenerateActionPlanUseCase:
         self.timeout_seconds = timeout_seconds
 
     async def execute(
-        self, observation_id: UUID, goal: str, constraints: tuple[str, ...], correlation_id: UUID
+        self,
+        observation_id: UUID,
+        goal: str,
+        constraints: tuple[str, ...],
+        correlation_id: UUID,
+        task_id: UUID | None = None,
     ) -> PlanningResult:
-        task_id, started = uuid4(), datetime.now(UTC)
+        task_id, started = task_id or uuid4(), datetime.now(UTC)
 
         async def event(kind: str, code: str | None = None) -> None:
             await self.telemetry.record(PlanningEvent(task_id, correlation_id, kind, code=code))

@@ -14,7 +14,14 @@ export function PlanningPage() {
   const [constraints, setConstraints] = useState("");
   const [observationId, setObservationId] = useState("");
   const [offset, setOffset] = useState(0);
-  const [selected, setSelected] = useState<PlanningResult | null>(null);
+  const [manualPlan, setSelected] = useState<PlanningResult | null>(null);
+  const linkedPlanId = new URLSearchParams(location.search).get("plan");
+  const linkedPlan = useQuery({
+    queryKey: ["linked-plan", linkedPlanId],
+    queryFn: () => planningApi.get(linkedPlanId!),
+    enabled: !!linkedPlanId,
+  });
+  const selected = manualPlan || linkedPlan.data || null;
   const [interpreted, setInterpreted] = useState<VisualScene | null>(null);
   const model = useModel();
   const client = useQueryClient();

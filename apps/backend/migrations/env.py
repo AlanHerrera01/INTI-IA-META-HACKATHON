@@ -5,6 +5,7 @@ from inti.infrastructure.config import ConfigurationProvider
 from inti.infrastructure.persistence import (
     Base,
     execution,  # noqa: F401
+    missions,  # noqa: F401
     planning,  # noqa: F401
     recovery,  # noqa: F401
     verification,  # noqa: F401

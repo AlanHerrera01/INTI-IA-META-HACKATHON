@@ -29,6 +29,7 @@ from inti.domain.execution import (
 from inti.domain.execution_policy import ExecutionPolicy
 from inti.domain.execution_ports import (
     ActionExecutorPort,
+    BeforeDispatchPort,
     BrowserSessionPort,
     ExecutionRepositoryPort,
 )
@@ -65,6 +66,7 @@ class ExecutionOrchestrator:
         self.max_concurrent = max_concurrent
         self.recovery: RecoveryPort | None = None
         self.verification: VerificationTriggerPort | None = None
+        self.demo_controller: BeforeDispatchPort | None = None
 
     def _lock(self, id: UUID) -> asyncio.Lock:
         return self.locks.setdefault(id, asyncio.Lock())
@@ -450,6 +452,8 @@ class ExecutionOrchestrator:
                                 payload={"action_id": str(action.id), "index": index},
                             ),
                         )
+                    if self.demo_controller:
+                        await self.demo_controller.before_dispatch(updated, action)
                     digest = hashlib.sha256(png).hexdigest()
                     resolution = await self._visual_resolution(bundle, index, before, digest)
                     tick = time.perf_counter()

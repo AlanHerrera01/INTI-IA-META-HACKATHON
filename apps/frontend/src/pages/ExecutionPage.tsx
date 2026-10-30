@@ -6,6 +6,7 @@ import { executionApi, mergeEvents } from "../services/executionApi";
 import { Link } from "react-router-dom";
 import { verificationApi } from "../services/verificationApi";
 import { VerdictBadge } from "../features/verification/VerdictBadge";
+import { useOperator } from "../hooks/useOperator";
 import {
   terminal,
   type ActionContract,
@@ -36,8 +37,10 @@ export class ExecutionBoundary extends Component<
 
 export function ExecutionPage() {
   const [draftToken, setDraftToken] = useState("");
-  const [token, setToken] = useState("");
-  const [id, setId] = useState("");
+  const { token, setToken } = useOperator();
+  const [id, setId] = useState(
+    () => new URLSearchParams(location.search).get("execution") || "",
+  );
   const [offset, setOffset] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -46,7 +49,9 @@ export function ExecutionPage() {
   >(null);
   const [events, setEvents] = useState<ExecutionEvent[]>([]);
   const [connection, setConnection] = useState("Disconnected");
-  const [planId, setPlanId] = useState("");
+  const [planId, setPlanId] = useState(
+    () => new URLSearchParams(location.search).get("plan") || "",
+  );
   const [contracts, setContracts] = useState("[]");
   const [mode, setMode] = useState("hybrid_dom");
   const query = useQueryClient();

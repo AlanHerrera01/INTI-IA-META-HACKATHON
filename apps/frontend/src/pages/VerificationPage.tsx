@@ -5,6 +5,7 @@ import { verificationApi } from "../services/verificationApi";
 import { errorMessage } from "../services/api";
 import { useRecordEvents } from "../hooks/useRecordEvents";
 import { VerdictBadge } from "../features/verification/VerdictBadge";
+import { useOperator } from "../hooks/useOperator";
 import {
   verificationTerminal,
   type VerificationBundle,
@@ -23,8 +24,10 @@ const valueText = (value: Value | undefined) =>
 
 export function VerificationPage() {
   const [draft, setDraft] = useState("");
-  const [token, setToken] = useState("");
-  const [id, setId] = useState("");
+  const { token, setToken } = useOperator();
+  const [id, setId] = useState(
+    () => new URLSearchParams(location.search).get("verification") || "",
+  );
   const [execution, setExecution] = useState(
     () => new URLSearchParams(location.search).get("execution") || "",
   );
