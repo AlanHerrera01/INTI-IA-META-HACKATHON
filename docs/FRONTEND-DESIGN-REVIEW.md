@@ -127,7 +127,7 @@ informe independiente revalidado permite mostrar Verified para la ultima ejecuci
 
 El usuario solicito un logo nuevo tras comprobar que el original remoto necesitaba
 inicio de sesion de Google. El PNG transparente se genero con imagegen y se sirve
-localmente en menu, bienvenida y favicon. [Logo y prompt](branding/LOGO.md).
+localmente en menu, bienvenida y favicon.
 
 Validacion final: 45 pruebas de frontend aprobadas, typecheck y lint correctos,
 compilacion de Docker correcta. Navegador real a 1366, 1600 y 1920 px sin

@@ -117,20 +117,13 @@ external dependency.
 - [x] The browser worker has no host port and is isolated.
 - [x] The verifier plane is read-only.
 
-## 10. Documentation and submission
+## 10. Documentation
 
 - [x] `README.md` updated for 0.7 and Phase 7.
 - [x] `docs/FINAL-ARCHITECTURE.md`.
-- [x] `docs/SUBMISSION.md`.
-- [x] `docs/DEMO-VIDEO-SCRIPT.md`.
-- [x] `docs/DEMO-STORYBOARD.md`.
-- [x] `docs/JUDGE-DEMO-GUIDE.md`.
 - [x] `docs/QA-CHECKLIST.md`.
 - [x] `docs/PHASE-07-REPORT.md`.
 - [x] Screenshots captured from the running app.
-- [ ] Demo video recorded (no video URL claimed).
-- [ ] Hackathon form submitted (no submission claimed).
-- [ ] Organizer rules/eligibility independently confirmed.
 
 ## 11. Cleanup before handoff
 

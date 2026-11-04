@@ -88,10 +88,8 @@ Real Phase 7 evidence:
   nine real browser actions, independent `VERIFIED_SUCCESS`, eight intact evidence
   items, persisted `PC-104 = Operational`, and an explicit
   `MODEL_CALLS_DISABLED` Meta dependency check.
-- [Phase 7 report](docs/PHASE-07-REPORT.md), [final architecture](docs/FINAL-ARCHITECTURE.md),
-  [judge guide](docs/JUDGE-DEMO-GUIDE.md), [QA checklist](docs/QA-CHECKLIST.md),
-  [submission notes](docs/SUBMISSION.md), [video script](docs/DEMO-VIDEO-SCRIPT.md)
-  and [storyboard](docs/DEMO-STORYBOARD.md).
+- [Phase 7 report](docs/PHASE-07-REPORT.md), [final architecture](docs/FINAL-ARCHITECTURE.md)
+  and [QA checklist](docs/QA-CHECKLIST.md).
 - Genuine screenshots from the running stack are in
   [`docs/screenshots/`](docs/screenshots/).
 
@@ -322,9 +320,8 @@ Meta planning/recovery quality with configured access, add explicit criterion
 authoring for additional applications, distributed ownership, artifact retention
 and stronger prompt-injection/concurrent-writer evaluations.
 
-Submission status: no demo video URL or hackathon form submission is claimed. See
-[docs/SUBMISSION.md](docs/SUBMISSION.md). Local evidence does not prove organizer
-eligibility or acceptance.
+Submission status: no demo video URL or hackathon form submission is claimed.
+Local evidence does not prove organizer eligibility or acceptance.
 
 All project source in this repository was authored for this implementation session.
 No proprietary assets or application source were copied. Third-party packages

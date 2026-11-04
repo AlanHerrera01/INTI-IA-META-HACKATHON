@@ -155,28 +155,6 @@ The interface language can be switched in the top bar. Spanish is the initial
 language, and the preference is stored in the browser. Entered task contents, file
 names, paths, URLs and exported API identifiers are not translated.
 
-## Demo film
-
-<p align="center">
-  <img src="docs/assets/readme/demo-film-final-frame.png" width="100%" alt="Closing frame of the INTI AI demo film" />
-</p>
-
-The project includes a **131.43 s (2:11)** produced film that demonstrates the
-real local runtime: English narration, synchronized Spanish captions, 1920×1080
-at 30 fps. It records one actual document task for the fictitious quotation
-`INTI-EC-104` — form entry, a required email validation error, correction,
-exact-digest approval, six agent actions, five saved files and a reviewed total
-of **USD 5,462.50**.
-
-The film is a demonstration of this repository, not a separate prototype. Its
-runtime, workflow, document pipeline and model-calibration scene match the
-architecture and guarantees documented here. Production sources and renders are
-intentionally outside Git; the committed record is the stills under
-[`docs/assets/readme/`](docs/assets/readme) and the full notes in
-**[`docs/DEMO-FILM.md`](docs/DEMO-FILM.md)**, including honest scope: Word/Excel
-views are extracted content, not Office recordings, and the model scene is a
-single calibration sample, not a benchmark.
-
 ## How it works
 
 ### The operator workflow
@@ -850,7 +828,6 @@ them with demo data.
 | Document | Contents |
 |---|---|
 | [Local computer](docs/LOCAL-COMPUTER.md) | Current runtime context, screenshots, validation and caveats. |
-| [Demo film](docs/DEMO-FILM.md) | Produced 2:11 film, what it demonstrates, and its honest scope. |
 | [Document workflow](docs/DOCUMENT-WORKFLOW.md) | Dossier inputs, outputs, verification and limitations. |
 | [Model measurements](docs/MODEL-MEASUREMENTS.md) | Telemetry definitions, calibration behavior and privacy. |
 | [Applications](docs/APPLICATIONS.md) | Discovery rules, permission semantics and launch limits. |
@@ -888,11 +865,6 @@ acciones acotadas dentro de una carpeta autorizada y devuelve recibos por cada p
   consumir cuota del proveedor.
 - **Límites claros:** no hay captura de pantalla del escritorio, razonamiento visual
   local, verificación visual independiente ni agentes para macOS/Linux.
-
-**Video de demostración:** el film de 2:11 (131.43 s) muestra el flujo real de
-`INTI-EC-104` — validación, aprobación exacta, seis acciones, cinco archivos y un
-total revisado de USD 5,462.50. Narración en inglés con subtítulos en español. Los
-detalles y el alcance honesto están en [`docs/DEMO-FILM.md`](docs/DEMO-FILM.md).
 
 **Inicio rápido:** ejecuta `.\scripts\start_computer.ps1`, abre
 <http://localhost:5173>, copia `EXECUTION_OPERATOR_TOKEN` desde `.env` en **Operator

@@ -163,19 +163,15 @@ without touching main-project data. See [clean-start evidence](evidence/phase7-c
 This does not establish an empty-cache dependency installation or public clean-clone
 build. No production deployment is claimed. Workspace: <http://localhost:5173>.
 
-## 14. Submission materials produced
+## 14. Project materials produced
 
-- [Submission copy and status](SUBMISSION.md)
-- [Approximately three-minute English video script](DEMO-VIDEO-SCRIPT.md)
-- [Storyboard](DEMO-STORYBOARD.md)
-- [Judge guide](JUDGE-DEMO-GUIDE.md)
 - [QA checklist](QA-CHECKLIST.md)
 - [Final architecture and API map](FINAL-ARCHITECTURE.md)
 - Genuine screenshots and machine-readable evidence.
 
 Public repository: <https://github.com/AlanHerrera01/INTI-IA-META-HACKATHON>.
 The organizer overview was checked on 2026-10-30; full rules, eligibility and exact
-video requirements remain unconfirmed as explained in the submission document.
+submission requirements remain unconfirmed.
 
 ## 15. Remaining blockers
 
