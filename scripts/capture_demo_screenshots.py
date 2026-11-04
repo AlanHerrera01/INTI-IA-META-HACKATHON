@@ -50,24 +50,24 @@ def main() -> int:
         page = browser.new_page(viewport={"width": 1600, "height": 1000})
         errors: list[str] = []
         page.on("pageerror", lambda error: errors.append(str(error)))
-        page.goto(f"{BASE}/?guided=1")
+        page.goto(f"{BASE}/missions/new?guided=1")
         settle(page)
         page.get_by_label("Operator capability").fill(token())
         page.get_by_role("button", name="Connect").click()
         settle(page)
         shot(page, "phase7-mission-control.png")
 
-        page.get_by_role("link", name="Benchmark Lab", exact=True).click()
+        page.get_by_role("link", name="Analytics & Benchmarks", exact=True).click()
         settle(page)
         shot(page, "phase7-benchmark-lab.png")
 
-        page.get_by_role("link", name="Mission Control", exact=True).click()
+        page.get_by_role("link", name="Task Manager", exact=True).click()
         settle(page)
         evidence_path = ROOT / "docs/evidence/phase7-live-demo.json"
         mission_id = str(
             UUID(json.loads(evidence_path.read_text(encoding="utf-8"))["mission"]["id"])
         )
-        mission_link = page.locator(f'.mission-list a[href="/missions/{mission_id}"]')
+        mission_link = page.locator(f'.task-table a[href="/missions/{mission_id}"]')
         if mission_link.count():
             mission_link.first.click()
             settle(page)
@@ -84,7 +84,7 @@ def main() -> int:
         page.get_by_role("link", name="Recovery Center", exact=True).click()
         settle(page)
         shot(page, "phase7-recovery-center.png")
-        page.get_by_role("link", name="Mission Control", exact=True).click()
+        page.get_by_role("link", name="Overview", exact=True).click()
         settle(page)
         responsive = []
         for width, height, label in [(1024, 900, "tablet"), (390, 844, "mobile")]:

@@ -1,0 +1,107 @@
+.local-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.local-lifecycle {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.local-lifecycle a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--primary);
+}
+.local-device-grid,
+.local-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.local-device-grid article,
+.local-stat-grid article {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  min-width: 0;
+}
+.local-device-grid code,
+.local-record code {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+  margin: 12px 0;
+  color: var(--primary);
+}
+.local-device-grid a,
+.local-workflow-footer a {
+  display: inline-block;
+  margin-top: 14px;
+  color: var(--primary);
+}
+.local-stat-grid strong {
+  display: block;
+  font-size: 27px;
+  margin-top: 14px;
+}
+.local-stat-grid span,
+.local-record dt {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.local-record {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+.local-record h3 {
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+.local-record button {
+  margin: 8px 12px 0 0;
+}
+.local-record dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+}
+.local-evidence {
+  padding: 14px;
+  margin: 12px 0;
+  background: var(--bg);
+  border-radius: 6px;
+  font-size: 12px;
+}
+.local-workflow-footer {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.local-table-scroll {
+  overflow: auto;
+}
+.local-workflow table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.local-workflow th,
+.local-workflow td {
+  padding: 16px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.local-workflow td small {
+  display: block;
+  margin-top: 8px;
+  font: 10px var(--font-mono);
+  color: var(--text-secondary);
+}

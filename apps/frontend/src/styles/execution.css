@@ -19,7 +19,7 @@
   background: color-mix(in srgb, var(--primary) 6.7%, transparent);
   color: var(--primary);
   padding: 7px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
 }
 .execution-layout {
@@ -36,9 +36,9 @@
 }
 .execution-panel,
 .execution-auth {
-  background: #101c2e;
-  border: 1px solid #243449;
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   padding: 20px;
 }
 .execution-auth {
@@ -61,7 +61,7 @@
   color: var(--text-primary);
   padding: 10px;
   border: 1px solid #334155;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   min-width: 0;
 }
 .execution-auth input {
@@ -74,7 +74,7 @@
   gap: 6px;
   padding: 10px 12px;
   border: 1px solid #334155;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: #16283b;
   color: var(--text-primary);
   cursor: pointer;
@@ -124,7 +124,7 @@
   font-size: 11px;
   background: var(--bg);
   padding: 14px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   max-height: 350px;
   overflow: auto;
 }
@@ -166,7 +166,7 @@
   color: var(--solar);
 }
 .execution-url {
-  font: 12px monospace;
+  font: 12px var(--font-mono);
   color: var(--text-secondary);
   overflow-wrap: anywhere;
 }
@@ -195,7 +195,7 @@
 }
 .execution-actions li {
   padding: 17px 0;
-  border-top: 1px solid #243449;
+  border-top: 1px solid var(--border-subtle);
 }
 .execution-action-heading {
   display: flex;
@@ -222,7 +222,7 @@
   display: flex;
   gap: 18px;
   padding: 10px 0;
-  border-bottom: 1px solid #243449;
+  border-bottom: 1px solid var(--border-subtle);
   font-size: 12px;
 }
 .execution-events time {

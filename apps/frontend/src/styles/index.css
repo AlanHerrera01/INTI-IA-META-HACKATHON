@@ -2,30 +2,36 @@
 @import "./planning.css";
 :root {
   color-scheme: dark;
-  /* Official INTI AI design tokens. */
-  --bg: #0b1220;
-  --surface: #111c2e;
-  --surface-raised: #16243a;
-  --sidebar: #0a101c;
-  --border: #1d293b;
-  --border-strong: #243449;
-  --primary: #06b6d4;
-  --solar: #f59e0b;
-  --success: #22c55e;
-  --error: #ef4444;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #8494ac;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  /* Semantic palette from the supplied Stitch HTML and DESIGN.md frontmatter. */
+  --bg: #0c1321;
+  --surface: #19202e;
+  --surface-raised: #232a39;
+  --surface-overlay: #2e3544;
+  --font-display: "Geist Variable", "Segoe UI", sans-serif;
+  --font-body: "Inter Variable", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", Consolas, monospace;
+  --sidebar: #151b2a;
+  --border: #3d494c;
+  --border-strong: #869397;
+  --border-subtle: #3d494c73;
+  --primary: #4cd7f6;
+  --primary-container: #06b6d4;
+  --solar: #ffb95f;
+  --success: #4ae176;
+  --error: #ffb4ab;
+  --text-primary: #dce2f6;
+  --text-secondary: #bcc9cd;
+  --text-muted: #869397;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 24px;
   --space-6: 32px;
-  font-family: Inter, "Segoe UI", sans-serif;
+  font-family: var(--font-body);
   color: var(--text-primary);
   background: var(--bg);
   font-synthesis: none;
@@ -78,16 +84,19 @@ p {
   margin: 0;
 }
 h1 {
-  font-size: 34px;
+  font-family: var(--font-display);
+  font-size: 32px;
   font-weight: 600;
   letter-spacing: -1.2px;
   line-height: 1.3;
 }
 h2 {
+  font-family: var(--font-display);
   font-size: 15px;
   font-weight: 600;
 }
 h3 {
+  font-family: var(--font-display);
   font-size: 17px;
   font-weight: 500;
 }
@@ -158,7 +167,7 @@ nav a {
   color: var(--text-secondary);
   padding: 12px 14px;
   border: 1px solid transparent;
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
 }
 nav a.active {
@@ -174,14 +183,14 @@ nav a:hover {
   padding-top: 40px;
 }
 .phase-card {
-  border: 1px solid #233044;
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 18px 16px;
   overflow: hidden;
   position: relative;
 }
 .phase-badge {
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   letter-spacing: 1px;
   color: #f5b649;
   border: 1px solid color-mix(in srgb, var(--solar) 20%, transparent);
@@ -208,7 +217,7 @@ nav a:hover {
   display: flex;
   gap: 8px;
   align-items: center;
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   letter-spacing: 1px;
   color: #8190a4;
   margin: 24px 7px 0;
@@ -260,7 +269,7 @@ nav a:hover {
   border: 1px solid color-mix(in srgb, var(--solar) 35%, transparent);
   border-radius: var(--radius-sm);
   padding: 5px 10px;
-  font: 10px monospace;
+  font: 10px var(--font-mono);
   letter-spacing: 0.6px;
   text-transform: uppercase;
 }
@@ -300,7 +309,7 @@ nav a:hover {
   background: #4b5b70;
 }
 .shell-version {
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   letter-spacing: 1px;
   color: var(--text-muted);
   border: 1px solid var(--border-strong);
@@ -331,7 +340,7 @@ nav a:hover {
   }
 }
 .environment {
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   letter-spacing: 1px;
   border: 1px solid #2a374a;
   padding: 5px 9px;
@@ -382,7 +391,7 @@ nav a:hover {
   gap: 9px;
   min-height: 41px;
   padding: 10px 17px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   border: 1px solid transparent;
   font-size: 12px;
   font-weight: 600;
@@ -398,11 +407,11 @@ nav a:hover {
 }
 .secondary {
   color: #d6e3ef;
-  background: #162437;
-  border-color: #2b3e55;
+  background: var(--surface-overlay);
+  border-color: var(--border);
 }
 .secondary:hover {
-  background: #20334b;
+  background: var(--surface-raised);
 }
 .status-grid {
   display: grid;
@@ -463,7 +472,7 @@ nav a:hover {
   border-bottom: 1px solid #1a283c;
 }
 .pipeline-label {
-  font: 8px monospace;
+  font: 8px var(--font-mono);
   letter-spacing: 1px;
   color: #71859e;
   margin-right: 6px;
@@ -476,7 +485,7 @@ nav a:hover {
   font-size: 11px;
 }
 .step-number {
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   color: #52677f;
 }
 .pipeline-step svg {
@@ -495,9 +504,9 @@ nav a:hover {
   margin-left: auto;
 }
 .panel {
-  border: 1px solid #233149;
+  border: 1px solid var(--border-subtle);
   border-radius: 9px;
-  background: #0e1827;
+  background: var(--surface);
   overflow: hidden;
 }
 .panel-header {
@@ -506,7 +515,7 @@ nav a:hover {
   justify-content: space-between;
   gap: 16px;
   padding: 18px 23px;
-  border-bottom: 1px solid #233149;
+  border-bottom: 1px solid var(--border-subtle);
 }
 .panel-header > div {
   display: flex;
@@ -517,7 +526,7 @@ nav a:hover {
   color: #65b3c8;
 }
 .mono {
-  font-family: "Cascadia Code", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
 }
 .subtle {
@@ -536,6 +545,7 @@ nav a:hover {
   background-size: 22px 22px;
 }
 .empty-state h3 {
+  font-family: var(--font-display);
   font-size: 17px;
   font-weight: 500;
   margin-top: 5px;
@@ -556,7 +566,7 @@ nav a:hover {
   width: 80px;
   border: 1px solid #15526b;
   background: color-mix(in srgb, var(--primary) 2.7%, transparent);
-  border-radius: 19px;
+  border-radius: var(--radius-lg);
   display: grid;
   place-items: center;
   color: #29abc7;
@@ -594,7 +604,7 @@ footer > span:first-child {
   background: #f43f5e0d;
   border: 1px solid #f43f5e33;
   padding: 12px 16px;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   margin: 12px 0;
 }
@@ -610,10 +620,10 @@ footer > span:first-child {
   padding: 24px;
 }
 .screenshot-frame {
-  border: 1px solid #2d4057;
-  border-radius: 7px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  background: #111c2b;
+  background: var(--surface);
 }
 .browser-bar {
   padding: 10px 14px;
@@ -622,7 +632,7 @@ footer > span:first-child {
   gap: 18px;
   font-size: 10px;
   color: #8297b0;
-  background: #152235;
+  background: var(--surface-overlay);
 }
 .browser-bar > a {
   margin-left: auto;
@@ -652,7 +662,7 @@ dl > div {
   justify-content: space-between;
   gap: 20px;
   padding: 10px 0;
-  border-bottom: 1px solid #203047;
+  border-bottom: 1px solid var(--border-subtle);
   font-size: 11px;
 }
 dt {
@@ -668,10 +678,10 @@ dd {
 .observation-details textarea {
   display: block;
   width: 100%;
-  background: #0a1321;
+  background: var(--bg);
   color: #ccd9e9;
-  border: 1px solid #2a3a50;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   resize: vertical;
   min-height: 76px;
   font: 12px/1.7 inherit;
@@ -685,7 +695,7 @@ dd {
   line-height: 1.7;
 }
 .analysis {
-  border-top: 1px solid #2a3a50;
+  border-top: 1px solid var(--border);
   margin-top: 25px;
   padding-top: 25px;
   color: #c8d9e8;
@@ -727,7 +737,7 @@ dd {
   display: flex;
   gap: 18px;
   align-items: center;
-  border-top: 1px solid #233149;
+  border-top: 1px solid var(--border-subtle);
   margin-top: 15px;
   padding-top: 15px;
   font-size: 12px;
@@ -798,7 +808,7 @@ dd {
     width: 100%;
     padding: 16px;
     border-right: 0;
-    border-bottom: 1px solid #233149;
+    border-bottom: 1px solid var(--border-subtle);
   }
   .app-shell {
     display: block;

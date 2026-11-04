@@ -13,6 +13,7 @@ from inti.domain.exceptions import IntiError
 from inti.infrastructure.config import ConfigurationProvider
 from inti.presentation.api import router
 from inti.presentation.benchmark_api import router as benchmark_router
+from inti.presentation.computer_api import router as computer_router
 from inti.presentation.dependencies import Services, build_services
 from inti.presentation.execution_api import router as execution_router
 from inti.presentation.mission_api import router as mission_router
@@ -110,12 +111,14 @@ def create_app(services: Services | None = None) -> FastAPI:
         )
 
     app.include_router(router)
-    app.include_router(planning_router)
-    app.include_router(execution_router)
-    app.include_router(verification_router)
-    app.include_router(recovery_router)
-    app.include_router(mission_router)
-    app.include_router(benchmark_router)
+    if settings.inti_runtime_mode == "inventory_sandbox":
+        app.include_router(planning_router)
+        app.include_router(execution_router)
+        app.include_router(verification_router)
+        app.include_router(recovery_router)
+        app.include_router(mission_router)
+        app.include_router(benchmark_router)
+    app.include_router(computer_router)
     return app
 
 

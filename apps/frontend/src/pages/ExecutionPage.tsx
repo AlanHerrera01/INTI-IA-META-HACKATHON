@@ -1,19 +1,30 @@
-import { Component, useEffect, useRef, useState, type ReactNode } from "react";
+import { Component, useState, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Play, Pause, ShieldCheck, Square, RefreshCw } from "lucide-react";
+import { Pause, Play, RefreshCw, ShieldCheck, Square } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
 import { errorMessage } from "../services/api";
-import { executionApi, mergeEvents } from "../services/executionApi";
-import { Link } from "react-router-dom";
-import { verificationApi } from "../services/verificationApi";
-import { VerdictBadge } from "../features/verification/VerdictBadge";
+import { executionApi } from "../services/executionApi";
 import { useOperator } from "../hooks/useOperator";
+import { useExecutionEvents } from "../hooks/useExecutionEvents";
+import { ExecutionBrowser } from "../features/execution/ExecutionBrowser";
+import { ExecutionStream } from "../features/execution/ExecutionStream";
+import { ExecutionPanels } from "../features/execution/ExecutionPanels";
+import { ExecutionVerification } from "../features/execution/ExecutionVerification";
+import {
+  ExecutionDashboard,
+  ActionTimeline,
+} from "../features/execution/ExecutionAudit";
+import { executionMetrics } from "../features/execution/metrics";
 import {
   terminal,
   type ActionContract,
+  type ExecutableAction,
   type ExecutionBundle,
-  type ExecutionEvent,
 } from "../types/execution";
 import "../styles/execution.css";
+import "../styles/live-execution.css";
+
+export { ExecutionDashboard, ActionTimeline };
 
 export class ExecutionBoundary extends Component<
   { children: ReactNode },
@@ -35,25 +46,28 @@ export class ExecutionBoundary extends Component<
   }
 }
 
+type Confirmation = {
+  kind: "plan" | "high_risk" | "cancel";
+  digest: string;
+  executionId: string;
+  actions: ExecutableAction[];
+};
+
 export function ExecutionPage() {
-  const [draftToken, setDraftToken] = useState("");
+  const [search, setSearch] = useSearchParams();
   const { token, setToken } = useOperator();
-  const [id, setId] = useState(
-    () => new URLSearchParams(location.search).get("execution") || "",
-  );
+  const [draftToken, setDraftToken] = useState("");
   const [offset, setOffset] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [confirm, setConfirm] = useState<
-    "plan" | "high_risk" | "cancel" | null
-  >(null);
-  const [events, setEvents] = useState<ExecutionEvent[]>([]);
-  const [connection, setConnection] = useState("Disconnected");
-  const [planId, setPlanId] = useState(
-    () => new URLSearchParams(location.search).get("plan") || "",
-  );
+  const [confirm, setConfirm] = useState<Confirmation | null>(null);
+  const [planId, setPlanId] = useState(() => search.get("plan") || "");
   const [contracts, setContracts] = useState("[]");
   const [mode, setMode] = useState("hybrid_dom");
+  const [focus, setFocus] = useState<{
+    executionId: string;
+    actionId: string;
+  } | null>(null);
   const query = useQueryClient();
   const history = useQuery({
     queryKey: ["executions", token, offset],
@@ -61,79 +75,36 @@ export function ExecutionPage() {
     enabled: !!token,
     refetchInterval: 3000,
   });
+  const id =
+    search.get("execution") ||
+    (!search.get("plan") ? history.data?.items[0]?.session.id : "") ||
+    "";
   const execution = useQuery({
     queryKey: ["execution", token, id],
     queryFn: () => executionApi.get(id, token),
     enabled: !!token && !!id,
     refetchInterval: 1000,
   });
-  const bundle = execution.data;
-  const cursor = useRef(0);
-  useEffect(() => {
-    if (!id || !token) return;
-    let stopped = false;
-    let socket: WebSocket | undefined;
-    let retry: ReturnType<typeof setTimeout>;
-    cursor.current = 0;
-    const append = (incoming: ExecutionEvent[]) => {
-      if (stopped) return;
-      for (const event of incoming)
-        cursor.current = Math.max(cursor.current, event.sequence);
-      setEvents((previous) => mergeEvents(previous, incoming));
-      void query.invalidateQueries({ queryKey: ["execution", token, id] });
-    };
-    const connect = () => {
-      if (stopped) return;
-      socket = new WebSocket(
-        `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/ws/executions/${id}`,
-      );
-      socket.onopen = () => {
-        setConnection("Live stream");
-        socket?.send(JSON.stringify({ token, after: cursor.current }));
-      };
-      socket.onmessage = (event) => {
-        try {
-          append([JSON.parse(event.data) as ExecutionEvent]);
-        } catch {
-          setConnection("Polling saved events");
-        }
-      };
-      socket.onclose = (event) => {
-        if (stopped) return;
-        setConnection(
-          event.code === 1000 ? "Saved event history" : "Polling saved events",
-        );
-        if (event.code !== 1000 && event.code !== 4401 && event.code !== 4403)
-          retry = setTimeout(connect, 2000);
-      };
-      socket.onerror = () => setConnection("Polling saved events");
-    };
-    connect();
-    const poll = setInterval(() => {
-      void executionApi
-        .events(id, token, cursor.current)
-        .then(append)
-        .catch(() => {
-          if (!stopped) setConnection("Event connection unavailable");
-        });
-    }, 2000);
-    void executionApi
-      .events(id, token, 0)
-      .then(append)
-      .catch(() => {});
-    return () => {
-      stopped = true;
-      clearTimeout(retry);
-      clearInterval(poll);
-      socket?.close();
-    };
-  }, [id, token, query]);
-
+  const bundle = token ? execution.data : undefined;
+  const stream = useExecutionEvents(id, token, () => {
+    void query.invalidateQueries({ queryKey: ["execution", token, id] });
+  });
+  const metrics = bundle ? executionMetrics(bundle) : null;
+  const action =
+    bundle?.manifest.actions.find(
+      (item) => focus?.executionId === id && item.id === focus.actionId,
+    ) ||
+    bundle?.manifest.actions[
+      Math.min(
+        bundle.session.current_action_index,
+        bundle.manifest.actions.length - 1,
+      )
+    ];
   const select = (value: string) => {
-    setEvents([]);
-    setId(value);
+    setSearch(value ? { execution: value } : {});
     setError("");
     setConfirm(null);
+    setFocus(null);
   };
   const run = async (work: () => Promise<ExecutionBundle>) => {
     setBusy(true);
@@ -143,139 +114,396 @@ export function ExecutionPage() {
       if (next.session.id !== id) select(next.session.id);
       query.setQueryData(["execution", token, next.session.id], next);
       await query.invalidateQueries({ queryKey: ["executions"] });
-    } catch (e) {
-      setError(errorMessage(e));
+    } catch (cause) {
+      setError(errorMessage(cause));
     } finally {
       setBusy(false);
       setConfirm(null);
     }
   };
-  const command = (name: string) =>
-    id && void run(() => executionApi.command(id, token, name));
-  const approve = () =>
-    bundle &&
+  const command = (name: string) => {
+    if (id && token) void run(() => executionApi.command(id, token, name));
+  };
+  const requestConfirmation = (kind: Confirmation["kind"]) => {
+    if (!bundle) return;
+    setConfirm({
+      kind,
+      digest: bundle.manifest.digest,
+      executionId: id,
+      actions: bundle.manifest.actions.filter(
+        (item) => kind !== "high_risk" || item.risk_level === "HIGH",
+      ),
+    });
+  };
+  const exactManifest =
+    !!confirm &&
+    !!bundle &&
+    confirm.executionId === id &&
+    confirm.digest === bundle.manifest.digest;
+  const approve = () => {
+    if (!confirm || !exactManifest || !token) return;
+    if (confirm.kind === "cancel") {
+      command("cancel");
+      return;
+    }
     void run(() =>
-      executionApi.command(id, token, "approve", {
-        manifest_digest: bundle.manifest.digest,
-        scope: confirm,
+      executionApi.command(confirm.executionId, token, "approve", {
+        manifest_digest: confirm.digest,
+        scope: confirm.kind,
         action_ids:
-          confirm === "high_risk"
-            ? bundle.manifest.actions
-                .filter((a) => a.risk_level === "HIGH")
-                .map((a) => a.id)
+          confirm.kind === "high_risk"
+            ? confirm.actions.map((item) => item.id)
             : [],
       }),
     );
+  };
   return (
-    <div className="execution-workspace">
-      <div className="page-heading">
+    <div className="execution-workspace live-workspace">
+      <header className="live-command-heading">
         <div>
-          <p className="eyebrow">AUTHORIZE · ACT · OBSERVE · RECORD</p>
+          <div className="live-heading-tags">
+            <span>AUTONOMOUS VISUAL AGENTIC LOOP</span>
+            <small>SEE · REASON · ACT · VERIFY</small>
+          </div>
+          {bundle?.session.status === "RECOVERING" && (
+            <span className="live-recovery-alert">RECOVERY IN PROGRESS</span>
+          )}
           <h1>Live Execution</h1>
-          <p>Authorized browser actions with persistent evidence.</p>
+          <p>
+            {bundle && terminal.has(bundle.session.status)
+              ? "Inspect a saved execution, its browser evidence and independent outcome."
+              : "Watch authorized browser actions, recorded evidence and policy gates in one workspace."}
+          </p>
         </div>
-        <span className="execution-chip">PHASE 03</span>
-      </div>
-      <form
-        className="execution-auth"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setToken(draftToken);
-          select("");
-        }}
-      >
-        <label>
-          Operator token
-          <input
-            type="password"
-            autoComplete="off"
-            value={draftToken}
-            onChange={(e) => setDraftToken(e.target.value)}
-            placeholder="Local execution capability"
-          />
-        </label>
-        <button disabled={!draftToken || busy}>Connect</button>
-        {token && (
-          <button
-            type="button"
-            onClick={() => {
-              setToken("");
+        <div className="live-heading-runtime">
+          <div className="live-header-facts">
+            <div>
+              <small>RECORDED ELAPSED</small>
+              <strong>
+                {metrics?.elapsed != null
+                  ? `${metrics.elapsed.toFixed(1)}s`
+                  : "Unavailable"}
+              </strong>
+            </div>
+            <div>
+              <small>MEAN ACTION TIME</small>
+              <strong>
+                {metrics?.averageActionMs != null
+                  ? `${metrics.averageActionMs.toFixed(0)} ms`
+                  : "Unavailable"}
+              </strong>
+            </div>
+            <div>
+              <small>GROUNDING MODE</small>
+              <strong>
+                {bundle?.manifest.grounding_mode.replaceAll("_", " ") ||
+                  "Not selected"}
+              </strong>
+            </div>
+          </div>
+          <div className="live-heading-controls">
+            <button
+              disabled={
+                busy ||
+                !bundle ||
+                bundle.session.status !== "RUNNING" ||
+                bundle.session.pause_requested
+              }
+              onClick={() => command("pause")}
+            >
+              <Pause size={15} />
+              {bundle?.session.pause_requested ? "Pausing…" : "Pause"}
+            </button>
+            <button
+              disabled={busy || bundle?.session.status !== "PAUSED"}
+              onClick={() => command("resume")}
+            >
+              <Play size={15} />
+              Resume
+            </button>
+          </div>
+        </div>
+      </header>
+      <div className="live-session-toolbar">
+        <details className="live-operator-connection" open={!token}>
+          <summary>
+            <ShieldCheck size={14} />
+            Operator {token ? "connected" : "connection required"}
+          </summary>
+          <form
+            className="live-operator-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setToken(draftToken);
               setDraftToken("");
-              select("");
-              query.removeQueries({ queryKey: ["execution"] });
-              query.removeQueries({ queryKey: ["executions"] });
             }}
           >
-            Disconnect
+            <label>
+              Operator token
+              <input
+                type="password"
+                autoComplete="off"
+                value={draftToken}
+                onChange={(event) => setDraftToken(event.target.value)}
+                placeholder="Local execution capability"
+              />
+            </label>
+            <button disabled={!draftToken || busy}>Connect</button>
+            {token && (
+              <button
+                type="button"
+                onClick={() => {
+                  setToken("");
+                  setDraftToken("");
+                  select("");
+                  query.removeQueries({ queryKey: ["execution"] });
+                  query.removeQueries({ queryKey: ["executions"] });
+                }}
+              >
+                Disconnect
+              </button>
+            )}
+            <small>
+              Capability stays in memory for this session. Approvals remain
+              explicit.
+            </small>
+          </form>
+        </details>
+        <label className="live-history-picker">
+          Saved execution
+          <select
+            aria-label="Saved execution"
+            value={id}
+            disabled={!token || history.isPending || busy}
+            onChange={(event) => select(event.target.value)}
+          >
+            {!id && (
+              <option value="">
+                {token ? "No execution selected" : "Connect to load history"}
+              </option>
+            )}
+            {id &&
+              !history.data?.items.some((item) => item.session.id === id) && (
+                <option value={id}>Requested #{id.slice(0, 8)}</option>
+              )}
+            {history.data?.items.map((item) => (
+              <option key={item.session.id} value={item.session.id}>
+                {item.session.status} · #{item.session.id.slice(0, 8)} ·{" "}
+                {new Date(item.session.updated_at).toLocaleString()}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="live-history-controls">
+          <button
+            aria-label="Previous execution page"
+            disabled={!token || offset === 0}
+            onClick={() => setOffset(Math.max(0, offset - 20))}
+          >
+            Previous
           </button>
-        )}
-        <small>
-          Kept in memory for this page. Configure EXECUTION_OPERATOR_TOKEN in
-          your local .env.
-        </small>
-      </form>
+          <button
+            aria-label="Next execution page"
+            disabled={
+              !token || !history.data || offset + 20 >= history.data.total
+            }
+            onClick={() => setOffset(offset + 20)}
+          >
+            Next
+          </button>
+          <button
+            aria-label="Refresh execution"
+            disabled={!token || history.isFetching || execution.isFetching}
+            onClick={() => {
+              void history.refetch();
+              if (id) void execution.refetch();
+            }}
+          >
+            <RefreshCw size={14} />
+          </button>
+        </div>
+        <Link to="/missions/new?compose=1">Create a task →</Link>
+      </div>
       {(error || execution.error || history.error) && (
         <p role="alert" className="execution-error">
           {error || errorMessage(execution.error || history.error)}
         </p>
       )}
-      <div className="execution-layout">
-        <aside className="execution-panel">
-          <h2>Execution history</h2>
-          <button
-            disabled={!token || busy}
-            onClick={() => void run(() => executionApi.prepare(token))}
-          >
-            <RefreshCw size={15} /> Prepare PC-104 sandbox
-          </button>
-          <p className="execution-help">
-            Authored demo recipe, validated against observed controls. No Meta
-            inference. Requires PC-104 to be Inactive.
-          </p>
-          {busy && <p role="status">Processing request…</p>}
-          {history.isFetching && <small>Refreshing history…</small>}
-          {history.data?.items.length === 0 && <p>No executions recorded.</p>}
-          <div className="execution-history">
-            {history.data?.items.map((item) => (
-              <button
-                key={item.session.id}
-                aria-pressed={id === item.session.id}
-                onClick={() => select(item.session.id)}
+      {busy && (
+        <p role="status" className="live-small-note">
+          Processing explicit request…
+        </p>
+      )}
+      {bundle ? (
+        <>
+          <div className="live-command-layout">
+            <aside className="live-left-column">
+              <ExecutionStream
+                key={id + token}
+                bundle={bundle}
+                selected={action?.id || ""}
+                onSelect={(actionId) => setFocus({ executionId: id, actionId })}
+                events={stream.events}
+                connection={stream.connection}
+              />
+            </aside>
+            <section className="live-center-column">
+              <ExecutionBrowser
+                key={id + token}
+                bundle={bundle}
+                token={token}
+              />
+              <section
+                className="live-progress-card"
+                aria-label="Execution controls"
               >
-                <strong>{item.session.status}</strong>
-                <span>{item.manifest.plan_snapshot.plan.goal}</span>
-                <small>
-                  {new Date(item.session.updated_at).toLocaleString()}
-                </small>
+                <div className="live-progress-heading">
+                  <strong>
+                    {metrics?.completed} / {bundle.manifest.actions.length}{" "}
+                    approved steps complete
+                  </strong>
+                  <span
+                    className={`state-${bundle.session.status.toLowerCase()}`}
+                  >
+                    {bundle.session.status.replaceAll("_", " ")}
+                  </span>
+                </div>
+                <progress
+                  aria-label="Approved action progress"
+                  max={bundle.manifest.actions.length || 1}
+                  value={metrics?.completed || 0}
+                />
+                <p className="live-small-note">
+                  Step completion and persisted task success are evaluated
+                  separately.
+                </p>
+                <div className="execution-controls live-approval-controls">
+                  <button
+                    disabled={
+                      busy ||
+                      bundle.session.status !== "AWAITING_APPROVAL" ||
+                      bundle.plan_approved
+                    }
+                    onClick={() => requestConfirmation("plan")}
+                  >
+                    <ShieldCheck size={14} />
+                    Approve Plan
+                  </button>
+                  <button
+                    disabled={
+                      busy ||
+                      bundle.session.status !== "AWAITING_APPROVAL" ||
+                      !bundle.plan_approved
+                    }
+                    onClick={() => requestConfirmation("high_risk")}
+                  >
+                    Confirm HIGH actions
+                  </button>
+                  <button
+                    className="live-start"
+                    disabled={busy || bundle.session.status !== "READY"}
+                    onClick={() => command("start")}
+                  >
+                    <Play size={14} />
+                    Start Execution
+                  </button>
+                </div>
+              </section>
+              <details className="live-audit-details">
+                <summary>Execution summary and action evidence</summary>
+                <ExecutionDashboard bundle={bundle} />
+                <ActionTimeline bundle={bundle} />
+              </details>
+              <details className="live-audit-details">
+                <summary>Execution inspector</summary>
+                <dl className="execution-inspector">
+                  <dt>Execution ID</dt>
+                  <dd>{id}</dd>
+                  <dt>Plan ID</dt>
+                  <dd>{bundle.session.plan_id}</dd>
+                  <dt>Manifest SHA-256</dt>
+                  <dd>{bundle.manifest.digest}</dd>
+                  <dt>Browser session</dt>
+                  <dd>{bundle.browser_session?.status || "Not opened"}</dd>
+                  <dt>Model provenance</dt>
+                  <dd>
+                    {bundle.manifest.plan_snapshot.model_usage
+                      .map((item) => `${item.model} / ${item.response_id}`)
+                      .join(", ") || "No model call — authored plan"}
+                  </dd>
+                </dl>
+                <pre>{JSON.stringify(bundle.decisions, null, 2)}</pre>
+              </details>
+            </section>
+            <aside className="live-right-column">
+              <ExecutionPanels bundle={bundle} action={action} />
+              <ExecutionVerification id={id} token={token} />
+              <button
+                className="live-cancel"
+                disabled={busy || terminal.has(bundle.session.status)}
+                onClick={() => requestConfirmation("cancel")}
+              >
+                <Square size={15} />
+                Cancel execution
               </button>
-            ))}
+            </aside>
           </div>
-          <div className="execution-controls">
+          <p className="live-workspace-footnote">
+            #{id.slice(0, 8)} · {stream.connection}. Saved captures and events
+            are evidence, not a continuous video stream.
+          </p>
+        </>
+      ) : (
+        <section className="live-empty-state">
+          <ShieldCheck size={34} />
+          <h2>
+            {!token
+              ? "Ready to connect"
+              : execution.isPending && id
+                ? "Loading execution…"
+                : "No execution selected"}
+          </h2>
+          <p>
+            {!token
+              ? "Connect your local operator to inspect saved executions or authorize a workflow."
+              : history.data?.total === 0
+                ? "No executions recorded. Create a task or explicitly prepare the authored sandbox below."
+                : "Select a saved execution or prepare an approved workflow."}
+          </p>
+        </section>
+      )}
+      <details className="live-prepare-details">
+        <summary>Prepare a workflow</summary>
+        <div className="live-prepare-grid">
+          <div>
+            <h2>Authored sandbox recipe</h2>
+            <p>
+              Validated controls for PC-104. No Meta inference. Requires PC-104
+              to be Inactive. Preparation does not start execution.
+            </p>
             <button
-              disabled={offset === 0}
-              onClick={() => setOffset(Math.max(0, offset - 20))}
+              disabled={!token || busy}
+              onClick={() => void run(() => executionApi.prepare(token))}
             >
-              Previous
-            </button>
-            <button
-              disabled={!history.data || offset + 20 >= history.data.total}
-              onClick={() => setOffset(offset + 20)}
-            >
-              Next
+              <RefreshCw size={14} />
+              Prepare PC-104 sandbox
             </button>
           </div>
-          <details>
-            <summary>Load an existing validated plan</summary>
+          <div>
+            <h2>Load an existing validated plan</h2>
             <label>
               Plan ID
               <input
                 value={planId}
-                onChange={(e) => setPlanId(e.target.value)}
+                onChange={(event) => setPlanId(event.target.value)}
               />
             </label>
             <label>
               Grounding mode
-              <select value={mode} onChange={(e) => setMode(e.target.value)}>
+              <select
+                value={mode}
+                onChange={(event) => setMode(event.target.value)}
+              >
                 <option>hybrid_dom</option>
                 <option>selector_based</option>
                 <option>visual_only</option>
@@ -284,15 +512,14 @@ export function ExecutionPage() {
             <label>
               Typed action contracts (JSON)
               <textarea
-                rows={8}
+                rows={5}
                 value={contracts}
-                onChange={(e) => setContracts(e.target.value)}
+                onChange={(event) => setContracts(event.target.value)}
               />
             </label>
-            <p className="execution-help">
-              One exact target and typed pre/postcondition contract per action.
-              See API documentation. Visual-only supports URL checks and fresh
-              model coordinates; DOM assertions are rejected.
+            <p>
+              Exact typed target and pre/postcondition contracts remain subject
+              to backend validation.
             </p>
             <button
               disabled={!token || !planId || busy}
@@ -309,123 +536,9 @@ export function ExecutionPage() {
             >
               Prepare execution
             </button>
-          </details>
-        </aside>
-        <section className="execution-main">
-          {!bundle ? (
-            <div className="execution-panel">
-              <h2>Ready to connect</h2>
-              <p>
-                Connect with your operator token, then prepare a sandbox
-                workflow or review a saved execution.
-              </p>
-            </div>
-          ) : (
-            <>
-              <ExecutionDashboard bundle={bundle} />
-              <ExecutionVerification id={bundle.session.id} token={token} />
-              <div
-                className="execution-panel execution-controls"
-                aria-label="Execution controls"
-              >
-                <button
-                  disabled={
-                    busy ||
-                    bundle.session.status !== "AWAITING_APPROVAL" ||
-                    bundle.plan_approved
-                  }
-                  onClick={() => setConfirm("plan")}
-                >
-                  <ShieldCheck size={15} /> Approve Plan
-                </button>
-                <button
-                  disabled={
-                    busy ||
-                    bundle.session.status !== "AWAITING_APPROVAL" ||
-                    !bundle.plan_approved
-                  }
-                  onClick={() => setConfirm("high_risk")}
-                >
-                  Confirm HIGH actions
-                </button>
-                <button
-                  disabled={busy || bundle.session.status !== "READY"}
-                  onClick={() => command("start")}
-                >
-                  <Play size={15} /> Start Execution
-                </button>
-                <button
-                  disabled={
-                    busy ||
-                    bundle.session.status !== "RUNNING" ||
-                    bundle.session.pause_requested
-                  }
-                  onClick={() => command("pause")}
-                >
-                  <Pause size={15} />{" "}
-                  {bundle.session.pause_requested ? "Pausing…" : "Pause"}
-                </button>
-                <button
-                  disabled={busy || bundle.session.status !== "PAUSED"}
-                  onClick={() => command("resume")}
-                >
-                  Resume
-                </button>
-                <button
-                  disabled={busy || terminal.has(bundle.session.status)}
-                  onClick={() => setConfirm("cancel")}
-                >
-                  <Square size={15} /> Cancel
-                </button>
-              </div>
-              <BrowserViewer bundle={bundle} token={token} />
-              <ActionTimeline bundle={bundle} />
-              <details className="execution-panel">
-                <summary>Execution inspector</summary>
-                <dl className="execution-inspector">
-                  <dt>Execution ID</dt>
-                  <dd>{id}</dd>
-                  <dt>Plan ID</dt>
-                  <dd>{bundle.session.plan_id}</dd>
-                  <dt>Browser session</dt>
-                  <dd>{bundle.browser_session?.status ?? "Not opened"}</dd>
-                  <dt>Grounding mode</dt>
-                  <dd>{bundle.manifest.grounding_mode}</dd>
-                  <dt>Manifest SHA-256</dt>
-                  <dd>{bundle.manifest.digest}</dd>
-                  <dt>Model metadata</dt>
-                  <dd>
-                    {bundle.manifest.plan_snapshot.model_usage
-                      .map((m) => `${m.model} / ${m.response_id}`)
-                      .join(", ") || "No model call — authored plan"}
-                  </dd>
-                  <dt>Failed actions</dt>
-                  <dd>
-                    {bundle.results.filter((r) => r.status === "FAILED").length}
-                  </dd>
-                </dl>
-                <pre>{JSON.stringify(bundle.decisions, null, 2)}</pre>
-              </details>
-              <section className="execution-panel">
-                <h2>
-                  Event timeline <small>{connection}</small>
-                </h2>
-                <ol className="execution-events">
-                  {events.map((event) => (
-                    <li key={event.id}>
-                      <time>
-                        {new Date(event.timestamp).toLocaleTimeString()}
-                      </time>
-                      <strong>{event.event_type}</strong>
-                      <small>#{event.sequence}</small>
-                    </li>
-                  ))}
-                </ol>
-              </section>
-            </>
-          )}
-        </section>
-      </div>
+          </div>
+        </div>
+      </details>
       {confirm && bundle && (
         <div className="execution-modal-backdrop">
           <section
@@ -435,287 +548,46 @@ export function ExecutionPage() {
             className="execution-panel execution-modal"
           >
             <h2 id="approval-title">
-              {confirm === "cancel"
+              {confirm.kind === "cancel"
                 ? "Cancel execution?"
-                : confirm === "plan"
+                : confirm.kind === "plan"
                   ? "Approve this exact plan?"
                   : "Confirm HIGH risk actions?"}
             </h2>
             <p>
-              {confirm === "cancel"
+              {confirm.kind === "cancel"
                 ? "Stop scheduling actions and close the browser. Completed application changes remain saved."
                 : "Review the exact targets, parameters and immediate checks. Approval applies only to this manifest."}
             </p>
-            <code>{bundle.manifest.digest}</code>
-            {confirm !== "cancel" && (
-              <pre>
-                {JSON.stringify(
-                  bundle.manifest.actions.filter(
-                    (a) => confirm === "plan" || a.risk_level === "HIGH",
-                  ),
-                  null,
-                  2,
-                )}
-              </pre>
+            <code>{confirm.digest}</code>
+            {confirm.kind !== "cancel" && (
+              <pre>{JSON.stringify(confirm.actions, null, 2)}</pre>
+            )}
+            {!exactManifest && (
+              <p role="alert" className="execution-error">
+                The selected execution or manifest changed. Return to review.
+              </p>
             )}
             <div className="execution-controls">
               <button disabled={busy} onClick={() => setConfirm(null)}>
                 Back to review
               </button>
               <button
-                disabled={busy}
-                onClick={() =>
-                  confirm === "cancel" ? command("cancel") : approve()
+                disabled={
+                  busy ||
+                  !exactManifest ||
+                  (confirm.kind === "cancel" &&
+                    terminal.has(bundle.session.status))
                 }
+                onClick={approve}
               >
-                Confirm {confirm === "high_risk" ? "HIGH actions" : confirm}
+                Confirm{" "}
+                {confirm.kind === "high_risk" ? "HIGH actions" : confirm.kind}
               </button>
             </div>
           </section>
         </div>
       )}
     </div>
-  );
-}
-
-function ExecutionVerification({ id, token }: { id: string; token: string }) {
-  const history = useQuery({
-    queryKey: ["execution-verifications", id, token],
-    queryFn: () => verificationApi.list(token, 0, id),
-    enabled: !!token,
-    refetchInterval: 3000,
-    retry: false,
-  });
-  const latest = history.data?.items[0];
-  const report = useQuery({
-    queryKey: ["execution-verification-report", latest?.session.id, token],
-    queryFn: () => verificationApi.report(latest!.session.id, token),
-    enabled: !!latest,
-    refetchInterval: 3000,
-    retry: false,
-  });
-  return (
-    <section className="execution-panel">
-      <h2>Independent task verification</h2>
-      <VerdictBadge verdict={report.data?.effective_verdict} />
-      <p>
-        {history.error || report.error
-          ? "Verification service unavailable. No outcome can be confirmed here."
-          : "The saved action result and the persisted task outcome are evaluated separately."}
-      </p>
-      <Link to={`/verification?execution=${id}`}>Open Verification Center</Link>
-      <p>
-        <Link to="/recovery">Review recovery history</Link>
-      </p>
-    </section>
-  );
-}
-
-export function ExecutionDashboard({ bundle }: { bundle: ExecutionBundle }) {
-  const { session, manifest } = bundle;
-  const completed = bundle.results.filter(
-    (r) => r.status === "SUCCEEDED" || r.status === "SATISFIED",
-  ).length;
-  const elapsed = session.started_at
-    ? Math.max(
-        0,
-        (Date.parse(session.completed_at || session.updated_at) -
-          Date.parse(session.started_at)) /
-          1000,
-      )
-    : 0;
-  return (
-    <section className="execution-panel">
-      <div className="execution-title">
-        <h2>{manifest.plan_snapshot.plan.goal}</h2>
-        <strong
-          className={`execution-status state-${session.status.toLowerCase()}`}
-        >
-          {session.status}
-        </strong>
-      </div>
-      <div className="execution-metrics">
-        <div>
-          <small>Actions completed</small>
-          <strong>
-            {completed} / {manifest.actions.length}
-          </strong>
-        </div>
-        <div>
-          <small>Current action</small>
-          <strong>
-            {manifest.actions[session.current_action_index]?.action_type || "—"}
-          </strong>
-        </div>
-        <div>
-          <small>Elapsed</small>
-          <strong>{elapsed.toFixed(1)}s</strong>
-        </div>
-        <div>
-          <small>Authorization</small>
-          <strong>
-            {bundle.decisions.length} / {manifest.actions.length}
-          </strong>
-        </div>
-      </div>
-      <progress
-        aria-label="Execution progress"
-        max={manifest.actions.length || 1}
-        value={completed}
-      />
-      <p className="execution-help">
-        Completed means the approved steps and immediate checks finished.
-        Execution's goal-verification declaration:{" "}
-        {session.overall_goal_verified
-          ? "verified"
-          : "not independently verified by this engine"}
-        . See the independent report below.
-      </p>
-      {session.error_summary && (
-        <p role="alert" className="execution-error">
-          {session.error_code}: {session.error_summary}
-        </p>
-      )}
-    </section>
-  );
-}
-
-function BrowserViewer({
-  bundle,
-  token,
-}: {
-  bundle: ExecutionBundle;
-  token: string;
-}) {
-  const id = bundle.session.latest_observation_id;
-  const [image, setImage] = useState<{ id: string; url: string } | null>(null);
-  const screenshot = useQuery({
-    queryKey: ["execution-screenshot", token, id],
-    queryFn: () => executionApi.screenshot(id!, token),
-    enabled: !!id && !!token,
-    gcTime: 0,
-  });
-  const observation = useQuery({
-    queryKey: ["execution-observation", token, id],
-    queryFn: () => executionApi.observation(id!, token),
-    enabled: !!id && !!token,
-    gcTime: 0,
-  });
-  useEffect(() => {
-    if (!screenshot.data || !id) return;
-    const url = URL.createObjectURL(screenshot.data);
-    // Blob URLs are revoked when evidence changes or the viewer unmounts.
-    setImage({ id, url });
-    return () => URL.revokeObjectURL(url);
-  }, [screenshot.data, id]);
-  const viewport = bundle.manifest.viewport;
-  const result = bundle.results.find((r) => r.before_observation_id === id);
-  const box = result?.resolution?.bounding_box;
-  return (
-    <section className="execution-panel">
-      <h2>
-        Live browser{" "}
-        <small>
-          {viewport.width} × {viewport.height}
-        </small>
-      </h2>
-      <p className="execution-url">
-        {bundle.browser_session?.current_url || bundle.manifest.initial_url}
-      </p>
-      {image?.id === id ? (
-        <div className="execution-screen">
-          <img src={image.url} alt="Latest execution browser observation" />
-          {box && (
-            <span
-              className="execution-target"
-              style={{
-                left: `${(box.x / viewport.width) * 100}%`,
-                top: `${(box.y / viewport.height) * 100}%`,
-                width: `${(box.width / viewport.width) * 100}%`,
-                height: `${(box.height / viewport.height) * 100}%`,
-              }}
-            />
-          )}
-        </div>
-      ) : (
-        <p>
-          {id
-            ? "Loading protected screenshot…"
-            : "A screenshot will appear after the browser opens."}
-        </p>
-      )}
-      {screenshot.error && <p role="alert">{errorMessage(screenshot.error)}</p>}
-      <small>
-        {observation.data
-          ? new Date(observation.data.timestamp).toLocaleString()
-          : "No observation yet"}{" "}
-        · {id || "—"}
-      </small>
-    </section>
-  );
-}
-
-export function ActionTimeline({ bundle }: { bundle: ExecutionBundle }) {
-  return (
-    <section className="execution-panel">
-      <h2>Action timeline</h2>
-      <ol className="execution-actions">
-        {bundle.manifest.actions.map((action, index) => {
-          const result = bundle.results.find((r) => r.action_id === action.id);
-          return (
-            <li key={action.id}>
-              <div className="execution-action-heading">
-                <strong>
-                  {index + 1}. {action.action_type}
-                </strong>
-                <span>{action.target?.name || "Page"}</span>
-                <small>{action.risk_level}</small>
-                <b>{result?.status || "PENDING"}</b>
-              </div>
-              <p>
-                {result?.resolution?.method || "Fresh resolution required"} ·
-                executed: {String(result?.action_executed ?? false)} · immediate
-                checks:{" "}
-                {result?.postconditions_satisfied == null
-                  ? "pending"
-                  : String(result.postconditions_satisfied)}
-              </p>
-              {result?.started_at && (
-                <small>
-                  {new Date(result.started_at).toLocaleTimeString()} →{" "}
-                  {result.completed_at
-                    ? new Date(result.completed_at).toLocaleTimeString()
-                    : "in progress"}{" "}
-                  · {result.duration_ms?.toFixed(0) ?? "—"} ms
-                </small>
-              )}
-              {result?.error_code && (
-                <p className="execution-error">
-                  {result.error_code}: {result.error_message}
-                  {result.may_have_executed &&
-                    " · May have executed; no automatic retry."}
-                </p>
-              )}
-              <details>
-                <summary>Parameters, checks and evidence</summary>
-                <pre>
-                  {JSON.stringify(
-                    {
-                      parameters: action.parameters,
-                      preconditions: action.preconditions,
-                      postconditions: action.expected_postconditions,
-                      before: result?.before_observation_id,
-                      after: result?.after_observation_id,
-                    },
-                    null,
-                    2,
-                  )}
-                </pre>
-              </details>
-            </li>
-          );
-        })}
-      </ol>
-    </section>
   );
 }

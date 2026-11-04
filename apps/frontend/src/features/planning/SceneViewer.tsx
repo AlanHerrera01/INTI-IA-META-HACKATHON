@@ -4,9 +4,11 @@ import type { VisualScene } from "../../types/planning";
 export function SceneViewer({
   scene,
   screenshotUrl,
+  authored = false,
 }: {
   scene: VisualScene;
   screenshotUrl: string;
+  authored?: boolean;
 }) {
   const [selected, setSelected] = useState<string | null>(null);
   return (
@@ -19,7 +21,7 @@ export function SceneViewer({
       <div className="scene-image">
         <img
           src={screenshotUrl}
-          alt="Screenshot with model-estimated element bounds"
+          alt={authored ? "Screenshot with recorded target bounds" : "Screenshot with model-estimated element bounds"}
         />
         {scene.elements
           .filter((e) => e.bounding_box && e.visible)
@@ -50,8 +52,7 @@ export function SceneViewer({
           })}
       </div>
       <p className="hint">
-        Bounds are model estimates. Coordinate validity does not establish
-        localization accuracy.
+        {authored ? "Bounds are recorded target estimates, not model inference. " : "Bounds are model estimates. "}Coordinate validity does not establish localization accuracy.
       </p>
       <div className="element-list" aria-label="Detected elements">
         {scene.elements.map((element) => (

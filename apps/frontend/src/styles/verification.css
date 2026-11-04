@@ -1,7 +1,7 @@
 .verification-workspace .verdict-badge {
   display: inline-flex;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   border: 1px solid #334155;
   font-size: 11px;
   white-space: nowrap;
@@ -35,7 +35,7 @@
 }
 .verification-criteria li {
   padding: 18px 0;
-  border-top: 1px solid #243449;
+  border-top: 1px solid var(--border-subtle);
 }
 .verification-criteria .execution-action-heading strong {
   color: var(--text-primary);
@@ -43,7 +43,7 @@
 }
 .criterion-status {
   border: 1px solid #334155;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: 5px 9px;
   font-size: 11px;
 }
@@ -68,7 +68,7 @@
 .verification-comparison > div {
   padding: 16px;
   background: var(--bg);
-  border: 1px solid #243449;
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
 }
 .verification-comparison p {

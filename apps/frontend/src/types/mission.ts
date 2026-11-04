@@ -81,6 +81,8 @@ export interface BenchmarkArtifact {
     inconclusive_rate?: Ratio;
     criteria_evaluation_accuracy?: Ratio;
     mean_verification_latency_ms?: number;
+    schema_validity_rate?: number;
+    unsupported_action_rate?: number;
     evidence_collection_failures?: number;
     evidence_integrity_validation_failures?: number;
     observed_inventory_mutations_by_verifier?: number;
@@ -90,6 +92,16 @@ export interface BenchmarkArtifact {
       actual_verdict: string;
       latency_ms: number;
       source_available: boolean;
+      expected_verdict?: string;
+    }[];
+    rows?: {
+      id: string;
+      status: string;
+      latency_ms: number;
+      expected_outcome_matched: boolean;
+      schema_valid: boolean;
+      grounding_valid: boolean;
+      unsupported_action: boolean;
     }[];
     expected_outcome_match_rate?: number;
     mean_latency_ms?: number;

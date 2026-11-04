@@ -1,0 +1,747 @@
+.native-design-page {
+  min-width: 0;
+}
+.native-design-page button {
+  cursor: pointer;
+}
+.native-design-page button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+.native-design-page a {
+  text-decoration: none;
+}
+.native-design-access {
+  font-size: 11px;
+  color: var(--text-secondary);
+  padding: 10px 0;
+}
+.native-design-access summary {
+  cursor: pointer;
+}
+.native-design-access .operator-connection {
+  margin-top: 12px;
+}
+.native-design-page .operator-connection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.native-design-page .operator-connection input {
+  max-width: 300px;
+}
+.native-design-page .operator-connection small {
+  width: 100%;
+}
+.native-design-panel {
+  min-width: 0;
+  background: var(--surface);
+  padding: 20px;
+  border-radius: 7px;
+}
+.native-design-panel > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 12px;
+}
+.native-design-panel > header h2 {
+  font-size: 16px;
+}
+.native-design-page
+  :is(
+    .models-metrics,
+    .analytics-metrics,
+    .activity-metrics,
+    .inventory-metrics,
+    .recovery-center-metrics
+  )
+  header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+}
+.native-design-page
+  :is(
+    .models-metrics,
+    .analytics-metrics,
+    .activity-metrics,
+    .inventory-metrics,
+    .recovery-center-metrics
+  )
+  header
+  h2 {
+  font: 9px/1.7 var(--font-mono);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+.native-design-page .studio-card > h2 {
+  font-size: 17px;
+}
+.native-design-page .studio-card .computer-applications > header h2 {
+  font-size: 14px;
+}
+.native-design-page .settings-apps .computer-card {
+  background: none;
+  padding: 0;
+}
+.native-design-page .settings-apps .computer-app-actions {
+  max-width: 300px;
+}
+.native-design-page .settings-identity p {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.native-design-page .settings-identity > svg {
+  flex-shrink: 0;
+}
+.native-design-page .settings-identity > div {
+  display: block;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  flex-shrink: 1;
+  background: none;
+  border: 0;
+}
+.native-design-page .settings-model-fields small,
+.native-design-page .settings-model-fields strong,
+.native-design-page .settings-app-facts span,
+.native-design-page .settings-app-facts strong {
+  display: block;
+}
+.native-design-page .settings-model-fields strong,
+.native-design-page .settings-app-facts strong {
+  margin-top: 6px;
+}
+.native-design-page .settings-aside .operator-connection {
+  flex-direction: column;
+  align-items: stretch;
+}
+.native-design-page .settings-aside .operator-connection input {
+  width: 100%;
+  min-width: 0;
+}
+.native-design-page .native-embedded-permissions .computer-sidebar {
+  grid-template-columns: minmax(0, 1fr);
+}
+.native-design-page .recovery-evidence > .native-design-frame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.native-design-page .recovery-evidence .native-frame-content {
+  flex: 1;
+}
+.native-design-page .recovery-evidence .native-frame-bar {
+  flex-wrap: wrap;
+}
+.native-design-page .native-frame-content {
+  min-width: 0;
+}
+.native-criterion {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.native-criterion h3 {
+  font-size: 12px;
+}
+.native-triple-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.native-triple-cards > div {
+  padding: 18px;
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  min-width: 0;
+}
+.native-triple-cards small {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.native-triple-cards strong {
+  display: block;
+  font-size: 13px;
+  color: var(--primary);
+}
+.native-application-context {
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow: auto;
+  margin-bottom: 16px;
+}
+.native-application-context > div {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background: var(--bg);
+  font-size: 11px;
+  min-width: 0;
+}
+.native-application-context > div > svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.native-application-context small {
+  display: block;
+  font: 8px var(--font-mono);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+  margin-top: 6px;
+}
+.native-device-thumbnail {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  height: 130px;
+  color: var(--primary);
+  background: var(--bg);
+  font: 9px var(--font-mono);
+}
+.native-design-page .observation-card > button {
+  width: 100%;
+  background: none;
+  padding: 8px;
+  text-align: left;
+}
+.native-design-page .observation-card h3 {
+  font-size: 12px;
+  margin: 12px 0 8px;
+}
+.native-design-page .observation-card small {
+  color: var(--text-muted);
+  font: 8px var(--font-mono);
+}
+.native-observation-receipts {
+  min-height: 430px;
+  padding: 18px;
+}
+.native-outcome-chart {
+  display: block;
+  width: 100%;
+  min-height: 280px;
+  margin: 18px 0;
+}
+.native-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.native-chart-legend button {
+  font-size: 8px;
+  padding: 7px;
+}
+.native-chart-legend button[aria-pressed="true"] {
+  color: var(--solar);
+}
+.native-design-page .activity-event-list article.activity-selected {
+  background: var(--surface-raised);
+  border-left: 3px solid var(--primary);
+}
+.native-design-page .activity-inspector .native-json {
+  max-height: 370px;
+}
+.native-design-page .task-manager-sidebar {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+.native-design-page .task-table tr.task-row-selected {
+  background: var(--surface-raised);
+}
+.native-design-page p.task-ledger-scope {
+  padding: 14px 16px;
+  font-size: 10px;
+  line-height: 1.7;
+}
+.native-note {
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.8;
+  margin: 12px 0;
+}
+.native-design-frame {
+  background: #080f1b;
+  border-radius: 6px;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid var(--border-subtle);
+}
+.native-frame-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 13px;
+  background: var(--surface-raised);
+  font: 9px var(--font-mono);
+}
+.native-frame-bar i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--solar);
+  flex-shrink: 0;
+}
+.native-frame-bar i:first-child {
+  background: var(--error);
+}
+.native-frame-bar i:nth-child(3) {
+  background: var(--success);
+}
+.native-frame-bar code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0 6px;
+}
+.native-frame-bar > span {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 8px;
+}
+.native-frame-content {
+  aspect-ratio: 16 / 10;
+  min-height: 390px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  gap: 18px;
+  text-align: center;
+}
+.native-frame-content > svg {
+  color: #4cd7f680;
+}
+.native-frame-content strong {
+  color: var(--text-secondary);
+  max-width: 400px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.native-frame-content p {
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+.native-frame-content a {
+  color: var(--primary);
+  font-size: 11px;
+}
+.native-frame-compact .native-frame-content {
+  aspect-ratio: auto;
+  min-height: 170px;
+  padding: 18px;
+  gap: 10px;
+}
+.native-frame-compact .native-frame-content p,
+.native-frame-compact .native-frame-bar span {
+  display: none;
+}
+.native-task-picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  font-size: 11px;
+}
+.native-task-picker > svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.native-task-picker label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.native-task-picker select {
+  max-width: 420px;
+  min-width: 0;
+  padding: 9px;
+  background: var(--bg);
+  font-size: 11px;
+  border: 1px solid var(--border);
+}
+.native-task-picker button {
+  padding: 8px;
+  background: var(--surface-raised);
+  border-radius: 4px;
+}
+.native-design-facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px 12px;
+  font-size: 11px;
+  margin: 18px 0;
+}
+.native-design-facts dt {
+  color: var(--text-muted);
+}
+.native-design-facts dd {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.native-receipt {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  display: grid;
+  gap: 10px;
+  font-size: 10px;
+}
+.native-receipt strong {
+  color: var(--primary);
+  font: 9px var(--font-mono);
+}
+.native-receipt code {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+.native-table-scroll {
+  overflow: auto;
+  min-width: 0;
+}
+.native-table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.native-table-scroll th {
+  font: 8px var(--font-mono);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  background: var(--bg);
+}
+.native-table-scroll td,
+.native-table-scroll th {
+  padding: 18px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.native-table-scroll td small {
+  display: block;
+  color: var(--text-muted);
+  font: 9px var(--font-mono);
+  margin-top: 8px;
+}
+.native-table-scroll td button {
+  border: 0;
+  padding: 0;
+  background: none;
+  text-align: left;
+  color: var(--primary);
+}
+.native-table-scroll tr.selected {
+  background: var(--surface-raised);
+}
+.native-status {
+  font: 8px var(--font-mono);
+  color: var(--primary);
+}
+.native-preview-caption {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+  font-size: 11px;
+}
+.native-preview-caption code,
+.native-preview-caption a {
+  color: var(--primary);
+  font-size: 10px;
+}
+.native-preview-caption a {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.native-design-page :is(.studio-card, .live-panel, .overview-recovery) > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  font-size: 11px;
+}
+.native-design-page button > svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+.native-design-page .native-export {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.native-design-page .overview-browser > .native-design-frame {
+  margin: 0 14px;
+}
+.native-design-page .overview-browser > .native-preview-caption {
+  margin: 14px;
+}
+.native-design-page .overview-history > .native-table-scroll {
+  margin: 0 14px 14px;
+}
+.native-inspector-steps {
+  margin: 18px 0;
+}
+.native-inspector-steps > h3 {
+  color: var(--text-muted);
+  font: 9px var(--font-mono);
+  margin-bottom: 14px;
+}
+.native-inspector-steps ol {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+.native-inspector-steps li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 10px;
+}
+.native-inspector-steps li > span {
+  color: var(--primary);
+  font-family: var(--font-mono);
+}
+.native-inspector-steps li > small {
+  grid-column: 2;
+  color: var(--text-muted);
+  font: 8px var(--font-mono);
+}
+.native-inspector-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.native-inspector-actions > * {
+  flex: 1;
+  padding: 10px 8px;
+  background: var(--surface-raised);
+  border-radius: 4px;
+  font-size: 10px;
+  text-align: center;
+}
+.native-design-page .settings-app-facts code {
+  display: block;
+  font: 10px/1.8 var(--font-mono);
+  overflow-wrap: anywhere;
+  margin-top: 8px;
+}
+.native-design-page .settings-app-target p {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.native-dark-card {
+  padding: 16px;
+  background: var(--bg);
+  border-radius: 4px;
+  margin: 16px 0;
+}
+.native-mode-tabs {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.native-mode-tabs button {
+  border: 0;
+  background: var(--bg);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+.native-mode-tabs button[aria-pressed="true"] {
+  color: var(--primary);
+  background: #4cd7f612;
+}
+.native-capability-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+.native-capability-grid span {
+  padding: 10px;
+  background: var(--bg);
+  font-size: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.native-capability-grid svg {
+  color: var(--success);
+  flex-shrink: 0;
+}
+.native-json {
+  background: var(--bg);
+  padding: 16px;
+  overflow: auto;
+  max-height: 400px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 10px/1.8 var(--font-mono);
+  margin-top: 16px;
+}
+.native-stream {
+  padding-left: 14px;
+  border-left: 1px solid var(--border);
+  display: grid;
+  gap: 16px;
+  margin: 24px 0;
+  list-style: none;
+}
+.native-stream li {
+  border: 1px solid var(--border);
+  padding: 14px 10px;
+  border-radius: 4px;
+  display: grid;
+  gap: 12px;
+}
+.native-stream li > span {
+  color: var(--primary);
+  font: 8px var(--font-mono);
+}
+.native-stream li > strong {
+  font-size: 11px;
+}
+.native-stream li > code {
+  color: var(--text-muted);
+  font: 8px var(--font-mono);
+  overflow-wrap: anywhere;
+}
+.native-state-large {
+  display: block;
+  margin: 18px 0;
+  color: var(--primary);
+  font-size: 20px;
+}
+.native-task-inspector {
+  border-radius: 7px;
+  padding: 16px;
+  background: var(--surface);
+  min-width: 0;
+}
+.native-task-inspector > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--primary);
+  font-size: 10px;
+}
+.native-task-inspector > .native-design-frame {
+  margin: 20px 0;
+}
+.native-task-inspector > a {
+  display: flex;
+  justify-content: space-between;
+  background: var(--surface-raised);
+  padding: 13px;
+  margin-top: 18px;
+  color: var(--primary);
+  font-size: 11px;
+}
+.native-embedded .computer-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+.native-embedded .computer-card {
+  padding: 0;
+  background: none;
+  border: 0;
+}
+.native-embedded .computer-card > header {
+  margin-top: 18px;
+}
+.native-embedded .computer-steps li {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.native-embedded .computer-step-status {
+  max-width: none;
+}
+.native-embedded .computer-task-actions {
+  gap: 6px;
+}
+.native-embedded .computer-task-actions button {
+  padding: 9px 8px;
+  font-size: 10px;
+}
+.native-embedded .computer-plan-target {
+  padding: 12px;
+}
+.native-stat-rule {
+  height: 2px;
+  background: var(--border);
+  margin: 18px 0;
+}
+@media (max-width: 1250px) {
+  .native-task-picker label {
+    flex-wrap: wrap;
+  }
+  .native-capability-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.native-workspace-path {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 5px;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.native-device-applications {
+  min-width: 0;
+  scroll-margin-top: 24px;
+}
+.native-device-applications .computer-card {
+  padding: 24px;
+}
+.native-device-applications input,
+.native-device-applications select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px;
+  margin-top: 8px;
+  color: var(--text-primary);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+.native-device-applications .computer-form-row {
+  margin-top: 18px;
+  align-items: end;
+}
+.native-device-applications .computer-form-row label {
+  display: block;
+}
+.native-device-applications .computer-form-row label > svg {
+  display: inline;
+  vertical-align: middle;
+}
+.native-device-applications .computer-app-list {
+  max-height: 560px;
+}
+.native-device-applications .computer-app-actions {
+  max-width: 360px;
+}

@@ -1,15 +1,15 @@
 :root {
   --inti-background: var(--bg);
   --inti-surface: var(--surface);
-  --inti-raised: #162438;
-  --inti-border: #26364c;
+  --inti-raised: var(--surface-raised);
+  --inti-border: var(--border);
   --inti-cyan: var(--primary);
   --inti-gold: var(--solar);
   --inti-success: var(--success);
   --inti-error: var(--error);
   --inti-text: var(--text-primary);
   --inti-muted: var(--text-secondary);
-  --inti-radius: 12px;
+  --inti-radius: 8px;
 }
 .mission-workspace {
   display: grid;
@@ -43,7 +43,7 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 22px;
-  font: 10px monospace;
+  font: 10px var(--font-mono);
   letter-spacing: 1px;
   color: var(--inti-muted);
 }
@@ -109,7 +109,7 @@
   background: var(--inti-background);
   color: var(--inti-text);
   padding: 12px 14px;
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   min-width: 0;
   font: inherit;
 }
@@ -142,7 +142,7 @@
   flex-wrap: wrap;
 }
 .mission-source {
-  font: 10px monospace;
+  font: 10px var(--font-mono);
   color: var(--inti-muted);
   letter-spacing: 0.6px;
 }
@@ -197,7 +197,7 @@
 }
 .mission-stages span {
   padding: 5px 8px;
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   border: 1px solid var(--inti-border);
   color: var(--inti-muted);
   border-radius: 4px;
@@ -245,7 +245,7 @@
   margin-top: 5px;
 }
 .mission-list span {
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   color: var(--inti-muted);
   white-space: nowrap;
 }
@@ -269,11 +269,11 @@
 }
 .mission-activity time {
   color: var(--inti-muted);
-  font: 10px monospace;
+  font: 10px var(--font-mono);
   white-space: nowrap;
 }
 .activity-source {
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: var(--inti-gold);
@@ -350,7 +350,7 @@
 .guide-next,
 .guide-blocked {
   margin-left: auto;
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   letter-spacing: 0.8px;
   padding: 3px 7px;
   border-radius: 4px;
@@ -478,7 +478,7 @@
   letter-spacing: -0.8px;
 }
 .ratio-metric > small {
-  font: 10px monospace;
+  font: 10px var(--font-mono);
   color: var(--inti-muted);
 }
 .metric-track {
@@ -519,8 +519,8 @@
   gap: 8px;
   padding: 6px 10px;
   border: 1px solid var(--inti-border);
-  border-radius: 5px;
-  font: 10px monospace;
+  border-radius: var(--radius-sm);
+  font: 10px var(--font-mono);
   letter-spacing: 0.4px;
   color: var(--inti-muted);
 }
@@ -549,7 +549,7 @@
   line-height: 1.6;
 }
 .mission-table td:nth-child(3) {
-  font: 10px monospace;
+  font: 10px var(--font-mono);
 }
 .mission-trail {
   display: flex;
@@ -583,10 +583,10 @@
   font-size: 20px;
 }
 .shell-health {
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   border: 1px solid var(--inti-border);
   padding: 5px 8px;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   color: var(--inti-muted);
   white-space: nowrap;
 }

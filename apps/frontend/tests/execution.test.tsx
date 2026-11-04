@@ -1,4 +1,11 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -8,6 +15,8 @@ import {
   ActionTimeline,
 } from "../src/pages/ExecutionPage";
 import { executionApi, mergeEvents } from "../src/services/executionApi";
+import { verificationApi } from "../src/services/verificationApi";
+import { ExecutionVerification } from "../src/features/execution/ExecutionVerification";
 import type { ExecutionBundle, ExecutionEvent } from "../src/types/execution";
 vi.mock("../src/services/verificationApi", () => ({
   verificationApi: {
@@ -74,6 +83,8 @@ class Socket {
   close = vi.fn();
 }
 beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(verificationApi.list).mockResolvedValue({ items: [], total: 0 });
   vi.stubGlobal("WebSocket", Socket);
   vi.mocked(executionApi.history).mockResolvedValue({
     items: [bundle],
@@ -83,17 +94,17 @@ beforeEach(() => {
   vi.mocked(executionApi.events).mockResolvedValue([]);
 });
 function workspace() {
-  render(
-    <QueryClientProvider
-      client={
-        new QueryClient({ defaultOptions: { queries: { retry: false } } })
-      }
-    >
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  const view = render(
+    <QueryClientProvider client={client}>
       <MemoryRouter>
         <ExecutionPage />
       </MemoryRouter>
     </QueryClientProvider>,
   );
+  return { ...view, client };
 }
 it("shows actual progress, authorization and the goal verification distinction", () => {
   render(<ExecutionDashboard bundle={bundle} />);
@@ -130,14 +141,12 @@ it("shows action failure evidence and grounding method", () => {
 });
 it("requires connection and explicit review before approving a plan", async () => {
   workspace();
+  fireEvent.click(screen.getByText("Prepare a workflow"));
   expect(screen.getByRole("button", { name: /Prepare PC-104/ })).toBeDisabled();
   fireEvent.change(screen.getByLabelText("Operator token"), {
     target: { value: "test-token" },
   });
   fireEvent.click(screen.getByRole("button", { name: "Connect" }));
-  fireEvent.click(
-    await screen.findByRole("button", { name: /AWAITING_APPROVAL/ }),
-  );
   fireEvent.click(await screen.findByRole("button", { name: "Approve Plan" }));
   expect(screen.getByRole("dialog")).toBeInTheDocument();
   expect(executionApi.command).not.toHaveBeenCalled();
@@ -202,4 +211,111 @@ it("enables pause and cancellation only for a running execution", () => {
   );
   expect(screen.getByText("RUNNING")).toBeInTheDocument();
   expect(screen.getByText("10.0s")).toBeInTheDocument();
+});
+
+async function connectWorkspace() {
+  fireEvent.change(screen.getByLabelText("Operator token"), {
+    target: { value: "test-token" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Connect" }));
+  await screen.findByRole("region", { name: "Task objective" });
+}
+it("opens the latest completed execution read-only with all execution commands disabled", async () => {
+  vi.mocked(executionApi.get).mockResolvedValue({
+    ...bundle,
+    session: { ...bundle.session, status: "COMPLETED" },
+  });
+  workspace();
+  await connectWorkspace();
+  for (const name of ["Pause", "Resume", "Start Execution", "Cancel execution"])
+    expect(screen.getByRole("button", { name })).toBeDisabled();
+  expect(
+    screen.getByText(/Saved execution. The browser is not presented/),
+  ).toBeInTheDocument();
+  expect(executionApi.command).not.toHaveBeenCalled();
+  expect(executionApi.prepare).not.toHaveBeenCalled();
+});
+it("keeps HIGH approval separate and sends only the reviewed action IDs", async () => {
+  vi.mocked(executionApi.get).mockResolvedValue({
+    ...bundle,
+    plan_approved: true,
+  });
+  vi.mocked(executionApi.command).mockResolvedValue({
+    ...bundle,
+    plan_approved: true,
+    session: { ...bundle.session, status: "READY" },
+  });
+  workspace();
+  await connectWorkspace();
+  fireEvent.click(screen.getByRole("button", { name: "Confirm HIGH actions" }));
+  expect(executionApi.command).not.toHaveBeenCalled();
+  fireEvent.click(
+    within(screen.getByRole("dialog")).getByRole("button", {
+      name: "Confirm HIGH actions",
+    }),
+  );
+  await waitFor(() =>
+    expect(executionApi.command).toHaveBeenCalledWith(
+      "execution-test",
+      "test-token",
+      "approve",
+      {
+        manifest_digest: bundle.manifest.digest,
+        scope: "high_risk",
+        action_ids: ["save"],
+      },
+    ),
+  );
+});
+it("blocks approval if the execution manifest changes while its confirmation is open", async () => {
+  const { client } = workspace();
+  await connectWorkspace();
+  fireEvent.click(screen.getByRole("button", { name: "Approve Plan" }));
+  act(() => {
+    client.setQueryData(["execution", "test-token", "execution-test"], {
+      ...bundle,
+      manifest: { ...bundle.manifest, digest: "b".repeat(64) },
+    });
+  });
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "manifest changed",
+  );
+  expect(
+    within(screen.getByRole("dialog")).getByRole("button", {
+      name: "Confirm plan",
+    }),
+  ).toBeDisabled();
+  expect(screen.getByText(bundle.manifest.digest)).toBeInTheDocument();
+  expect(executionApi.command).not.toHaveBeenCalled();
+});
+
+it("withholds a cached success verdict when the independent report cannot be refreshed", async () => {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  client.setQueryData(
+    ["execution-verification-report", "report-fixture", "test-token"],
+    { effective_verdict: "VERIFIED_SUCCESS" },
+  );
+  vi.mocked(verificationApi.list).mockResolvedValue({
+    items: [{ session: { id: "report-fixture" } }],
+    total: 1,
+  } as unknown as Awaited<ReturnType<typeof verificationApi.list>>);
+  vi.mocked(verificationApi.report).mockRejectedValue(
+    new Error("Verifier unavailable"),
+  );
+  render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter>
+        <ExecutionVerification id="execution-test" token="test-token" />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+  expect(
+    await screen.findByText(
+      "Verification service unavailable. No outcome can be confirmed here.",
+    ),
+  ).toBeInTheDocument();
+  expect(screen.getByRole("status")).toHaveTextContent("NOT VERIFIED");
+  expect(screen.queryByText("VERIFIED_SUCCESS")).not.toBeInTheDocument();
 });

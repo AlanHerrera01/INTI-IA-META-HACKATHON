@@ -8,5 +8,6 @@ COPY . .
 RUN npm run build && chown -R node:node /app
 USER node
 ENV API_PROXY_TARGET=http://backend:8000
+ENV INVENTORY_PROXY_TARGET=http://demo:8001
 EXPOSE 5173
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "preview"]

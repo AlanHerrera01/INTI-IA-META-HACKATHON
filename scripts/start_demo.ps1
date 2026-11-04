@@ -31,7 +31,7 @@ foreach ($featureName in @('EXECUTION_ENABLED','VERIFICATION_ENABLED','RECOVERY_
 Set-ReleaseSetting 'MISSION_MODEL_CALLS_ENABLED' ($EnableModelCalls.IsPresent.ToString().ToLowerInvariant())
 Set-ReleaseSetting 'DEMO_CONTROL_TOKEN' (Read-ReleaseSetting 'DEMO_FAULT_CONTROL_TOKEN')
 [IO.File]::WriteAllText($environmentPath,$releaseSettings,(New-Object Text.UTF8Encoding $false))
-$composeArguments=@('-f','docker-compose.yml')
+$composeArguments=@('-f','docker-compose.legacy.yml')
 if ($BuildCaPem) {
   $trustedCa=(Resolve-Path -LiteralPath $BuildCaPem).Path.Replace('\','/')
   $temporaryDirectory=Join-Path $releaseRoot '.tmp'

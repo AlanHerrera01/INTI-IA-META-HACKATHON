@@ -1,0 +1,616 @@
+.settings-workspace {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.settings-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px;
+  border-radius: 7px;
+  background: var(--surface);
+}
+.settings-heading-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: var(--primary);
+  background: #4cd7f60a;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.settings-eyebrow {
+  color: var(--primary);
+  font: 8px var(--font-mono);
+  margin: 0 0 8px;
+}
+.settings-heading h1 {
+  font-size: 21px;
+  line-height: 1.5;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+.settings-heading > div:nth-child(2) {
+  flex: 1;
+}
+.settings-heading p:last-child {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 7px 0 0;
+}
+.settings-heading-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.settings-workspace button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 4px;
+  font-size: 11px;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+}
+.settings-workspace button:hover:not(:disabled) {
+  color: var(--primary);
+  background: var(--surface-overlay);
+}
+.settings-workspace button.settings-primary {
+  background: var(--primary);
+  color: #003640;
+}
+.settings-workspace button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.settings-module-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 5px;
+  background: var(--surface);
+}
+.settings-module-nav button {
+  background: none;
+  flex: 1;
+  white-space: nowrap;
+  padding: 12px 8px;
+}
+.settings-module-nav button[aria-pressed="true"] {
+  color: var(--primary);
+  background: var(--surface-raised);
+}
+.settings-body {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.settings-aside,
+.settings-main {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+.settings-body.settings-filtered {
+  grid-template-columns: minmax(0, 1fr);
+}
+.settings-filtered .settings-aside {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+.settings-card {
+  min-width: 0;
+  padding: 22px;
+  background: var(--surface);
+  border-radius: 7px;
+}
+.settings-card > header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 20px;
+}
+.settings-card > header > svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.settings-card h2 {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+.settings-card h3 {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+}
+.settings-card p {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.75;
+}
+.settings-tag {
+  display: inline-block;
+  border-radius: 3px;
+  padding: 4px 6px;
+  color: var(--primary);
+  background: #4cd7f60a;
+  font: 8px var(--font-mono);
+  white-space: nowrap;
+}
+.settings-neutral {
+  color: var(--text-muted);
+  background: var(--surface-raised);
+}
+.settings-identity {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 4px;
+  background: var(--surface-raised);
+}
+.settings-identity > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 60px;
+  color: var(--primary);
+  background: var(--bg);
+  border: 1px solid #4cd7f644;
+  border-radius: 5px;
+}
+.settings-identity > section {
+  min-width: 0;
+}
+.settings-identity h3 {
+  font-size: 12px;
+}
+.settings-identity p {
+  font-size: 10px;
+  margin: 5px 0 10px;
+}
+.settings-card .settings-note {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+.settings-profile form {
+  margin: 22px 0 12px;
+}
+.settings-profile label {
+  display: grid;
+  gap: 10px;
+  color: var(--text-muted);
+  font: 10px var(--font-mono);
+}
+.settings-profile input {
+  width: 100%;
+  min-width: 0;
+  padding: 11px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg);
+  color: var(--text-primary);
+  font-size: 12px;
+}
+.settings-access-actions {
+  display: flex;
+  gap: 7px;
+  margin-top: 12px;
+}
+.settings-access-actions button {
+  font-size: 10px;
+  padding: 10px 9px;
+  flex: 1;
+}
+.settings-profile > small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.8;
+}
+.settings-card a {
+  color: var(--primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.settings-card a:hover {
+  text-decoration: underline;
+}
+.settings-card a.settings-profile-assets {
+  display: flex;
+  padding: 14px;
+  background: var(--surface-raised);
+  border-radius: 4px;
+  margin-top: 20px;
+  gap: 9px;
+}
+.settings-profile-assets > span {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+.settings-profile-assets svg {
+  flex-shrink: 0;
+}
+.settings-profile-assets small {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 9px;
+}
+.settings-calibration > strong {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 24px;
+  letter-spacing: -0.6px;
+  padding-top: 6px;
+}
+.settings-calibration p {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.settings-workspace dt {
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+.settings-workspace dd {
+  margin: 7px 0 0;
+  color: var(--text-primary);
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.settings-model-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 20px;
+}
+.settings-model-fields > div {
+  display: block;
+  padding: 12px;
+  min-width: 0;
+  border-radius: 4px;
+  background: var(--surface-raised);
+}
+.settings-model-fields dt {
+  font: 9px var(--font-mono);
+  text-transform: uppercase;
+  line-height: 1.7;
+}
+.settings-grounding-note {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 4px;
+  background: var(--bg);
+  margin: 20px 0;
+}
+.settings-grounding-note > svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.settings-grounding-note p {
+  font-size: 11px;
+  margin: 7px 0 10px;
+}
+.settings-permissions {
+  display: grid;
+  gap: 10px;
+}
+.settings-permissions > div {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  padding: 14px;
+  background: var(--surface-raised);
+  border-radius: 4px;
+}
+.settings-permissions > div > svg {
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.settings-permissions > div > div {
+  flex: 1;
+  min-width: 0;
+}
+.settings-permissions p {
+  font-size: 11px;
+  margin: 5px 0 0;
+}
+.settings-state {
+  display: inline-block;
+  color: var(--text-muted);
+  background: var(--bg);
+  border-radius: 3px;
+  padding: 5px 7px;
+  font: 9px var(--font-mono);
+  white-space: nowrap;
+}
+.settings-enabled {
+  color: var(--success);
+  background: #4ae1760a;
+}
+.settings-app-target {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: var(--surface-raised);
+  border-radius: 4px;
+}
+.settings-app-target > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.settings-app-target p {
+  margin: 5px 0 0;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.settings-app-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--success);
+  background: #4ae1760a;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.settings-app-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.settings-app-facts > div {
+  display: block;
+  min-width: 0;
+}
+.settings-app-facts dd {
+  font-size: 11px;
+}
+.settings-app-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.settings-apps > p:last-child {
+  margin-bottom: 0;
+}
+.settings-sandbox-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.settings-sandbox-grid > section {
+  background: var(--surface-raised);
+  border-radius: 4px;
+  padding: 18px;
+  min-width: 0;
+}
+.settings-card .settings-field-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font: 9px var(--font-mono);
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0 0 18px;
+}
+.settings-field-label svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.settings-sandbox-grid strong {
+  font-size: 16px;
+}
+.settings-sandbox-grid p {
+  font-size: 11px;
+}
+.settings-sandbox-grid small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.8;
+  margin-top: 16px;
+}
+.settings-dependencies {
+  margin: 0;
+}
+.settings-dependencies > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0;
+}
+.settings-dependencies dd {
+  margin: 0;
+  font-size: 11px;
+  text-align: right;
+}
+.settings-session-controls {
+  border-left: 2px solid var(--solar);
+}
+.settings-session-controls h3 {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+.settings-session-controls a {
+  margin-top: 6px;
+}
+.settings-service-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 4px;
+  background: var(--surface-raised);
+}
+.settings-service-summary > svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.settings-service-summary > div {
+  flex: 1;
+}
+.settings-service-summary strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.settings-service-summary span {
+  color: var(--text-secondary);
+  margin-left: 12px;
+  font: 10px var(--font-mono);
+}
+.settings-service-summary > small {
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.7;
+  max-width: 420px;
+}
+.settings-config-guide {
+  margin-top: 18px;
+}
+.settings-config-guide summary {
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.settings-config-guide p {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.settings-config-guide code {
+  color: var(--primary);
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.settings-audit-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  border-radius: 5px;
+  background: var(--surface);
+}
+.settings-audit-note > svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.settings-audit-note > span {
+  font: 10px var(--font-mono);
+  color: var(--text-secondary);
+}
+.settings-audit-note > small {
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.7;
+  margin-left: auto;
+}
+.settings-error {
+  color: var(--error);
+  font-size: 12px;
+  border-left: 2px solid var(--error);
+  background: #ffb4ab0a;
+  padding: 14px 18px;
+}
+.settings-error p {
+  margin: 0 0 8px;
+}
+.settings-error small {
+  font-size: 10px;
+}
+@media (max-width: 1450px) {
+  .settings-heading-actions {
+    flex-direction: column;
+  }
+  .settings-body {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+  .settings-aside .settings-card {
+    padding: 18px;
+  }
+  .settings-aside .settings-card h2 {
+    font-size: 12px;
+  }
+  .settings-card .settings-app-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1050px) {
+  .settings-body {
+    grid-template-columns: 1fr;
+  }
+  .settings-aside {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .settings-sandbox-grid {
+    grid-template-columns: 1fr;
+  }
+  .settings-module-nav {
+    flex-wrap: wrap;
+  }
+  .settings-module-nav button {
+    flex: 1 0 150px;
+  }
+  .settings-service-summary {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 700px) {
+  .settings-heading {
+    flex-wrap: wrap;
+    padding: 16px;
+  }
+  .settings-heading-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .settings-aside,
+  .settings-filtered .settings-aside,
+  .settings-model-fields {
+    grid-template-columns: 1fr;
+  }
+  .settings-card {
+    padding: 16px;
+  }
+  .settings-card > header {
+    flex-wrap: wrap;
+  }
+  .settings-audit-note {
+    flex-wrap: wrap;
+  }
+  .settings-audit-note > small {
+    margin-left: 0;
+  }
+}

@@ -34,10 +34,10 @@ export function Dashboard({
       <div className="page-heading">
         <div>
           <div className="eyebrow">
-            INTELLIGENCE WORKSPACE <span>/</span> PHASE 01
+            INTELLIGENCE WORKSPACE <span>/</span> CAPTURED EVIDENCE
           </div>
           <h1>
-            {observationsPage ? "Observations" : "Observation console"}
+            {observationsPage ? "Visual Observations" : "Observation console"}
             <span className="gold-dot">.</span>
           </h1>
           <p>See the interface. Understand the state. Build the next move.</p>
@@ -121,25 +121,48 @@ export function Dashboard({
         )}
       </section>
       {observationsPage && query.data && query.data.length > 0 && (
-        <section className="panel history">
-          <h2>Recent captures</h2>
-          {query.data.map((item) => (
-            <Link key={item.id} to={`/observations/${item.id}`}>
-              <span>{item.page_title}</span>
-              <span className="mono subtle">
-                {new Date(item.timestamp).toLocaleString()}
-              </span>
-              <ArrowUpRight size={16} />
-            </Link>
-          ))}
+        <section className="capture-gallery-section">
+          <div className="mission-section-title">
+            <h2>Recent captures</h2>
+            <span className="workspace-tag">
+              {Math.min(query.data.length, 8)} recent observations
+            </span>
+          </div>
+          <div className="capture-gallery">
+            {query.data.slice(0, 8).map((item) => (
+              <Link
+                className="capture-card"
+                key={item.id}
+                to={`/observations/${item.id}`}
+              >
+                <div className="capture-thumbnail">
+                  <img
+                    loading="lazy"
+                    src={item.screenshot_url}
+                    alt={`Saved observation: ${item.page_title}`}
+                  />
+                  <span className="workspace-tag">
+                    {item.width} ? {item.height}
+                  </span>
+                </div>
+                <div className="capture-card-copy">
+                  <strong>{item.page_title}</strong>
+                  <time dateTime={item.timestamp}>
+                    {new Date(item.timestamp).toLocaleString()}
+                  </time>
+                  <ArrowUpRight size={15} aria-hidden="true" />
+                </div>
+              </Link>
+            ))}
+          </div>
         </section>
       )}
       <div className="sandbox-note">
         <ShieldCheck size={17} />
         <span>Authorized local environment</span>
         <span className="subtle">
-          Only allowlisted demo URLs can be observed. Autonomous actions arrive
-          in a later phase.
+          Only allowlisted demo URLs can be observed. Capturing an observation
+          does not authorize an action.
         </span>
       </div>
     </>

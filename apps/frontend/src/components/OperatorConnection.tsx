@@ -1,8 +1,10 @@
+import { useLocale } from "../i18n/useLocale";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { LockKeyhole } from "lucide-react";
 import { useOperator } from "../hooks/useOperator";
 export function OperatorConnection() {
+  const { t } = useLocale();
   const { token, setToken, notify } = useOperator();
   const [draft, setDraft] = useState("");
   const cache = useQueryClient();
@@ -19,19 +21,21 @@ export function OperatorConnection() {
       }}
     >
       <LockKeyhole size={17} />
-      <label htmlFor="mission-token">Operator capability</label>
+      <label htmlFor="mission-token">{t("Operator capability")}</label>
       <input
         id="mission-token"
         type="password"
         autoComplete="off"
         value={draft}
         placeholder={
-          token ? "Connected · held in memory" : "Enter local operator token"
+          token
+            ? t("Connected · held in memory")
+            : t("Enter local operator token")
         }
         onChange={(e) => setDraft(e.target.value)}
       />
       <button className="button secondary" disabled={!draft}>
-        Connect
+        {t("Connect")}
       </button>
       {token && (
         <button
@@ -44,10 +48,10 @@ export function OperatorConnection() {
             notify("Disconnected. The local capability was cleared.");
           }}
         >
-          Disconnect
+          {t("Disconnect")}
         </button>
       )}
-      <small>Shared across workspaces; cleared on reload.</small>
+      <small>{t("Shared across workspaces; cleared on reload.")}</small>
     </form>
   );
 }

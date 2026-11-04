@@ -9,7 +9,7 @@ from inti.application.use_cases import (
     CaptureObservationUseCase,
     GetSystemStatusUseCase,
 )
-from inti.domain.exceptions import NotFoundError
+from inti.domain.exceptions import ConfigurationError, NotFoundError
 from inti.presentation.dependencies import Services
 from inti.presentation.execution_auth import require_operator
 from inti.presentation.schemas import (
@@ -37,6 +37,15 @@ async def health() -> dict[str, str]:
 
 @router.get("/system/status")
 async def system_status(svc: Container) -> dict[str, str | bool]:
+    if svc.settings.inti_runtime_mode == "local_computer":
+        database = await svc.repository.available()
+        return {
+            "backend": True,
+            "database": database,
+            "browser": False,
+            "ready": database,
+            "version": __version__,
+        }
     return await GetSystemStatusUseCase(svc.repository, svc.browser).execute()
 
 
@@ -46,6 +55,7 @@ async def capabilities(svc: Container) -> dict[str, str | bool]:
     settings = svc.settings
     return {
         "version": __version__,
+        "runtime_mode": settings.inti_runtime_mode,
         "execution_enabled": settings.execution_enabled,
         "verification_enabled": settings.verification_enabled,
         "recovery_enabled": settings.recovery_enabled,
@@ -62,6 +72,8 @@ async def model_status(svc: Container) -> dict[str, str | bool | None]:
 
 @router.post("/observations/capture", status_code=201)
 async def capture(payload: CaptureRequest, svc: Container) -> ObservationResponse:
+    if svc.settings.inti_runtime_mode == "local_computer":
+        raise ConfigurationError("Use the paired Windows agent for local-computer tasks")
     observation = await CaptureObservationUseCase(svc.browser, svc.repository, svc.storage).execute(
         payload.url or svc.settings.demo_url, payload.width, payload.height
     )

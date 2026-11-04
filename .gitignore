@@ -1,4 +1,10 @@
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.backup
+*.log
 .venv/
 __pycache__/
 *.py[cod]
@@ -18,3 +24,10 @@ artifacts/
 test-results/
 *.tsbuildinfo
 pytest-cache-files-*/
+
+# Generated captures and reports can contain local machine data.
+/docs/screenshots/
+/docs/evidence/*-ui.json
+/docs/evidence/local-computer-sample.json
+/docs/evidence/local-workflow-navigation.json
+/docs/evidence/restored-local-designs.json

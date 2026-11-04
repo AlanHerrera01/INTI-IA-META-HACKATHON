@@ -1,440 +1,593 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import {
+  Activity,
+  Download,
+  Gauge,
+  RefreshCw,
+  ShieldCheck,
+  Timer,
+  Wrench,
+} from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
 import { recoveryApi } from "../services/recoveryApi";
-import { executionApi } from "../services/executionApi";
 import { errorMessage } from "../services/api";
-import { useRecordEvents } from "../hooks/useRecordEvents";
 import { useOperator } from "../hooks/useOperator";
+import { RecoveryOverview } from "../features/recovery/RecoveryOverview";
+import { RecoveryEvidence } from "../features/recovery/RecoveryEvidence";
+import { RecoveryPipeline } from "../features/recovery/RecoveryPipeline";
+import {
+  RecoveryAudit,
+  RecoveryDiagnoses,
+} from "../features/recovery/RecoveryAudit";
+import { RecoveryTimeline } from "../features/recovery/RecoveryTimeline";
+import { recoveryMetrics, recoveryStopped } from "../features/recovery/metrics";
+import { downloadTaskJson } from "../features/tasks/records";
 import type { RecoveryBundle } from "../types/recovery";
 import "../styles/execution.css";
-import "../styles/verification.css";
+import "../styles/recovery-center.css";
 
-const stopped = new Set(["RECOVERED", "FAILED", "CANCELLED", "ESCALATED"]);
+export { RecoveryOverview };
+type Review = {
+  kind: "plan" | "high_risk" | "cancel" | "retry";
+  snapshot: RecoveryBundle;
+  digest: string | null;
+};
+
 export function RecoveryPage() {
   const [draft, setDraft] = useState("");
   const { token, setToken } = useOperator();
-  const [id, setId] = useState(
-    () => new URLSearchParams(location.search).get("recovery") || "",
-  );
+  const [search, setSearch] = useSearchParams();
   const [offset, setOffset] = useState(0);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [review, setReview] = useState<"plan" | "high_risk" | null>(null);
-  const query = useQueryClient();
+  const [review, setReview] = useState<Review | null>(null);
+  const client = useQueryClient();
   const history = useQuery({
     queryKey: ["recoveries", token, offset],
     queryFn: () => recoveryApi.list(token, offset),
     enabled: !!token,
     refetchInterval: 2000,
   });
+  const records = token && !history.error ? (history.data?.items ?? []) : [];
+  const id = search.get("recovery") || records[0]?.session.id || "";
   const selected = useQuery({
     queryKey: ["recovery", token, id],
     queryFn: () => recoveryApi.get(id, token),
     enabled: !!token && !!id,
     refetchInterval: 1000,
+    retry: false,
   });
-  const bundle = selected.data;
-  const events = useRecordEvents(
-    id,
-    bundle?.session.execution_id || "",
-    token,
-    "recovery_id",
-    recoveryApi.events,
-    () => void query.invalidateQueries({ queryKey: ["recovery", token, id] }),
-  );
+  const mismatch = !!selected.data && selected.data.session.id !== id;
+  const bundle =
+    token && !selected.error && !mismatch ? selected.data : undefined;
+  const metrics = recoveryMetrics(records);
+  const loaded = !!token && !!history.data && !history.error;
+  const select = (value: string) => {
+    setSearch(value ? { recovery: value } : {});
+    setReview(null);
+    setError("");
+  };
   const run = async (work: () => Promise<RecoveryBundle>) => {
     setBusy(true);
     setError("");
     try {
       const result = await work();
-      query.setQueryData(["recovery", token, id], result);
-      setReview(null);
-    } catch (e) {
-      setError(errorMessage(e));
+      if (result.session.id !== id)
+        throw new Error("Recovery response did not match the selected case.");
+      client.setQueryData(["recovery", token, id], result);
+      await client.invalidateQueries({ queryKey: ["recoveries"] });
+    } catch (cause) {
+      setError(errorMessage(cause));
     } finally {
       setBusy(false);
+      setReview(null);
     }
   };
+  const request = (kind: Review["kind"]) => {
+    if (bundle)
+      setReview({
+        kind,
+        snapshot: bundle,
+        digest: bundle.plan?.digest ?? null,
+      });
+  };
+  const sameCase =
+    !!review && !!bundle && review.snapshot.session.id === bundle.session.id;
+  const samePlan =
+    sameCase && !!review?.digest && review.digest === bundle?.plan?.digest;
+  const canConfirm =
+    !busy &&
+    !!token &&
+    sameCase &&
+    (review?.kind === "cancel"
+      ? !recoveryStopped.has(bundle!.session.status)
+      : review?.kind === "retry"
+        ? bundle!.session.status === "ESCALATED" &&
+          bundle!.session.retry_allowed
+        : samePlan &&
+          bundle!.session.status === "AWAITING_APPROVAL" &&
+          (review?.kind === "plan"
+            ? !bundle!.plan_approved
+            : bundle!.plan_approved));
+  const confirm = () => {
+    if (!review || !canConfirm) return;
+    if (review.kind === "cancel" || review.kind === "retry") {
+      const kind = review.kind;
+      void run(() =>
+        recoveryApi.control(review.snapshot.session.id, kind, token),
+      );
+    } else {
+      const scope = review.kind;
+      void run(() =>
+        recoveryApi.approve(
+          review.snapshot,
+          token,
+          scope,
+          scope === "high_risk"
+            ? review.snapshot
+                .plan!.actions.filter((action) => action.risk_level === "HIGH")
+                .map((action) => action.id)
+            : [],
+        ),
+      );
+    }
+  };
+  const refresh = () => {
+    void history.refetch();
+    if (id) void selected.refetch();
+  };
   return (
-    <div className="execution-workspace">
-      <div className="page-heading">
+    <div className="execution-workspace recovery-center-workspace">
+      <header className="recovery-center-heading">
         <div>
-          <p className="eyebrow">DETECT · DIAGNOSE · RECOVER</p>
+          <div className="recovery-heading-tags">
+            <span>SELF-HEALING ENGINE</span>
+            <small>BOUNDED RECOVERY</small>
+          </div>
           <h1>Recovery Center</h1>
-          <p>Review failures, bounded repairs and renewed authorization.</p>
+          <p>
+            Inspect interface failures, evidence-backed repair proposals and
+            renewed authorization.
+          </p>
         </div>
-        <span className="execution-chip">PHASE 04</span>
-      </div>
-      <form
-        className="execution-auth"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setToken(draft);
-          setId("");
-          setReview(null);
-        }}
-      >
-        <label>
-          Operator token
-          <input
-            type="password"
-            autoComplete="off"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-          />
-        </label>
-        <button disabled={!draft}>Connect</button>
-        {token && (
-          <button
-            type="button"
-            onClick={() => {
-              setToken("");
-              setDraft("");
-              setId("");
-              query.removeQueries({ queryKey: ["recovery"] });
-              query.removeQueries({ queryKey: ["recoveries"] });
-            }}
-          >
-            Disconnect
-          </button>
-        )}
-        <small>
-          Capability stays in memory. Expanded scope requires explicit approval.
-        </small>
-      </form>
-      {(error || history.error || selected.error) && (
-        <p role="alert" className="execution-error">
-          {error || errorMessage(history.error || selected.error)}
-        </p>
-      )}
-      <div className="execution-layout">
-        <aside className="execution-panel">
-          <h2>Recovery history</h2>
-          {history.isLoading && <p role="status">Loading recoveries…</p>}
-          {history.data?.items.length === 0 && <p>No recovery records yet.</p>}
-          <div className="execution-history">
-            {history.data?.items.map((item) => (
-              <button
-                key={item.session.id}
-                aria-pressed={item.session.id === id}
-                onClick={() => {
-                  setId(item.session.id);
-                  setReview(null);
-                }}
-              >
-                <strong>{item.session.status}</strong>
-                <span>{item.session.initial_failure_type}</span>
-                <small>
-                  {new Date(item.session.started_at).toLocaleString()}
-                </small>
-              </button>
-            ))}
+        <div className="recovery-protocol-badge">
+          <Wrench size={25} />
+          <div>
+            <span>EVIDENCE &amp; POLICY</span>
+            <strong>
+              {bundle
+                ? bundle.session.status.replaceAll("_", " ")
+                : "Waiting for evidence"}
+            </strong>
           </div>
-          <div className="execution-controls">
-            <button
-              disabled={!offset}
-              onClick={() => setOffset(Math.max(0, offset - 20))}
-            >
-              Previous
-            </button>
-            <button
-              disabled={!history.data || offset + 20 >= history.data.total}
-              onClick={() => setOffset(offset + 20)}
-            >
-              Next
-            </button>
-          </div>
-        </aside>
-        <section className="execution-main">
-          {!bundle ? (
-            <div className="execution-panel">
-              <h2>Select a recovery</h2>
-              <p>
-                Recovery starts after a structured execution failure. Model
-                proposals pass deterministic validation before any action.
-              </p>
-            </div>
-          ) : (
-            <>
-              <RecoveryOverview bundle={bundle} />
-              <section className="execution-panel">
-                <h2>Controls</h2>
-                <div className="execution-controls">
-                  <button
-                    disabled={busy || stopped.has(bundle.session.status)}
-                    onClick={() =>
-                      void run(() => recoveryApi.control(id, "cancel", token))
-                    }
-                  >
-                    Cancel recovery and execution
-                  </button>
-                  <button
-                    disabled={
-                      busy ||
-                      bundle.session.status !== "ESCALATED" ||
-                      !bundle.session.retry_allowed
-                    }
-                    onClick={() =>
-                      void run(() => recoveryApi.control(id, "retry", token))
-                    }
-                  >
-                    Retry within remaining budget
-                  </button>
-                  <Link
-                    to={`/verification?execution=${bundle.session.execution_id}`}
-                  >
-                    Verify persisted outcome
-                  </Link>
-                </div>
-                <p>
-                  Recovered means the interrupted action's checks passed.
-                  Independent verification determines task success.
-                </p>
-              </section>
-              <section className="execution-panel">
-                <h2>Before and after evidence</h2>
-                <div className="recovery-images">
-                  <RecoveryImage
-                    id={bundle.context.previous_observation_id}
-                    token={token}
-                    label="Before failure"
-                  />
-                  <RecoveryImage
-                    id={
-                      bundle.session.evidence_ids.at(-1) ||
-                      bundle.context.current_observation_id
-                    }
-                    token={token}
-                    label="Fresh recovery observation"
-                  />
-                </div>
-              </section>
-              {bundle.diagnoses.map((d) => (
-                <section className="execution-panel" key={d.id}>
-                  <h2>Diagnosis · {d.failure_type}</h2>
-                  <p>{d.change_summary}</p>
-                  <h3>Observed facts</h3>
-                  <ul>
-                    {d.observed_facts.map((f, i) => (
-                      <li key={i}>{f}</li>
-                    ))}
-                  </ul>
-                  <h3>Hypotheses</h3>
-                  <ul>
-                    {d.hypotheses.map((h, i) => (
-                      <li key={i}>{h}</li>
-                    ))}
-                  </ul>
-                  <h3>Uncertainties</h3>
-                  <p>{d.uncertainties.join("; ") || "None declared"}</p>
-                  <h3>Relevant target regions</h3>
-                  <p>
-                    {d.candidate_targets
-                      .map((t) => `${t.role}: ${t.name}`)
-                      .join("; ") || "No candidate controls declared"}
-                  </p>
-                  <pre>
-                    {d.changed_regions?.length
-                      ? JSON.stringify(d.changed_regions, null, 2)
-                      : "No reliable changed regions proposed"}
-                  </pre>
-                  <h3>Validation warnings</h3>
-                  <p>
-                    {bundle.warnings.join("; ") ||
-                      "No validation warnings recorded"}
-                  </p>
-                </section>
-              ))}
-              {bundle.plan && (
-                <section className="execution-panel">
-                  <h2>Proposed repair</h2>
-                  <p>{bundle.plan.objective}</p>
-                  <p>{bundle.plan.decision.justification}</p>
-                  <code className="evidence-hash">{bundle.plan.digest}</code>
-                  <ol>
-                    {bundle.plan.actions.map((a) => (
-                      <li key={a.id}>
-                        <strong>
-                          {a.action_type} · {a.risk_level}
-                        </strong>{" "}
-                        {a.target?.name}
-                        <details>
-                          <summary>Parameters and assertions</summary>
-                          <pre>
-                            {JSON.stringify(
-                              {
-                                parameters: a.parameters,
-                                preconditions: a.preconditions,
-                                postconditions: a.expected_postconditions,
-                              },
-                              null,
-                              2,
-                            )}
-                          </pre>
-                        </details>
-                      </li>
-                    ))}
-                  </ol>
-                  {bundle.session.status === "AWAITING_APPROVAL" && (
-                    <div className="execution-controls">
-                      <button
-                        disabled={busy || bundle.plan_approved}
-                        onClick={() => setReview("plan")}
-                      >
-                        Review plan approval
-                      </button>
-                      <button
-                        disabled={busy || !bundle.plan_approved}
-                        onClick={() => setReview("high_risk")}
-                      >
-                        Review HIGH risk actions
-                      </button>
-                    </div>
-                  )}
-                  {review && (
-                    <div
-                      role="dialog"
-                      aria-label="Confirm recovery authorization"
-                      className="execution-panel"
-                    >
-                      <h3>
-                        Authorize{" "}
-                        {review === "plan"
-                          ? "this exact repair plan"
-                          : "HIGH risk repair actions"}
-                      </h3>
-                      <p>
-                        The digest above binds this approval to the displayed
-                        objective, controls, parameters and assertions.
-                      </p>
-                      <button
-                        disabled={busy}
-                        onClick={() =>
-                          void run(() =>
-                            recoveryApi.approve(
-                              bundle,
-                              token,
-                              review,
-                              review === "high_risk"
-                                ? bundle
-                                    .plan!.actions.filter(
-                                      (a) => a.risk_level === "HIGH",
-                                    )
-                                    .map((a) => a.id)
-                                : [],
-                            ),
-                          )
-                        }
-                      >
-                        Confirm authorization
-                      </button>
-                      <button onClick={() => setReview(null)}>Back</button>
-                    </div>
-                  )}
-                </section>
-              )}
-              <section className="execution-panel">
-                <h2>Attempts</h2>
-                {bundle.attempts.map((a) => (
-                  <p key={a.id}>
-                    Attempt {a.attempt_number} · {a.outcome} ·{" "}
-                    {a.completed_at
-                      ? new Date(a.completed_at).toLocaleTimeString()
-                      : "In progress"}
-                  </p>
-                ))}
-              </section>
-              <section className="execution-panel">
-                <h2>Timeline</h2>
-                <small>{events.connection}</small>
-                <ol>
-                  {events.events.map((e) => (
-                    <li key={e.id}>
-                      {new Date(e.timestamp).toLocaleTimeString()} ·{" "}
-                      {e.event_type}
-                    </li>
-                  ))}
-                </ol>
-              </section>
-            </>
-          )}
+        </div>
+      </header>
+      <div className="recovery-center-metrics">
+        <section aria-label="Stored recoveries">
+          <header>
+            <Activity size={16} />
+            <h2>RECORDED RECOVERIES</h2>
+            <span>STORED TOTAL</span>
+          </header>
+          <strong>
+            {history.error ? "Unavailable" : loaded ? history.data!.total : "—"}
+          </strong>
+          <p>Persistent recovery sessions, not simulated incidents.</p>
+        </section>
+        <section aria-label="Recovery rate on loaded page">
+          <header>
+            <ShieldCheck size={16} />
+            <h2>RECOVERY RATE</h2>
+            <span>LOADED PAGE</span>
+          </header>
+          <strong>
+            {!loaded || metrics.rate === null
+              ? "Unavailable"
+              : `${metrics.rate.toFixed(1)}%`}
+          </strong>
+          <p>
+            {loaded
+              ? `${metrics.recovered} recovered / ${metrics.resolved} recovered or failed records.`
+              : "Connect to inspect recorded outcomes."}
+          </p>
+        </section>
+        <section aria-label="Mean recorded recovery duration">
+          <header>
+            <Timer size={16} />
+            <h2>MEAN SESSION TIME</h2>
+            <span>RECORDED</span>
+          </header>
+          <strong>
+            {!loaded || metrics.meanMs === null
+              ? "Unavailable"
+              : `${metrics.meanMs.toFixed(0)} ms`}
+          </strong>
+          <p>
+            {loaded
+              ? `${metrics.durationSamples} valid closed-session duration samples.`
+              : "No duration samples loaded."}
+          </p>
+        </section>
+        <section aria-label="Escalated recoveries on loaded page">
+          <header>
+            <Gauge size={16} />
+            <h2>ESCALATED CASES</h2>
+            <span>LOADED PAGE</span>
+          </header>
+          <strong>{loaded ? metrics.escalated : "—"}</strong>
+          <p>Requires review of policy, evidence and remaining budget.</p>
         </section>
       </div>
-    </div>
-  );
-}
-export function RecoveryOverview({ bundle }: { bundle: RecoveryBundle }) {
-  const { session: s } = bundle;
-  return (
-    <section className="execution-panel">
-      <h2>Recovery · {s.status}</h2>
-      <p>{bundle.context.observed_state}</p>
-      <p>{s.final_outcome || bundle.context.error_details}</p>
-      <div className="execution-metrics">
-        <div>
-          <small>Attempts</small>
-          <strong>
-            {s.attempts_count} / {s.budget.max_attempts}
-          </strong>
+      <div className="recovery-session-toolbar">
+        <details className="recovery-operator" open={!token}>
+          <summary>
+            <ShieldCheck size={14} />
+            {token ? "Operator connected" : "Connect operator"}
+          </summary>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              setToken(draft);
+              setDraft("");
+              setReview(null);
+            }}
+          >
+            <label>
+              Operator token
+              <input
+                type="password"
+                autoComplete="off"
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+              />
+            </label>
+            <button disabled={!draft}>Connect</button>
+            {token && (
+              <button
+                type="button"
+                onClick={() => {
+                  setToken("");
+                  setDraft("");
+                  select("");
+                  client.removeQueries({ queryKey: ["recovery"] });
+                  client.removeQueries({ queryKey: ["recoveries"] });
+                }}
+              >
+                Disconnect
+              </button>
+            )}
+            <small>
+              Capability stays in memory. Expanded scope requires explicit
+              approval.
+            </small>
+          </form>
+        </details>
+        <label>
+          Recovery history
+          <select
+            aria-label="Recovery history"
+            value={id}
+            disabled={!token || !records.length || busy}
+            onChange={(event) => select(event.target.value)}
+          >
+            {!id && (
+              <option value="">
+                {token ? "No recovery records yet" : "Connect to load history"}
+              </option>
+            )}
+            {id && !records.some((record) => record.session.id === id) && (
+              <option value={id}>Requested #{id.slice(0, 8)}</option>
+            )}
+            {records.map((record) => (
+              <option key={record.session.id} value={record.session.id}>
+                {record.session.status} · {record.session.initial_failure_type}{" "}
+                · #{record.session.id.slice(0, 8)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="recovery-history-buttons">
+          <button
+            disabled={!token || offset === 0 || history.isFetching}
+            onClick={() => setOffset(Math.max(0, offset - 20))}
+          >
+            Previous
+          </button>
+          <button
+            disabled={
+              !loaded ||
+              offset + 20 >= (history.data?.total || 0) ||
+              history.isFetching
+            }
+            onClick={() => setOffset(offset + 20)}
+          >
+            Next
+          </button>
+          <button
+            aria-label="Refresh recovery history"
+            disabled={!token || history.isFetching || selected.isFetching}
+            onClick={refresh}
+          >
+            <RefreshCw size={14} />
+          </button>
         </div>
-        <div>
-          <small>Model calls</small>
-          <strong>
-            {s.model_calls} / {s.budget.max_model_calls}
-          </strong>
-        </div>
-        <div>
-          <small>Actions</small>
-          <strong>
-            {s.actions_used} / {s.budget.max_actions}
-          </strong>
-        </div>
-        <div>
-          <small>Time limit</small>
-          <strong>{s.budget.max_duration_seconds}s</strong>
-        </div>
+        <small>
+          Page {Math.floor(offset / 20) + 1} · {records.length} loaded · metrics
+          apply to this page
+        </small>
       </div>
-      <p>
-        Tokens: {s.tokens_used ?? "Unreported"} /{" "}
-        {s.budget.max_tokens_optional ?? "No aggregate token cap"}
-      </p>
-    </section>
-  );
-}
-function RecoveryImage({
-  id,
-  token,
-  label,
-}: {
-  id: string;
-  token: string;
-  label: string;
-}) {
-  const [resource, setResource] = useState<{ id: string; url: string } | null>(
-    null,
-  );
-  const image = useQuery({
-    queryKey: ["recovery-image", token, id],
-    queryFn: () => executionApi.screenshot(id, token),
-    enabled: !!id && !!token,
-  });
-  useEffect(() => {
-    if (!image.data) return;
-    const url = URL.createObjectURL(image.data);
-    setResource({ id, url });
-    return () => URL.revokeObjectURL(url);
-  }, [id, image.data]);
-  return (
-    <figure>
-      <figcaption>{label}</figcaption>
-      {resource?.id === id ? (
-        <img src={resource.url} alt={label} style={{ width: "100%" }} />
-      ) : (
-        <p>
-          {image.error ? errorMessage(image.error) : "Loading protected image…"}
+      {(error || history.error || selected.error || mismatch) && (
+        <p role="alert" className="execution-error">
+          {error ||
+            (mismatch
+              ? "The returned recovery does not match the selected case."
+              : errorMessage(history.error || selected.error))}
         </p>
       )}
-    </figure>
+      {busy && (
+        <p role="status" className="recovery-small-note">
+          Processing explicit request…
+        </p>
+      )}
+      {!bundle && (
+        <p className="recovery-empty-notice">
+          {!token
+            ? "Connect your local operator to inspect protected recovery evidence."
+            : history.isPending || (id && selected.isPending)
+              ? "Loading saved recovery records…"
+              : history.error || selected.error || mismatch
+                ? "Recovery evidence is unavailable. Refresh or select another case."
+                : "No recovery records yet. Recovery begins after a structured execution failure; this workspace does not generate a case automatically."}
+        </p>
+      )}
+      <section
+        className="recovery-case"
+        aria-label="Recovery evidence comparison"
+      >
+        <header className="recovery-case-heading">
+          <div>
+            <Wrench size={21} />
+            <div>
+              <h2>
+                {bundle
+                  ? `Recorded Recovery Case #${bundle.session.id.slice(0, 8)}`
+                  : "Recovery Case · No record selected"}
+              </h2>
+              <p>
+                {bundle
+                  ? `${bundle.session.initial_failure_type} · execution #${bundle.session.execution_id.slice(0, 8)}`
+                  : "Baseline, diagnosis and fresh evidence appear here when recorded."}
+              </p>
+            </div>
+          </div>
+          <div>
+            <span
+              className={`recovery-case-state recovery-state-${bundle?.session.status.toLowerCase() || "empty"}`}
+            >
+              {bundle?.session.status.replaceAll("_", " ") ||
+                "AWAITING EVIDENCE"}
+            </span>
+            <button
+              disabled={!bundle}
+              onClick={() =>
+                bundle &&
+                downloadTaskJson(
+                  `inti-recovery-${bundle.session.id}.json`,
+                  bundle,
+                )
+              }
+            >
+              <Download size={13} />
+              Export record
+            </button>
+          </div>
+        </header>
+        <div className="recovery-comparison-grid">
+          <RecoveryEvidence
+            key={
+              (bundle?.context.previous_observation_id || "before-empty") +
+              token
+            }
+            id={bundle?.context.previous_observation_id}
+            token={token}
+            label="Captured baseline"
+          />
+          <RecoveryPipeline bundle={bundle} />
+          <RecoveryEvidence
+            key={
+              (bundle?.session.evidence_ids.at(-1) ||
+                bundle?.context.current_observation_id ||
+                "after-empty") + token
+            }
+            id={
+              bundle?.session.evidence_ids.at(-1) ||
+              bundle?.context.current_observation_id
+            }
+            token={token}
+            label="Fresh recovery observation"
+          />
+        </div>
+        <div className="recovery-case-controls">
+          <div>
+            <button
+              disabled={
+                busy || !bundle || recoveryStopped.has(bundle.session.status)
+              }
+              onClick={() => request("cancel")}
+            >
+              Cancel recovery and execution
+            </button>
+            <button
+              disabled={
+                busy ||
+                bundle?.session.status !== "ESCALATED" ||
+                !bundle.session.retry_allowed
+              }
+              onClick={() => request("retry")}
+            >
+              Retry within remaining budget
+            </button>
+          </div>
+          <Link
+            to={
+              bundle
+                ? `/execution?execution=${bundle.session.execution_id}`
+                : "/execution"
+            }
+          >
+            Inspect original execution →
+          </Link>
+        </div>
+      </section>
+      <div className="recovery-lower-grid">
+        <div className="recovery-left-column">
+          <RecoveryTimeline
+            key={(bundle?.session.id || "none") + token}
+            bundle={bundle}
+            token={token}
+          />
+          <RecoveryDiagnoses bundle={bundle} />
+        </div>
+        <RecoveryAudit bundle={bundle} />
+      </div>
+      <section className="recovery-repair-plan" aria-label="Proposed repair">
+        <header>
+          <h2>Proposed Repair &amp; Authorization</h2>
+          <span>{bundle?.plan ? "SCOPED MANIFEST" : "NO REPAIR PROPOSED"}</span>
+        </header>
+        {bundle?.plan ? (
+          <>
+            <p>{bundle.plan.objective}</p>
+            <p>{bundle.plan.decision.justification}</p>
+            <code className="recovery-plan-digest">{bundle.plan.digest}</code>
+            <ol>
+              {bundle.plan.actions.map((action) => (
+                <li key={action.id}>
+                  <strong>
+                    {action.action_type} · {action.risk_level}
+                  </strong>
+                  <span>{action.target?.name || "Page"}</span>
+                  <details>
+                    <summary>Parameters and assertions</summary>
+                    <pre>
+                      {JSON.stringify(
+                        {
+                          target: action.target,
+                          parameters: action.parameters,
+                          preconditions: action.preconditions,
+                          postconditions: action.expected_postconditions,
+                        },
+                        null,
+                        2,
+                      )}
+                    </pre>
+                  </details>
+                </li>
+              ))}
+            </ol>
+            <div className="recovery-approval-buttons">
+              <button
+                disabled={
+                  busy ||
+                  bundle.session.status !== "AWAITING_APPROVAL" ||
+                  bundle.plan_approved
+                }
+                onClick={() => request("plan")}
+              >
+                Review plan approval
+              </button>
+              <button
+                disabled={
+                  busy ||
+                  bundle.session.status !== "AWAITING_APPROVAL" ||
+                  !bundle.plan_approved ||
+                  !bundle.plan.actions.some(
+                    (action) => action.risk_level === "HIGH",
+                  )
+                }
+                onClick={() => request("high_risk")}
+              >
+                Review HIGH risk actions
+              </button>
+            </div>
+          </>
+        ) : (
+          <p>
+            No bounded repair plan is recorded. A proposal will show its
+            objective, targets, parameters and immediate checks before any
+            renewed approval.
+          </p>
+        )}
+      </section>
+      {bundle && (
+        <details className="recovery-budget-details">
+          <summary>Budget and token ledger</summary>
+          <RecoveryOverview bundle={bundle} />
+        </details>
+      )}
+      <p className="recovery-center-footnote">
+        Recovered means the interrupted action's checks passed. Independent
+        verification determines task success. No replay, repair or model call
+        starts from inspecting this page.
+      </p>
+      {review && (
+        <div className="execution-modal-backdrop">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-label="Confirm recovery authorization"
+            className="execution-panel execution-modal"
+          >
+            <h2>
+              {review.kind === "cancel"
+                ? "Cancel recovery and execution?"
+                : review.kind === "retry"
+                  ? "Retry within the remaining budget?"
+                  : review.kind === "high_risk"
+                    ? "Authorize HIGH risk repair actions?"
+                    : "Authorize this exact repair plan?"}
+            </h2>
+            <p>
+              {review.kind === "cancel"
+                ? "Stop scheduling recovery actions and cancel the execution. Changes already persisted remain saved."
+                : review.kind === "retry"
+                  ? "Request another bounded diagnosis attempt using the remaining recovery budget. This does not expand approved scope."
+                  : "Approval binds only the displayed recovery manifest, targets, parameters and assertions."}
+            </p>
+            {review.digest && (
+              <code className="recovery-plan-digest">{review.digest}</code>
+            )}
+            {(review.kind === "plan" || review.kind === "high_risk") && (
+              <pre>
+                {JSON.stringify(
+                  review.snapshot.plan?.actions.filter(
+                    (action) =>
+                      review.kind !== "high_risk" ||
+                      action.risk_level === "HIGH",
+                  ),
+                  null,
+                  2,
+                )}
+              </pre>
+            )}
+            {!canConfirm && !busy && (
+              <p role="alert" className="execution-error">
+                The recovery, manifest or allowed action changed. Return to
+                review before authorizing.
+              </p>
+            )}
+            <div className="execution-controls">
+              <button disabled={!canConfirm} onClick={confirm}>
+                Confirm authorization
+              </button>
+              <button disabled={busy} onClick={() => setReview(null)}>
+                Back
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+    </div>
   );
 }

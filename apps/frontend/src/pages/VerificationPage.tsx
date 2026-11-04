@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { FileCheck2, RefreshCw, Download, ShieldCheck } from "lucide-react";
+import { RefreshCw, Download, ShieldCheck, History } from "lucide-react";
 import { verificationApi } from "../services/verificationApi";
 import { errorMessage } from "../services/api";
 import { useRecordEvents } from "../hooks/useRecordEvents";
 import { VerdictBadge } from "../features/verification/VerdictBadge";
+import {
+  VerificationMetrics,
+  VerificationPipeline,
+  VerificationLedger,
+} from "../features/verification/VerificationPanels";
 import { useOperator } from "../hooks/useOperator";
 import {
   verificationTerminal,
@@ -14,6 +19,7 @@ import {
 } from "../types/verification";
 import "../styles/execution.css";
 import "../styles/verification.css";
+import "../styles/verification-lab.css";
 
 const valueText = (value: Value | undefined) =>
   value == null
@@ -23,8 +29,21 @@ const valueText = (value: Value | undefined) =>
       : String(value);
 
 export function VerificationPage() {
-  const [draft, setDraft] = useState("");
   const { token, setToken } = useOperator();
+  // Remount protected content when the capability changes, including event cursors.
+  return (
+    <VerificationWorkspace key={token} token={token} setToken={setToken} />
+  );
+}
+
+function VerificationWorkspace({
+  token,
+  setToken,
+}: {
+  token: string;
+  setToken: (token: string) => void;
+}) {
+  const [draft, setDraft] = useState("");
   const [id, setId] = useState(
     () => new URLSearchParams(location.search).get("verification") || "",
   );
@@ -34,36 +53,321 @@ export function VerificationPage() {
   const [offset, setOffset] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [clock, setClock] = useState(Date.now());
   const query = useQueryClient();
-  useEffect(() => {
-    const timer = setInterval(() => setClock(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
   const history = useQuery({
     queryKey: ["verifications", token, offset],
     queryFn: () => verificationApi.list(token, offset),
     enabled: !!token,
-    refetchInterval: 3000,
+    refetchInterval: 10000,
   });
+  const items = useMemo(
+    () => (token && !history.isError ? history.data?.items || [] : []),
+    [token, history.isError, history.data],
+  );
   const selected = useQuery({
     queryKey: ["verification", token, id],
     queryFn: () => verificationApi.get(id, token),
     enabled: !!token && !!id,
-    refetchInterval: 1000,
+    refetchInterval: 3000,
   });
-  const report = useQuery({
+  const bundle =
+    token && !selected.isError && selected.data?.session.id === id
+      ? selected.data
+      : undefined;
+  const reportQuery = useQuery({
     queryKey: ["verification-report", token, id],
     queryFn: () => verificationApi.report(id, token),
-    enabled: !!token && !!id,
-    refetchInterval: () =>
-      selected.data && !verificationTerminal.has(selected.data.session.status)
-        ? 1000
-        : false,
+    enabled: !!bundle,
+    refetchInterval: 10000,
   });
+  const report =
+    bundle &&
+    !reportQuery.isError &&
+    reportQuery.data?.verification_id === id &&
+    reportQuery.data.execution_id === bundle.session.execution_id &&
+    reportQuery.data.criteria_version.id === bundle.criteria_version.id &&
+    reportQuery.data.criteria_version.digest === bundle.criteria_version.digest
+      ? reportQuery.data
+      : undefined;
+  useEffect(() => {
+    if (!id && items.length) {
+      const initial =
+        items.find((item) => item.session.execution_id === execution) ||
+        (!execution ? items[0] : undefined);
+      if (initial) setId(initial.session.id);
+    }
+  }, [id, items, execution]);
+  const choose = (item: VerificationBundle) => {
+    setId(item.session.id);
+    setExecution(item.session.execution_id);
+    setError("");
+  };
+  const run = async (work: () => Promise<VerificationBundle>) => {
+    setBusy(true);
+    setError("");
+    try {
+      const next = await work();
+      choose(next);
+      query.setQueryData(["verification", token, next.session.id], next);
+      await query.invalidateQueries({ queryKey: ["verifications"] });
+      await query.invalidateQueries({
+        queryKey: ["verification-report", token, next.session.id],
+      });
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const refresh = () => {
+    void history.refetch();
+    if (id) {
+      void selected.refetch();
+      void reportQuery.refetch();
+    }
+  };
+  const disconnect = () => {
+    setToken("");
+    for (const key of [
+      "verification",
+      "verifications",
+      "verification-report",
+      "verification-artifact",
+    ])
+      query.removeQueries({ queryKey: [key] });
+  };
+  return (
+    <div className="execution-workspace verification-workspace verification-lab">
+      <div className="verification-heading">
+        <div>
+          <p className="verification-kicker">
+            <span>{token ? "OPERATOR CONNECTED" : "PROTECTED EVIDENCE"}</span>{" "}
+            INDEPENDENT OUTCOME VALIDATION
+          </p>
+          <h1>Verification Lab</h1>
+          <p>
+            Independent outcome validation — verify the result with recorded
+            evidence.
+          </p>
+        </div>
+        <div className="verification-heading-actions">
+          <a href="#verification-ledger">
+            <History size={15} /> Audit Ledger
+          </a>
+          <button
+            onClick={refresh}
+            disabled={!token || selected.isFetching || history.isFetching}
+          >
+            <RefreshCw size={15} /> Refresh evidence
+          </button>
+        </div>
+      </div>
+      <details className="execution-panel verification-access" open={!token}>
+        <summary>
+          {token
+            ? "Operator connected · Manage access"
+            : "Connect to protected evidence"}
+        </summary>
+        <form
+          className="execution-auth"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setToken(draft.trim());
+          }}
+        >
+          <label>
+            Operator token
+            <input
+              type="password"
+              autoComplete="off"
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              placeholder="Local operator capability"
+            />
+          </label>
+          <button disabled={!draft.trim() || busy}>Connect</button>
+          {token && (
+            <button type="button" onClick={disconnect}>
+              Disconnect
+            </button>
+          )}
+          <small>
+            Capability stays in memory. Verification reads application state
+            independently.
+          </small>
+        </form>
+      </details>
+      {(error || history.error || selected.error || reportQuery.error) && (
+        <p role="alert" className="execution-error">
+          {error ||
+            errorMessage(history.error || selected.error || reportQuery.error)}
+          {(selected.isError || reportQuery.isError) &&
+            " Current evidence unavailable. No verified verdict is displayed."}
+        </p>
+      )}
+      <VerificationMetrics bundle={bundle} report={report} />
+      <VerificationPipeline bundle={bundle} report={report} />
+      <div className="verification-section-heading">
+        <div>
+          <p className="verification-kicker">Independent proof inspection</p>
+          <h2>State Differential Engine</h2>
+        </div>
+        <label>
+          Selected verification
+          <select
+            aria-label="Selected verification"
+            value={items.some((item) => item.session.id === id) ? id : ""}
+            onChange={(event) => {
+              const item = items.find(
+                (item) => item.session.id === event.target.value,
+              );
+              if (item) choose(item);
+            }}
+          >
+            <option value="">Choose a saved case</option>
+            {items.map((item) => (
+              <option key={item.session.id} value={item.session.id}>
+                {item.session.id.slice(0, 8)} · {item.session.status}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      {bundle ? (
+        <>
+          <VerificationOverview bundle={bundle} report={report} compact />
+          <div className="verification-proof-grid">
+            <div>
+              <p className="verification-proof-label">
+                EXPECTED STATE / APPROVED CONTRACT
+              </p>
+              <CriteriaInspector bundle={bundle} />
+            </div>
+            <div>
+              <p className="verification-proof-label">
+                OBSERVED STATE / INDEPENDENT EVIDENCE
+              </p>
+              <EvidenceViewer
+                key={`${token}:${id}`}
+                bundle={bundle}
+                token={token}
+              />
+            </div>
+          </div>
+          {report && <ExecutionVerificationComparison report={report} />}
+          <div className="execution-panel verification-case-controls">
+            <span>Case actions</span>
+            <button
+              disabled={busy || verificationTerminal.has(bundle.session.status)}
+              onClick={() => {
+                if (window.confirm("Cancel this verification?"))
+                  void run(() => verificationApi.cancel(id, token));
+              }}
+            >
+              Cancel verification
+            </button>
+            <button
+              disabled={
+                busy || !verificationTerminal.has(bundle.session.status)
+              }
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Collect a new independent evidence set for this execution?",
+                  )
+                )
+                  void run(() =>
+                    verificationApi.create(
+                      bundle.session.execution_id,
+                      token,
+                      `recheck-${crypto.randomUUID()}`,
+                    ),
+                  );
+              }}
+            >
+              <RefreshCw size={14} /> Collect fresh evidence again
+            </button>
+            <button
+              disabled={reportQuery.isFetching}
+              onClick={() => void reportQuery.refetch()}
+            >
+              Recheck evidence integrity
+            </button>
+          </div>
+          <VerificationTimeline
+            key={`${token}:${id}`}
+            id={id}
+            execution={bundle.session.execution_id}
+            token={token}
+          />
+          {report && <ReportViewer report={report} />}
+        </>
+      ) : (
+        <section className="execution-panel verification-empty">
+          <ShieldCheck size={30} />
+          <h2>Evidence before conclusions</h2>
+          <p>
+            {token
+              ? "Choose a saved verification or enter an execution below to collect independent evidence."
+              : "Connect an operator to review approved criteria, protected evidence and independent verdicts."}
+          </p>
+          <small>
+            A completed execution does not prove a persisted business outcome.
+          </small>
+        </section>
+      )}
+      <VerificationLedger
+        items={items}
+        total={!history.isError ? history.data?.total || 0 : 0}
+        offset={offset}
+        select={choose}
+        previous={() => setOffset(Math.max(0, offset - 20))}
+        next={() => setOffset(offset + 20)}
+      />
+      <details className="execution-panel verification-manual">
+        <summary>Run Manual Verification</summary>
+        <p className="execution-help">
+          Loads the approved criteria and collects fresh evidence. This creates
+          a verification record; it does not edit inventory.
+        </p>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (token && execution.trim() && !busy)
+              void run(() => verificationApi.create(execution.trim(), token));
+          }}
+        >
+          <label>
+            Execution ID
+            <input
+              value={execution}
+              onChange={(event) => setExecution(event.target.value)}
+              placeholder="Completed or stopped execution UUID"
+            />
+          </label>
+          <button disabled={!token || !execution.trim() || busy}>
+            <ShieldCheck size={15} /> Verify execution
+          </button>
+        </form>
+        {busy && <p role="status">Processing verification request…</p>}
+      </details>
+    </div>
+  );
+}
+
+function VerificationTimeline({
+  id,
+  execution,
+  token,
+}: {
+  id: string;
+  execution: string;
+  token: string;
+}) {
+  const query = useQueryClient();
   const events = useRecordEvents(
     id,
-    selected.data?.session.execution_id || "",
+    execution,
     token,
     "verification_id",
     verificationApi.events,
@@ -74,225 +378,20 @@ export function VerificationPage() {
       });
     },
   );
-  const run = async (work: () => Promise<VerificationBundle>) => {
-    setBusy(true);
-    setError("");
-    try {
-      const next = await work();
-      setId(next.session.id);
-      setExecution(next.session.execution_id);
-      query.setQueryData(["verification", token, next.session.id], next);
-      await query.invalidateQueries({ queryKey: ["verifications"] });
-    } catch (e) {
-      setError(errorMessage(e));
-    } finally {
-      setBusy(false);
-    }
-  };
-  const disconnect = () => {
-    setToken("");
-    setDraft("");
-    setId("");
-    query.removeQueries({ queryKey: ["verification"] });
-    query.removeQueries({ queryKey: ["verifications"] });
-    query.removeQueries({ queryKey: ["verification-report"] });
-  };
   return (
-    <div className="execution-workspace verification-workspace">
-      <div className="page-heading">
-        <div>
-          <p className="eyebrow">DEFINE SUCCESS · COLLECT EVIDENCE · DECIDE</p>
-          <h1>Verification Center</h1>
-          <p>
-            Independent, read-only evidence for the original task objective.
-          </p>
-        </div>
-        <span className="execution-chip">PHASE 05</span>
-      </div>
-      <form
-        className="execution-auth"
-        onSubmit={(event) => {
-          event.preventDefault();
-          setToken(draft);
-          setId("");
-          setError("");
-        }}
-      >
-        <label>
-          Operator token
-          <input
-            type="password"
-            autoComplete="off"
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            placeholder="Local operator capability"
-          />
-        </label>
-        <button disabled={!draft || busy}>Connect</button>
-        {token && (
-          <button type="button" onClick={disconnect}>
-            Disconnect
-          </button>
-        )}
-        <small>
-          Capability stays in memory. Verification cannot edit the application.
-        </small>
-      </form>
-      {(error || history.error || selected.error || report.error) && (
-        <p role="alert" className="execution-error">
-          {error ||
-            errorMessage(history.error || selected.error || report.error)}
-        </p>
-      )}
-      <div className="execution-layout">
-        <aside className="execution-panel">
-          <h2>Verify an execution</h2>
-          <label>
-            Execution ID
-            <input
-              value={execution}
-              onChange={(event) => setExecution(event.target.value)}
-              placeholder="Completed or stopped execution UUID"
-            />
-          </label>
-          <button
-            disabled={!token || !execution || busy}
-            onClick={() =>
-              void run(() => verificationApi.create(execution, token))
-            }
-          >
-            <ShieldCheck size={15} /> Verify execution
-          </button>
-          <p className="execution-help">
-            Loads the approved criteria and collects fresh evidence. Repeated
-            requests return the same verification for that criteria version.
-          </p>
-          {busy && <p role="status">Processing verification request…</p>}
-          <h2>Verification history</h2>
-          {history.isFetching && <small>Refreshing saved records…</small>}
-          {history.data?.items.length === 0 && (
-            <p>No verification records yet.</p>
-          )}
-          <div className="execution-history">
-            {history.data?.items.map((item) => (
-              <button
-                key={item.session.id}
-                aria-pressed={id === item.session.id}
-                onClick={() => {
-                  setId(item.session.id);
-                  setExecution(item.session.execution_id);
-                  setError("");
-                }}
-              >
-                <strong>
-                  {item.session.final_verdict || item.session.status}
-                </strong>
-                <span>{item.criteria_version.objective}</span>
-                <small>
-                  {new Date(item.session.started_at).toLocaleString()}
-                </small>
-              </button>
-            ))}
-          </div>
-          <div className="execution-controls">
-            <button
-              disabled={offset === 0}
-              onClick={() => setOffset(Math.max(0, offset - 20))}
-            >
-              Previous
-            </button>
-            <button
-              disabled={!history.data || offset + 20 >= history.data.total}
-              onClick={() => setOffset(offset + 20)}
-            >
-              Next
-            </button>
-          </div>
-        </aside>
-        <section className="execution-main">
-          {!selected.data ? (
-            <div className="execution-panel">
-              <FileCheck2 size={28} />
-              <h2>Evidence before conclusions</h2>
-              <p>
-                Connect to review verification history, or enter an execution ID
-                to collect independent evidence.
-              </p>
-              <p className="execution-help">
-                A completed browser workflow and a saved confirmation message do
-                not prove a persisted business outcome.
-              </p>
-            </div>
-          ) : (
-            <>
-              <VerificationOverview
-                bundle={selected.data}
-                report={report.data}
-                clock={clock}
-              />
-              <div className="execution-panel execution-controls">
-                <button
-                  disabled={
-                    busy ||
-                    verificationTerminal.has(selected.data.session.status)
-                  }
-                  onClick={() =>
-                    void run(() => verificationApi.cancel(id, token))
-                  }
-                >
-                  Cancel verification
-                </button>
-                <button
-                  disabled={
-                    busy ||
-                    !verificationTerminal.has(selected.data.session.status)
-                  }
-                  onClick={() =>
-                    void run(() =>
-                      verificationApi.create(
-                        selected.data!.session.execution_id,
-                        token,
-                        `recheck-${crypto.randomUUID()}`,
-                      ),
-                    )
-                  }
-                >
-                  <RefreshCw size={15} /> Collect fresh evidence again
-                </button>
-                <button
-                  disabled={report.isFetching}
-                  onClick={() => void report.refetch()}
-                >
-                  Recheck evidence integrity
-                </button>
-              </div>
-              {report.data && (
-                <ExecutionVerificationComparison report={report.data} />
-              )}
-              <CriteriaInspector bundle={selected.data} />
-              <EvidenceViewer bundle={selected.data} token={token} />
-              <section className="execution-panel">
-                <h2>
-                  Verification timeline <small>{events.connection}</small>
-                </h2>
-                <ol className="execution-events">
-                  {events.events.map((event) => (
-                    <li key={event.id}>
-                      <time>
-                        {new Date(event.timestamp).toLocaleTimeString()}
-                      </time>
-                      <strong>{event.event_type}</strong>
-                      <small>#{event.sequence}</small>
-                    </li>
-                  ))}
-                </ol>
-              </section>
-              {report.data && <ReportViewer report={report.data} />}
-            </>
-          )}
-        </section>
-      </div>
-    </div>
+    <details className="execution-panel verification-timeline">
+      <summary>Verification timeline · {events.connection}</summary>
+      <ol className="execution-events">
+        {events.events.map((event) => (
+          <li key={event.id}>
+            <time>{new Date(event.timestamp).toLocaleTimeString()}</time>
+            <strong>{event.event_type}</strong>
+            <small>#{event.sequence}</small>
+          </li>
+        ))}
+      </ol>
+      {!events.events.length && <p>No events available for this case.</p>}
+    </details>
   );
 }
 
@@ -300,10 +399,12 @@ export function VerificationOverview({
   bundle,
   report,
   clock = Date.now(),
+  compact = false,
 }: {
   bundle: VerificationBundle;
   report?: VerificationReport;
   clock?: number;
+  compact?: boolean;
 }) {
   const session = bundle.session;
   const elapsed = Math.max(
@@ -322,27 +423,29 @@ export function VerificationOverview({
         </div>
         <VerdictBadge verdict={report?.effective_verdict} />
       </div>
-      <div className="execution-metrics">
-        <div>
-          <small>Criteria evaluated</small>
-          <strong>
-            {session.criteria_results.length} /{" "}
-            {bundle.criteria_version.criteria.length}
-          </strong>
+      {!compact && (
+        <div className="execution-metrics">
+          <div>
+            <small>Criteria evaluated</small>
+            <strong>
+              {session.criteria_results.length} /{" "}
+              {bundle.criteria_version.criteria.length}
+            </strong>
+          </div>
+          <div>
+            <small>Evidence records</small>
+            <strong>{bundle.evidence.length}</strong>
+          </div>
+          <div>
+            <small>Verification duration</small>
+            <strong>{elapsed.toFixed(1)}s</strong>
+          </div>
+          <div>
+            <small>Criteria version</small>
+            <strong>v{bundle.criteria_version.version}</strong>
+          </div>
         </div>
-        <div>
-          <small>Evidence records</small>
-          <strong>{bundle.evidence.length}</strong>
-        </div>
-        <div>
-          <small>Verification duration</small>
-          <strong>{elapsed.toFixed(1)}s</strong>
-        </div>
-        <div>
-          <small>Criteria version</small>
-          <strong>v{bundle.criteria_version.version}</strong>
-        </div>
-      </div>
+      )}
       <p className="execution-help">
         The verifier obtains fresh application state through a separate
         read-only interface. Execution completion does not determine this
@@ -507,6 +610,7 @@ function EvidenceViewer({
   });
   useEffect(() => {
     if (
+      content.isError ||
       !content.data ||
       !selected ||
       selected.metadata.content_type !== "image/png"
@@ -515,7 +619,7 @@ function EvidenceViewer({
     const url = URL.createObjectURL(content.data.blob);
     setImage({ id: selected.id, url });
     return () => URL.revokeObjectURL(url);
-  }, [content.data, selected]);
+  }, [content.data, content.isError, selected]);
   return (
     <section className="execution-panel">
       <h2>Evidence viewer</h2>
@@ -535,28 +639,18 @@ function EvidenceViewer({
           </button>
         ))}
       </div>
+      {selected && (
+        <button
+          disabled={content.isFetching}
+          onClick={() => void content.refetch()}
+        >
+          Reload artifact
+        </button>
+      )}
       {!selected ? (
         <p>No evidence collected yet.</p>
       ) : (
         <>
-          <dl className="execution-inspector">
-            <dt>Source</dt>
-            <dd>{selected.source}</dd>
-            <dt>Captured</dt>
-            <dd>{new Date(selected.captured_at).toLocaleString()}</dd>
-            <dt>Collection method</dt>
-            <dd>{selected.metadata.collection_method}</dd>
-            <dt>Record</dt>
-            <dd>{selected.metadata.target_record_id}</dd>
-            <dt>SHA-256</dt>
-            <dd>{selected.content_hash}</dd>
-            <dt>Artifact reference</dt>
-            <dd>{selected.artifact_reference}</dd>
-            <dt>Data store</dt>
-            <dd>
-              {selected.metadata.source_store_id || "Supplementary evidence"}
-            </dd>
-          </dl>
           {content.isFetching && (
             <p role="status">Loading protected evidence…</p>
           )}
@@ -565,7 +659,8 @@ function EvidenceViewer({
               {errorMessage(content.error)}
             </p>
           )}
-          {selected.metadata.content_type === "image/png" &&
+          {!content.isError &&
+            selected.metadata.content_type === "image/png" &&
             image?.id === selected.id && (
               <div className="execution-screen">
                 <img
@@ -574,7 +669,28 @@ function EvidenceViewer({
                 />
               </div>
             )}
-          {content.data?.text && (
+          <details className="verification-provenance">
+            <summary>Evidence provenance and SHA-256</summary>
+            <dl className="execution-inspector">
+              <dt>Source</dt>
+              <dd>{selected.source}</dd>
+              <dt>Captured</dt>
+              <dd>{new Date(selected.captured_at).toLocaleString()}</dd>
+              <dt>Collection method</dt>
+              <dd>{selected.metadata.collection_method}</dd>
+              <dt>Record</dt>
+              <dd>{selected.metadata.target_record_id}</dd>
+              <dt>SHA-256</dt>
+              <dd>{selected.content_hash}</dd>
+              <dt>Artifact reference</dt>
+              <dd>{selected.artifact_reference}</dd>
+              <dt>Data store</dt>
+              <dd>
+                {selected.metadata.source_store_id || "Supplementary evidence"}
+              </dd>
+            </dl>{" "}
+          </details>
+          {!content.isError && content.data?.text && (
             <pre className="verification-json">{content.data.text}</pre>
           )}
         </>
@@ -602,24 +718,36 @@ function ReportViewer({ report }: { report: VerificationReport }) {
           <Download size={15} /> Download JSON
         </button>
       </div>
-      <dl className="execution-inspector">
-        <dt>Task ID</dt>
-        <dd>{report.task_id}</dd>
-        <dt>Execution ID</dt>
-        <dd>{report.execution_id}</dd>
-        <dt>Verification ID</dt>
-        <dd>{report.verification_id}</dd>
-        <dt>Criteria digest</dt>
-        <dd>{report.criteria_version.digest}</dd>
-        <dt>Historical verdict</dt>
-        <dd>{report.final_verdict || "Pending"}</dd>
-      </dl>
-      <h3>Limitations</h3>
-      <ul className="verification-limitations">
-        {report.limitations.map((item, index) => (
-          <li key={`${index}:${item}`}>{item}</li>
-        ))}
-      </ul>
+      <details className="verification-report-details">
+        <summary>Report provenance, integrity checks and limitations</summary>
+        <dl className="execution-inspector">
+          <dt>Task ID</dt>
+          <dd>{report.task_id}</dd>
+          <dt>Execution ID</dt>
+          <dd>{report.execution_id}</dd>
+          <dt>Verification ID</dt>
+          <dd>{report.verification_id}</dd>
+          <dt>Criteria digest</dt>
+          <dd>{report.criteria_version.digest}</dd>
+          <dt>Historical verdict</dt>
+          <dd>{report.final_verdict || "Pending"}</dd>
+        </dl>
+        <h3>Limitations</h3>
+        <ul className="verification-limitations">
+          {report.limitations.map((item, index) => (
+            <li key={`${index}:${item}`}>{item}</li>
+          ))}
+        </ul>
+        <ul className="verification-integrity-list">
+          {report.integrity_checks.map((check) => (
+            <li key={check.evidence_id}>
+              <code>{check.evidence_id}</code>
+              <span>{check.intact ? "INTACT" : "FAILED"}</span>
+              {check.error && <p>{check.error}</p>}
+            </li>
+          ))}
+        </ul>
+      </details>
       <details>
         <summary>Structured report</summary>
         <pre>{JSON.stringify(report, null, 2)}</pre>

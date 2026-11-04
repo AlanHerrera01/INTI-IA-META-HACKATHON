@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Link,
@@ -78,6 +78,12 @@ export function MissionControl() {
   });
   const canModel =
     !!model.data?.configured && !!overview.data?.model_calls_enabled;
+  useEffect(() => {
+    if (search.get("connect") === "1")
+      document.getElementById("mission-token")?.focus();
+    if (search.get("compose") === "1" && !id)
+      document.getElementById("mission-objective")?.focus();
+  }, [search, id]);
   const run = async (work: () => Promise<unknown>) => {
     setBusy(true);
     setError("");
@@ -111,59 +117,43 @@ export function MissionControl() {
             ))}
           </div>
         </div>
-        <Radar size={88} strokeWidth={0.65} aria-hidden="true" />
+        <div className="mission-hero-actions">
+          <span className="workspace-tag">LOCAL WORKSPACE</span>
+          <Link className="button secondary" to="/execution">
+            <Play size={15} aria-hidden="true" /> Inspect execution
+          </Link>
+          <Radar size={48} strokeWidth={0.8} aria-hidden="true" />
+        </div>
       </div>
-      <div className="mission-status-grid" aria-label="System overview">
-        <Health
-          label="Backend"
-          value={
-            system.error
-              ? "Unavailable"
-              : system.data?.backend
-                ? "Online"
-                : "Checking"
-          }
-        />
-        <Health
-          label="Browser engine"
-          value={
-            system.data?.browser
-              ? "Ready"
-              : system.error
-                ? "Unknown"
-                : "Checking"
-          }
-        />
-        <Health
-          label="Database"
-          value={
-            system.data?.database
-              ? "Connected"
-              : system.error
-                ? "Unknown"
-                : "Checking"
-          }
-        />
-        <Health
-          label="Meta model"
-          value={
-            model.data?.available === true
-              ? "Verified available"
-              : model.data?.configured
-                ? "Configured · unverified"
-                : model.data
-                  ? "Not configured"
-                  : "Checking"
-          }
-        />
-        <Health
-          label="Active executions"
-          value={
-            overview.data
-              ? String(overview.data.active_executions)
-              : "Connect to inspect"
-          }
-        />
+      <div className="overview-metrics" aria-label="Mission overview">
+        <div className="overview-metric">
+          <span>Stored missions</span>
+          <strong>{overview.data?.mission_count ?? "\u2014"}</strong>
+          <small>Persistent task history</small>
+        </div>
+        <div className="overview-metric">
+          <span>Active executions</span>
+          <strong className="accent">
+            {overview.data?.active_executions ?? "\u2014"}
+          </strong>
+          <small>Current browser activity</small>
+        </div>
+        <div className="overview-metric">
+          <span>Latest independent verdict</span>
+          <Link
+            className="overview-verdict"
+            to="/verification"
+            aria-label="Inspect independent verification"
+          >
+            <VerdictBadge verdict={overview.data?.latest_verdict} />
+          </Link>
+          <small>Stored evidence integrity checked</small>
+        </div>
+        <div className="overview-metric">
+          <span>Local verification trials</span>
+          <strong>{source?.data.scenarios ?? "\u2014"}</strong>
+          <small>Measured fault trials · no model</small>
+        </div>
       </div>
       <OperatorConnection />
       {(error || overview.error || mission.error || system.error) && (
@@ -296,8 +286,8 @@ export function MissionControl() {
           <section className="mission-card">
             <div className="mission-section-title">
               <h2>Recent missions</h2>
-              <Link className="mission-link" to="/">
-                New task <ArrowRight size={13} />
+              <Link className="mission-link" to="/tasks">
+                All tasks <ArrowRight size={13} />
               </Link>
             </div>
             {!token && (
@@ -309,7 +299,7 @@ export function MissionControl() {
               <p>No missions yet. Create a task above to begin.</p>
             )}
             <div className="mission-list">
-              {overview.data?.missions.map((m) => (
+              {overview.data?.missions.slice(0, 5).map((m) => (
                 <Link to={`/missions/${m.id}`} key={m.id}>
                   <div>
                     <strong>{m.objective}</strong>
@@ -351,6 +341,59 @@ export function MissionControl() {
         <aside className="mission-secondary">
           <section className="mission-card">
             <div className="mission-section-title">
+              <h2>Runtime status</h2>
+              <span className="workspace-tag">LOCAL</span>
+            </div>
+            <div className="runtime-health-grid">
+              <Health
+                label="Backend"
+                value={
+                  system.error
+                    ? "Unavailable"
+                    : system.data?.backend
+                      ? "Online"
+                      : "Checking"
+                }
+              />
+              <Health
+                label="Browser"
+                value={
+                  system.data?.browser
+                    ? "Ready"
+                    : system.error
+                      ? "Unknown"
+                      : "Checking"
+                }
+              />
+              <Health
+                label="Database"
+                value={
+                  system.data?.database
+                    ? "Connected"
+                    : system.error
+                      ? "Unknown"
+                      : "Checking"
+                }
+              />
+              <Health
+                label="Meta model"
+                value={
+                  model.data?.available === true
+                    ? "Verified available"
+                    : model.data?.configured
+                      ? "Configured ? unverified"
+                      : model.data
+                        ? "Not configured"
+                        : "Checking"
+                }
+              />
+            </div>
+            <Link className="mission-link" to="/system">
+              Inspect system <ArrowRight size={14} />
+            </Link>
+          </section>
+          <section className="mission-card">
+            <div className="mission-section-title">
               <h2>Evaluation snapshot</h2>
               <FlaskConical size={18} className="accent" />
             </div>
@@ -381,21 +424,6 @@ export function MissionControl() {
             )}
             <Link className="mission-link" to="/benchmarks">
               Inspect Benchmark Lab <ArrowRight size={14} />
-            </Link>
-          </section>
-          <section className="mission-card">
-            <div className="mission-section-title">
-              <h2>Latest independent verdict</h2>
-              <ShieldCheck size={17} className="accent" />
-            </div>
-            <VerdictBadge verdict={overview.data?.latest_verdict} />
-            <p className="mission-muted">
-              {overview.data?.latest_verdict
-                ? "Historical report verdict, with stored evidence integrity checked."
-                : "No verification verdict is stored yet. Execution completion is not a verdict."}
-            </p>
-            <Link className="mission-link" to="/verification">
-              Open Verification Center <ArrowRight size={14} />
             </Link>
           </section>
           <section className="mission-card">
@@ -460,7 +488,7 @@ export function MissionControl() {
               integrity.
             </p>
             <div className="mission-list">
-              {overview.data?.recent_verifications.map((v) => (
+              {overview.data?.recent_verifications.slice(0, 3).map((v) => (
                 <Link
                   key={v.session.id}
                   to={`/verification?verification=${v.session.id}&execution=${v.session.execution_id}`}

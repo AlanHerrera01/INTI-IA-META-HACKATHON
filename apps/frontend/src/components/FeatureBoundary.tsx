@@ -1,4 +1,15 @@
 import { Component, type ReactNode } from "react";
+import { useLocale } from "../i18n/useLocale";
+export function WorkspaceError() {
+  const { t } = useLocale();
+  return (
+    <div role="alert">
+      {t(
+        "This workspace could not render. Reload to reconnect with saved records.",
+      )}
+    </div>
+  );
+}
 export class FeatureBoundary extends Component<
   { children: ReactNode },
   { failed: boolean }
@@ -8,12 +19,6 @@ export class FeatureBoundary extends Component<
     return { failed: true };
   }
   render() {
-    return this.state.failed ? (
-      <div role="alert">
-        This workspace could not render. Reload to reconnect with saved records.
-      </div>
-    ) : (
-      this.props.children
-    );
+    return this.state.failed ? <WorkspaceError /> : this.props.children;
   }
 }

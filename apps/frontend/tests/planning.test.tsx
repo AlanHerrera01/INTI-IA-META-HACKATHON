@@ -1,13 +1,26 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  within,
+  waitFor,
+} from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import { PlanningPage } from "../src/pages/PlanningPage";
 import { api } from "../src/services/api";
 import { planningApi } from "../src/services/planningApi";
 import type { PlanningResult } from "../src/types/planning";
 
 vi.mock("../src/services/api", () => ({
-  api: { observations: vi.fn(), observation: vi.fn(), model: vi.fn() },
+  api: {
+    observations: vi.fn(),
+    observation: vi.fn(),
+    model: vi.fn(),
+    capabilities: vi.fn(),
+  },
   errorMessage: (e: Error) => e.message,
 }));
 vi.mock("../src/services/planningApi", () => ({
@@ -132,23 +145,27 @@ const result: PlanningResult = {
   ended_at: "2026-10-28T12:00:01Z",
   correlation_id: "test-correlation",
 };
-function mount() {
-  return render(
-    <QueryClientProvider
-      client={
-        new QueryClient({
-          defaultOptions: {
-            queries: { retry: false },
-            mutations: { retry: false },
-          },
-        })
-      }
-    >
-      <PlanningPage />
+function mount(entry = "/planning") {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  const view = render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={[entry]}>
+        <PlanningPage />
+      </MemoryRouter>
     </QueryClientProvider>,
   );
+  return { ...view, client };
 }
 beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(api.capabilities).mockResolvedValue({
+    model_calls_enabled: true,
+    execution_enabled: true,
+    verification_enabled: true,
+    recovery_enabled: true,
+  });
   vi.mocked(api.observations).mockResolvedValue([observation]);
   vi.mocked(api.observation).mockResolvedValue(observation);
   vi.mocked(api.model).mockResolvedValue({
@@ -187,16 +204,21 @@ it("generates and renders a typed plan, overlays and warnings", async () => {
   });
   fireEvent.click(screen.getByRole("button", { name: "Generate Plan" }));
   expect(
-    await screen.findByRole("heading", { name: "Action plan" }),
+    await screen.findByRole("heading", { name: "Compiled Execution Tree" }),
   ).toBeInTheDocument();
   expect(screen.getByText("Inspect search input")).toBeInTheDocument();
+  fireEvent.click(screen.getByText("Visual evidence & target bounds"));
   expect(
     screen.getByRole("button", { name: "Inspect Search equipment" }),
   ).toBeInTheDocument();
   expect(
     screen.getAllByText(/Desired status is unspecified/).length,
   ).toBeGreaterThan(0);
-  expect(screen.getByText("test-only-model")).toBeInTheDocument();
+  expect(
+    within(
+      screen.getByRole("region", { name: "Active Intelligence Engine" }),
+    ).getByText("test-only-model"),
+  ).toBeInTheDocument();
 });
 it("displays model request error", async () => {
   vi.mocked(planningApi.generate).mockRejectedValue(
@@ -236,4 +258,80 @@ it("explains missing credentials", async () => {
   mount();
   expect(await screen.findByText(/Meta is not configured/)).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Generate Plan" })).toBeDisabled();
+});
+
+it("keeps model actions disabled when the server disallows calls even with configured credentials", async () => {
+  vi.mocked(api.capabilities).mockResolvedValue({
+    model_calls_enabled: false,
+    execution_enabled: true,
+    verification_enabled: true,
+    recovery_enabled: true,
+  });
+  mount();
+  await screen.findByRole("option", { name: /Synthetic inventory/ });
+  await screen.findByText(/Real model calls are disabled/);
+  expect(screen.getByRole("button", { name: "Generate Plan" })).toBeDisabled();
+  expect(
+    screen.getByRole("button", { name: "Interpret scene" }),
+  ).toBeDisabled();
+  fireEvent.keyDown(screen.getByLabelText("Natural-language objective"), {
+    ctrlKey: true,
+    key: "Enter",
+  });
+  expect(planningApi.generate).not.toHaveBeenCalled();
+  expect(planningApi.interpret).not.toHaveBeenCalled();
+});
+it("shows saved plans without model calls and reset does not reload a linked plan", async () => {
+  vi.mocked(planningApi.get).mockResolvedValue(result);
+  mount("/planning?plan=test-plan");
+  await screen.findByRole("heading", { name: "Compiled Execution Tree" });
+  await waitFor(() =>
+    expect(screen.getByLabelText("Natural-language objective")).toHaveValue(
+      "Find EQ-001",
+    ),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+  expect(screen.getByLabelText("Natural-language objective")).toHaveValue("");
+  expect(
+    screen.getByRole("heading", { name: "No plan selected" }),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByRole("heading", { name: "Compiled Execution Tree" }),
+  ).not.toBeInTheDocument();
+  expect(planningApi.generate).not.toHaveBeenCalled();
+  expect(planningApi.interpret).not.toHaveBeenCalled();
+});
+it("loads the latest saved plan and keeps draft edits during background refresh", async () => {
+  vi.mocked(planningApi.list).mockResolvedValue({
+    items: [result],
+    total: 1,
+    offset: 0,
+    limit: 10,
+  });
+  const { client } = mount();
+  await screen.findByRole("heading", { name: "Compiled Execution Tree" });
+  await waitFor(() =>
+    expect(screen.getByLabelText("Natural-language objective")).toHaveValue(
+      "Find EQ-001",
+    ),
+  );
+  fireEvent.change(screen.getByLabelText("Natural-language objective"), {
+    target: { value: "A new draft objective" },
+  });
+  vi.mocked(planningApi.list).mockResolvedValue({
+    items: [{ ...result, plan: { ...result.plan, goal: "Updated stored goal" } }],
+    total: 1,
+    offset: 0,
+    limit: 10,
+  });
+  await act(async () => {
+    await client.refetchQueries({ queryKey: ["plans"] });
+  });
+  expect(screen.getByLabelText("Natural-language objective")).toHaveValue(
+    "A new draft objective",
+  );
+  expect(
+    screen.getByText(/Saved plan loaded for inspection/),
+  ).toBeInTheDocument();
+  expect(planningApi.generate).not.toHaveBeenCalled();
 });

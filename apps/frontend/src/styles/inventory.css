@@ -1,0 +1,584 @@
+.inventory-workspace {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.inventory-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+}
+.inventory-eyebrow {
+  font: 9px var(--font-mono);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.inventory-eyebrow > span {
+  font-size: 8px;
+  padding: 4px 6px;
+  border-radius: 3px;
+}
+.inventory-connected {
+  color: var(--success);
+  background: #4ae1760c;
+}
+.inventory-disconnected {
+  color: var(--text-muted);
+  background: var(--surface);
+}
+.inventory-heading h1 {
+  font-size: 28px;
+  letter-spacing: -0.8px;
+  margin: 12px 0 8px;
+}
+.inventory-heading > div > p:last-child {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.7;
+  max-width: 780px;
+}
+.inventory-heading-actions {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex: 0 0 300px;
+}
+.inventory-workspace button,
+.inventory-heading-actions a {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 10px 12px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  background: var(--surface-raised);
+  font-size: 11px;
+}
+.inventory-workspace button:hover:not(:disabled) {
+  background: var(--surface-overlay);
+  color: var(--primary);
+}
+.inventory-heading-actions .inventory-open-sandbox {
+  color: #003642;
+  background: var(--primary);
+  font-size: 11px;
+}
+.inventory-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.inventory-metrics > section {
+  background: var(--surface);
+  border-radius: 7px;
+  padding: 21px;
+  min-width: 0;
+}
+.inventory-metrics section > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+}
+.inventory-metrics h2 {
+  font: 10px var(--font-mono);
+  color: var(--text-muted);
+}
+.inventory-metrics section > strong {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 41px;
+  margin: 18px 0 10px;
+  line-height: 1.2;
+}
+.inventory-metrics strong > span {
+  font: 8px var(--font-mono);
+  color: var(--text-secondary);
+}
+.inventory-metrics section:nth-child(2) > strong {
+  color: var(--solar);
+}
+.inventory-metrics section:nth-child(3) > strong {
+  color: var(--success);
+}
+.inventory-metrics p {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+.inventory-toolbar {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 14px;
+  border-radius: 7px;
+  background: var(--sidebar);
+}
+.inventory-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 230px;
+  min-width: 190px;
+  color: var(--text-muted);
+  background: var(--surface);
+  padding: 10px 12px;
+  border-radius: 4px;
+}
+.inventory-search input {
+  background: transparent;
+  color: var(--text-primary);
+  border: 0;
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+}
+.inventory-workspace .inventory-search button {
+  padding: 0;
+  background: transparent;
+}
+.inventory-toolbar > label:not(.inventory-search) {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font: 8px var(--font-mono);
+  color: var(--text-muted);
+}
+.inventory-toolbar select {
+  padding: 8px 9px;
+  background: var(--surface);
+  border: 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+  border-radius: 4px;
+  max-width: 190px;
+}
+.inventory-workspace .inventory-reset {
+  font-size: 10px;
+  padding: 8px;
+  background: transparent;
+}
+.inventory-error {
+  color: var(--error);
+  font-size: 12px;
+  padding: 13px;
+  border: 1px solid #ffb4ab40;
+  border-radius: 5px;
+  background: #ffb4ab08;
+}
+.inventory-error button {
+  margin-left: 10px;
+}
+.inventory-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 18px;
+  align-items: start;
+}
+.inventory-ledger {
+  min-width: 0;
+  background: var(--sidebar);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.inventory-ledger > header {
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--surface);
+}
+.inventory-ledger h2 {
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.inventory-ledger h2 > span {
+  font: 8px var(--font-mono);
+  color: var(--text-secondary);
+  padding: 3px 5px;
+  background: var(--surface-raised);
+}
+.inventory-ledger > header > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.inventory-ledger > header > div > span {
+  font: 8px var(--font-mono);
+  color: var(--primary);
+}
+.inventory-workspace .inventory-ledger header button {
+  padding: 5px;
+  background: transparent;
+}
+.inventory-table-scroll {
+  overflow: auto;
+}
+.inventory-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 590px;
+  font-size: 11px;
+  text-align: left;
+}
+.inventory-table th {
+  padding: 17px 13px;
+  color: var(--text-muted);
+  background: #070e1c;
+  font: 9px var(--font-mono);
+}
+.inventory-table th:first-child {
+  width: 47%;
+}
+.inventory-table td {
+  padding: 21px 13px;
+  color: var(--text-secondary);
+  border-top: 1px solid #3d494c26;
+}
+.inventory-table tr:nth-child(even) {
+  background: #19202e66;
+}
+.inventory-table tr.selected-asset {
+  background: var(--surface-raised);
+}
+.inventory-table tr:hover {
+  background: var(--surface-overlay);
+}
+.inventory-workspace .inventory-select-asset {
+  display: flex;
+  gap: 12px;
+  padding: 0;
+  width: 100%;
+  background: transparent;
+  text-align: left;
+  justify-content: flex-start;
+}
+.inventory-workspace .inventory-select-asset:hover {
+  background: transparent;
+}
+.inventory-asset-icon {
+  color: var(--primary);
+  background: #4cd7f60c;
+  padding: 9px;
+  border-radius: 4px;
+  display: grid;
+  place-content: center;
+  flex-shrink: 0;
+}
+.inventory-select-asset > span:last-child {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+.inventory-select-asset strong {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+.inventory-select-asset small {
+  color: var(--primary);
+  font: 8px var(--font-mono);
+}
+.inventory-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #070e1c;
+  padding: 7px;
+  border-radius: 3px;
+  font-size: 10px;
+}
+.inventory-location svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.inventory-state {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 5px 7px;
+  background: #86939712;
+  color: var(--text-secondary);
+  border-radius: 20px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.inventory-state > i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.inventory-state-operational {
+  color: var(--success);
+  background: #4ae17610;
+}
+.inventory-state-in-use {
+  color: var(--primary);
+  background: #4cd7f610;
+}
+.inventory-state-maintenance {
+  color: var(--solar);
+  background: #ffb95f10;
+}
+.inventory-table td > code {
+  color: var(--text-muted);
+  font: 9px var(--font-mono);
+}
+.inventory-pagination {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #070e1c;
+  padding: 14px 16px;
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+.inventory-pagination > div {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.inventory-pagination > div > span {
+  color: var(--primary);
+  font: 8px var(--font-mono);
+  white-space: nowrap;
+}
+.inventory-workspace .inventory-pagination button {
+  padding: 6px 8px;
+  font-size: 9px;
+}
+.inventory-inspector {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.inventory-inspection-card {
+  background: var(--surface);
+  border-radius: 7px;
+  padding: 17px;
+}
+.inventory-inspection-card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.inventory-inspection-card h2 {
+  font-size: 17px;
+}
+.inventory-inspection-card header > span {
+  color: var(--primary);
+  background: #4cd7f60c;
+  font: 9px var(--font-mono);
+  padding: 4px 5px;
+}
+.inventory-selected-heading {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  padding: 13px;
+  background: var(--sidebar);
+  border-radius: 4px;
+}
+.inventory-selected-heading h3 {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.inventory-selected-heading p {
+  font: 9px var(--font-mono);
+  color: var(--text-muted);
+  margin: 7px 0;
+}
+.inventory-record-facts {
+  margin: 16px 0;
+  padding: 14px;
+  border-radius: 4px;
+  background: #070e1c;
+  display: grid;
+  gap: 15px;
+  font-size: 11px;
+}
+.inventory-record-facts > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  justify-content: space-between;
+}
+.inventory-record-facts dt {
+  color: var(--text-muted);
+}
+.inventory-record-facts dd {
+  margin: 0;
+  color: var(--text-secondary);
+  text-align: right;
+}
+.inventory-record-facts > div:first-child dd {
+  color: var(--primary);
+}
+.inventory-section-label {
+  color: var(--text-muted);
+  font: 9px var(--font-mono);
+  margin: 18px 0 10px;
+}
+.inventory-snapshot {
+  background: #070e1c;
+  padding: 13px;
+  border-radius: 4px;
+}
+.inventory-snapshot p {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+.inventory-snapshot dl {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  font: 9px var(--font-mono);
+}
+.inventory-snapshot dl > div {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+.inventory-snapshot dt {
+  color: var(--text-muted);
+}
+.inventory-snapshot dd {
+  color: var(--primary);
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.inventory-inspector-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.inventory-inspector-actions button,
+.inventory-inspector-actions a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 11px 8px;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  font-size: 10px;
+  flex: 1;
+}
+.inventory-audit-note {
+  display: flex;
+  gap: 11px;
+  padding: 17px;
+  border-radius: 7px;
+  background: var(--surface-raised);
+}
+.inventory-audit-note > svg {
+  color: var(--solar);
+  flex-shrink: 0;
+}
+.inventory-audit-note h2 {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.inventory-audit-note p {
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.8;
+}
+.inventory-audit-note a {
+  display: block;
+  font-size: 10px;
+  color: var(--primary);
+  margin-top: 12px;
+}
+.inventory-empty {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 35px 20px;
+  min-height: 230px;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.inventory-empty svg {
+  color: var(--primary);
+}
+.inventory-empty h3 {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+.inventory-freshness {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 15px;
+  color: var(--text-muted);
+  font: 9px var(--font-mono);
+  line-height: 1.8;
+}
+@media (max-width: 1450px) {
+  .inventory-layout {
+    grid-template-columns: minmax(0, 1fr) 310px;
+    gap: 14px;
+  }
+  .inventory-heading-actions {
+    flex-basis: 235px;
+  }
+  .inventory-table td {
+    padding: 20px 10px;
+  }
+  .inventory-table th {
+    padding: 16px 10px;
+  }
+  .inventory-metrics > section {
+    padding: 18px;
+  }
+}
+@media (max-width: 1050px) {
+  .inventory-layout {
+    grid-template-columns: 1fr;
+  }
+  .inventory-inspector {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .inventory-heading {
+    flex-wrap: wrap;
+  }
+  .inventory-heading-actions {
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+}
+@media (max-width: 700px) {
+  .inventory-metrics,
+  .inventory-inspector {
+    grid-template-columns: 1fr;
+  }
+  .inventory-ledger > header {
+    flex-wrap: wrap;
+  }
+}

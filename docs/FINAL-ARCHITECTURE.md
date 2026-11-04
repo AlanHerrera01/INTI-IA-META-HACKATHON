@@ -1,3 +1,5 @@
+> Default runtime update: the local-computer mode now runs PostgreSQL, backend and frontend, plus an outbound Windows agent on the host. See [README](../README.md). It supports an explicitly authored, digest-approved text-file/Notepad/browser sample with no model calls. The architecture below documents the optional inventory sandbox (`docker-compose.legacy.yml`), whose data is retained.
+
 # INTI AI — Final Architecture
 
 Version: 0.7.0 · Phase 7 · Local single-operator release
@@ -51,7 +53,7 @@ apps/backend/src/inti/
 apps/frontend/src/
   app/             Shell, routing, operator context
   pages/           Mission Control, Planning, Execution, Recovery, Verification,
-                   Benchmark Lab, Observations, System
+                   Analytics & Benchmarks, Observations, System
   components/      Shared UI and metric components
   features/        Domain-specific inspectors and badges
   services/        Typed API clients
@@ -188,14 +190,14 @@ Design tokens in `apps/frontend/src/styles/index.css`:
 
 | Token | Value |
 |---|---|
-| `--bg` | `#0B1220` |
-| `--surface` | `#111C2E` |
-| `--primary` | `#06B6D4` |
-| `--solar` | `#F59E0B` |
-| `--success` | `#22C55E` |
-| `--error` | `#EF4444` |
-| `--text-primary` | `#F8FAFC` |
-| `--text-secondary` | `#94A3B8` |
+| `--bg` | `#0C1321` |
+| `--surface` | `#19202E` |
+| `--primary` | `#4CD7F6` |
+| `--solar` | `#FFB95F` |
+| `--success` | `#4AE176` |
+| `--error` | `#FFB4AB` |
+| `--text-primary` | `#DCE2F6` |
+| `--text-secondary` | `#BCC9CD` |
 
 Alpha variants use `color-mix(in srgb, var(--token) N%, transparent)`. The shell
 provides a skip link, visible focus outlines, responsive navigation, live health
@@ -211,7 +213,7 @@ Mission Control adds:
 
 ## 11. Benchmark evidence
 
-The Benchmark Lab reads only allowlisted, committed reports:
+The Analytics & Benchmarks reads only allowlisted, committed reports:
 
 - `benchmarks/reports/phase-05-verification.json`
 - `benchmarks/reports/phase-02-policy.json`
@@ -277,3 +279,32 @@ disables TLS verification.
 ## 15. Clean-data release check
 
 Run `powershell -ExecutionPolicy Bypass -File .\scripts\verify_clean_start.ps1` after building images. It exports release files, creates fresh capabilities and volumes in a unique temporary project, checks empty history and the initial asset, runs the real authored scenario, then removes only its temporary project/volumes. It preserves the main stack and history. This checks fresh data/configuration with built images, not empty-cache installation. Evidence: `docs/evidence/phase7-clean-start.json`.
+
+The desktop frontend follows the supplied Stitch HTML, with a 288px sidebar, 64px top bar, local Geist/Inter/JetBrains Mono fonts, task ledger, bounded activity view and read-only model/settings views. See [design decisions](FRONTEND-DESIGN-REVIEW.md) for exact palette provenance and deliberate exclusions.
+
+AI Agent Studio (`/planning`) provides the directive editor, compact typed plan tree, focused action inspector and evidence/provenance panels. It loads persisted plans without executing them. Protected observation metadata and screenshots use the operator capability; screenshots are displayed through temporary object URLs. Generation and scene interpretation require both configured model access and the server's model-call capability. Planning grants no execution authority.
+
+The Docker frontend serves its compiled `dist` using the local Vite preview server on port 5173, retaining the API and WebSocket proxies. Development outside Docker uses `npm run dev`. Serving compiled assets avoids mixing cached development dependency chunks after rebuilding or switching local servers.
+
+Visual Observations (`/observations`, `/observations/:id`) combines the latest public captures with operator-authorized evidence referenced by the latest ten plans. Its desktop workbench provides a searchable gallery, raw/recorded-bounds display, viewport facts, recorded element provenance and PNG export. Bounds require a matching observation ID and viewport and valid coordinates; selecting a target does not execute it. Protected screenshot object URLs are revoked on replacement/unmount. Missing FPS, latency, segmentation masks and model interpretation remain explicitly unavailable.
+
+Live Execution (`/execution`) arranges the approved action stream, protected browser frame and recorded state/trace/verification in three desktop columns. Connecting opens the latest saved execution for inspection. Terminal records keep execution commands disabled and label screenshots as saved evidence. Approval dialogs freeze the reviewed digest and actions and reject a changed selection or manifest. Event state is scoped to execution and operator; WebSocket and REST maintain separate cursors, and stale responses are ignored. Step counts use the latest result per manifest action; recorded timing samples exclude invalid durations. Task success continues to come from the independent report, not execution completion alone.
+
+Task Manager (`/tasks`) displays the paginated mission ledger and a focused evidence inspector. It requests at most twenty mission details for the loaded page, using each detail's revalidated independent report. Lifecycle/search/date/preparation filters and recovered/verified counters are scoped to that page; only the stored-task total is global. Failed refreshes and mismatched mission IDs cannot supply evidence or success badges. The inspector reuses the protected observation viewer, latest-result execution metrics and existing mission/execution/verification links. JSON downloads describe the visible ledger scope or selected task detail and do not contain the operator capability.
+
+Recovery Center (`/recovery`) presents protected before/fresh screenshots around a recorded five-stage pipeline, with scoped metrics, events, diagnoses and audit facts. Missing recovery records remain explicitly empty. The resolved-case ratio excludes cancelled/escalated sessions; duration samples require valid closed-session timestamps. Case/capability changes remount the event stream and revoke screenshot object URLs. Plan/HIGH approval uses the reviewed digest and snapshot, while cancellation and budget-permitted retry require explicit confirmation. A failed case refresh cannot retain evidence or active commands. Recovery success remains separate from independent task verification. The current browser evidence covers an empty real history; non-empty states and authorization flows use unit fixtures, without real model calls.
+
+Hardware & IT Inventory (`/inventory`) is a native connected-app catalog over the existing sandbox records. A frontend server adapter exposes only exact GET/HEAD `/inventory-data`, maps it to the fixed configured origin's `/api/inventory`, rejects writes/extra paths/query routing and redirects, and validates the returned asset schema. `INVENTORY_PROXY_TARGET` defaults to localhost:8001 for native development and demo:8001 in Docker. The adapter is installed in both Vite dev and compiled-preview servers. No backend or sandbox endpoints, DOM, allowlist or persisted rows change. The view provides full-snapshot filters, five-row pagination, current-record inspection and JSON downloads; stale data is withdrawn on read failure. Versions are not represented as audit seals, and unsupported custody/specification/certification/history fields remain explicitly unrecorded.
+
+Verification Lab (`/verification`) displays selected-case criterion/evidence/integrity metrics, a four-stage recorded pipeline, approved expected values beside protected observed artifacts, and a paginated historical ledger. Only a revalidated report matching verification, execution, criteria version and digest can provide the effective verdict or report export. Report, case and artifact refresh failures withdraw their respective cached content. History outcomes are explicitly historical. Operator/case changes remount scoped events and protected artifact viewers; temporary image URLs are revoked. Execution/verification deep links survive operator connection. Cancellation and fresh evidence collection require confirmation; inspection and integrity rechecks use read-only endpoints. Unsupported visual-accuracy/OCR/pHash claims from the mockup are omitted.
+
+AI Models (`/models`) has a dedicated desktop view over existing public read-only model, capability, system and observation endpoints. It distinguishes local adapter configuration, the last real analysis availability and task-request permissions. A refresh performs dependency diagnostics and reads status, never provider inference. Performance/VRAM/precision remain unmeasured; host GPU/RAM telemetry is unavailable. Cards identify the single configured model adapter and actual supporting grounding, browser and independent verification services without claiming SAM or fallback models. The side panel displays real server switches and the latest public saved observation with explicit capture/analysis provenance. Source refresh failures withdraw cached statuses or frames. Configuration guidance names local environment variables without credential entry, registry operations or routing writes. Settings has its own desktop configuration view described below.
+
+
+Settings (`/system`) provides module filters around a desktop operator/vision/inventory/sandbox layout. It reads the existing public model status, capability switches, dependency checks and fixed read-only inventory catalog. Configured credentials, last-analysis availability, enabled feature policy and dependency readiness remain distinct. Unknown or failed sources withdraw their cached values and disable complete diagnostic export. Export selects an explicit public field set and excludes operator capability, input draft, extra API fields and asset rows. Operator access uses the shared in-memory context; loading clears the password input, disconnect clears access, route navigation preserves it and reload clears it. It does not establish personal identity or persist browser storage. Unsupported server-setting saves, editable routing thresholds, webhook/profile/ERP operations and global halt controls are omitted; configuration stays in the local environment and per-execution controls link to Live Execution. No backend, environment or original inventory data changes are introduced.
+
+
+Analytics & Benchmarks (`/benchmarks`) separates archived verifier trials from synthetic planning-policy fixtures through a source selector. Four source-specific metrics retain original denominators and reported means; different methodologies are not combined. An interactive discrete latency bar chart uses valid finite nonnegative per-scenario samples in source order, with keyboard sample selection and explicit millisecond units. It does not imply time trends, pipeline phase timings or model performance. Outcome cards and a searchable scenario table expose archived results; table filters preserve report metric scope. Harness IDs are inspected as archived JSON, not routed into the current workspace execution store. Exports include parsed report data and provenance, while copy uses the backend file SHA-256, explicitly distinct from export bytes and certification. Refresh errors withdraw cached reports and actions, and an explicitly selected missing source is not silently replaced. Empty, invalid or unmeasured data remains explicit. Model leaderboards, unsupported workloads, live throughput and run-suite operations from the mockup are omitted. Browser QA reads existing sources only and does not start evaluations or mutate inventory, server flags or reports.
+
+
+Activity Logs (`/activity`) presents the existing protected recent-event window with five loaded-window counters, source/type/text/time filters, six-entry client pagination, compact cards and an exact metadata inspector. Identity is scoped by source and event ID because forwarded events may appear in multiple streams; counters do not imply global uniqueness, 24-hour totals or security status. The endpoint supplies only ID, source, type and timestamp, so payloads, parent-session links, frames, severity, signing identities and cryptographic proofs are not fabricated. Source links open general workspaces rather than claiming exact-session association. JSON export selects only the four permitted fields with filter/count/read-time scope, and omits overview data, operator capability and raw search text. CSV uses quoting and spreadsheet-formula neutralization. Failed reads and capability changes withdraw cached selection and export access. This view polls under an independent query key, so its automatic reads can pause while shell diagnostics continue; manual refresh remains available and no server execution is paused. Browser acceptance verifies the frozen read timestamp over a full interval, metadata copy, scoped exports, three desktop widths and capability clearing on reload without any HTTP writes or Meta calls.

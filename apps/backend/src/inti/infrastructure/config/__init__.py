@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 from urllib.parse import urlsplit
 
 from pydantic import Field, SecretStr, field_validator
@@ -7,6 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class ConfigurationProvider(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    inti_runtime_mode: Literal["inventory_sandbox", "local_computer"] = "inventory_sandbox"
 
     database_url: SecretStr = SecretStr(
         "postgresql+psycopg://inti:inti@127.0.0.1:5432/inti?connect_timeout=5"

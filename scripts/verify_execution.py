@@ -103,15 +103,15 @@ async def verify(output: Path, run_sandbox: bool) -> None:
             await page.goto("http://127.0.0.1:5173/execution", wait_until="networkidle")
             await page.get_by_label("Operator token").fill(token)
             await page.get_by_role("button", name="Connect", exact=True).click()
-            await page.get_by_role(
-                "button", name="COMPLETED", exact=False
-            ).first.click()
+            await page.get_by_label("Saved execution", exact=True).select_option(
+                bundle["session"]["id"]
+            )
             await page.get_by_alt_text(
                 "Latest execution browser observation"
             ).wait_for()
             await page.get_by_text("Saved event history", exact=True).wait_for()
-            # Clear the token input before capturing the UI; capability remains only in memory.
-            await page.get_by_label("Operator token").fill("")
+            # Connecting clears the input; capability remains only in memory.
+            assert await page.get_by_label("Operator token").input_value() == ""
             await page.screenshot(path=str(output.with_suffix(".png")), full_page=True)
             await page.set_viewport_size({"width": 390, "height": 844})
             await page.screenshot(

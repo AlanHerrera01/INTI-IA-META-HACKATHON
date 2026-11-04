@@ -14,12 +14,12 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  font: 10px monospace;
+  font: 10px var(--font-mono);
   letter-spacing: 1px;
   color: #f6b649;
   border: 1px solid color-mix(in srgb, var(--solar) 26.7%, transparent);
   padding: 9px 12px;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
 }
 .planning-section-title {
   display: flex;
@@ -37,11 +37,11 @@
 .task-input select {
   display: block;
   width: 100%;
-  background: #0a1321;
+  background: var(--bg);
   color: #d5dfed;
-  border: 1px solid #2b3b50;
+  border: 1px solid var(--border);
   padding: 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font:
     12px/1.7 "Segoe UI",
     sans-serif;
@@ -71,7 +71,7 @@
   border: 1px solid color-mix(in srgb, var(--solar) 18.8%, transparent);
   padding: 12px;
   margin-top: 17px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 .planning-warning h3 {
   font-size: 13px;
@@ -105,8 +105,8 @@
 .scene-image {
   position: relative;
   overflow: hidden;
-  border: 1px solid #294058;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 .scene-image > img {
   display: block;
@@ -126,7 +126,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  font: 8px monospace;
+  font: 8px var(--font-mono);
   color: #fff;
   background: #066c82;
   padding: 1px 3px;
@@ -149,7 +149,7 @@
 .element-list > button {
   text-align: left;
   border: 1px solid #24354a;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   background: #111e30;
   padding: 12px;
   color: #dae6f2;
@@ -173,19 +173,19 @@
 }
 .provenance {
   display: inline-block;
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   color: #6ed3e1;
 }
 .element-list .hint {
   font-size: 9px;
 }
 .plan-status {
-  font: 9px/1.7 monospace;
+  font: 9px/1.7 var(--font-mono);
   letter-spacing: 0.3px;
   padding: 3px 7px;
   border-radius: 4px;
   display: inline-block;
-  background: #243449;
+  background: var(--border-subtle);
   color: #b6c7d9;
 }
 .plan-status.valid {
@@ -222,7 +222,7 @@
   border-radius: 50%;
   width: 30px;
   height: 30px;
-  font: 10px monospace;
+  font: 10px var(--font-mono);
   z-index: 1;
 }
 .plan-timeline > li:not(:last-child)::before {
@@ -232,13 +232,13 @@
   bottom: 0;
   left: 14px;
   width: 1px;
-  background: #2b3b50;
+  background: var(--border);
 }
 .timeline-body {
   flex: 1;
   min-width: 0;
   border: 1px solid #23364d;
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   padding: 15px;
   background: #101d2e;
   font-size: 12px;
@@ -264,7 +264,7 @@
   line-height: 1.8;
 }
 .risk {
-  font: 9px monospace;
+  font: 9px var(--font-mono);
   padding: 3px 6px;
   border-radius: 3px;
   background: color-mix(in srgb, var(--success) 8.2%, transparent);
@@ -310,7 +310,7 @@
 .parameter-list {
   margin-top: 12px;
   overflow-wrap: anywhere;
-  font: 10px/1.8 monospace;
+  font: 10px/1.8 var(--font-mono);
 }
 .parameter-list span {
   color: #839ab3;
@@ -322,7 +322,7 @@
   color: #cbdcec;
   background: #101d2e;
   border: 1px solid #2a3c52;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   margin-top: 12px;
   padding: 13px;
 }
