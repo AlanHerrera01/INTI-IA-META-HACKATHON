@@ -82,9 +82,9 @@ repository, not a separate prototype:
 ## Where the production sources live
 
 The Remotion composition, narration tooling, capture scripts and raw renders are
-kept in the local `inti-video/` workspace and are intentionally **not** committed
-to this repository. That folder contains `node_modules`, local captures and a
-large MP4 export, and some capture tooling depends on a prepared local runtime.
+kept in the local `inti-video/` workspace, which is excluded from Git by the root
+`.gitignore`. That folder contains `node_modules`, local captures and a large MP4
+export, and some capture tooling depends on a prepared local runtime.
 
 This page and the curated stills under
 [`docs/assets/readme/`](assets/readme) are the committed record of the film.

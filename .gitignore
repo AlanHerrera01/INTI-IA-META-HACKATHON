@@ -25,6 +25,9 @@ test-results/
 *.tsbuildinfo
 pytest-cache-files-*/
 
+# Local hackathon film workspace: Remotion sources, captures and renders stay out of Git.
+/inti-video/
+
 # Generated captures and reports can contain local machine data.
 /docs/screenshots/
 /docs/evidence/*-ui.json
