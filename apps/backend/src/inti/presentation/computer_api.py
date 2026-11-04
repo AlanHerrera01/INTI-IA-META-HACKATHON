@@ -14,6 +14,7 @@ from inti.domain.computer import (
     ComputerPlan,
     parse_computer_plan,
 )
+from inti.domain.documents import DOCUMENT_OUTPUTS, DocumentPlan, DocumentRequest
 from inti.domain.exceptions import ConfigurationError
 from inti.domain.execution import ExecutionError, OperatorRequired
 from inti.infrastructure.computer_store import ComputerStore
@@ -77,11 +78,22 @@ class Approval(BaseModel):
 
 class StepReceipt(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    id: Literal["write_file", "open_notepad", "open_browser", "open_application"]
-    status: Literal["VERIFIED_READBACK", "LAUNCH_REQUESTED"]
+    id: Literal[
+        "write_file",
+        "open_notepad",
+        "open_browser",
+        "open_application",
+        "validate_document_data",
+        "write_quote_docx",
+        "write_budget_xlsx",
+        "write_quote_pdf",
+        "write_document_summary",
+        "verify_document_package",
+    ]
+    status: Literal["VERIFIED_READBACK", "LAUNCH_REQUESTED", "VALIDATED"]
     path: str | None = Field(default=None, max_length=1500)
     sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
-    bytes: int | None = Field(default=None, ge=0, le=64000)
+    bytes: int | None = Field(default=None, ge=0, le=2_000_000)
     pid: int | None = Field(default=None, gt=0)
     url: str | None = Field(default=None, max_length=2048)
     application_id: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
@@ -93,14 +105,14 @@ class Receipt(BaseModel):
     claim: str = Field(min_length=20, max_length=128)
     ok: bool
     cancelled: bool = False
-    steps: list[StepReceipt] = Field(max_length=3)
+    steps: list[StepReceipt] = Field(max_length=6)
     error: str | None = Field(default=None, max_length=500)
 
 
 class Progress(BaseModel):
     model_config = ConfigDict(extra="forbid")
     claim: str = Field(min_length=20, max_length=128)
-    steps: list[StepReceipt] = Field(min_length=1, max_length=3)
+    steps: list[StepReceipt] = Field(min_length=1, max_length=6)
 
 
 @router.post("/devices/{device_id}/tasks/{id}/progress")
@@ -174,6 +186,31 @@ def approve(id: UUID, payload: Approval, db: Store, actor: Operator) -> dict[str
         raise conflict(error) from None
 
 
+class PrepareDocuments(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    device_id: UUID
+    document_request: DocumentRequest
+
+
+@router.post("/document-tasks")
+def prepare_documents(payload: PrepareDocuments, db: Store, actor: Operator) -> dict[str, Any]:
+    target = next((item for item in db.devices() if item["id"] == str(payload.device_id)), None)
+    if not target:
+        raise ExecutionError("DEVICE_NOT_FOUND", "Pair a Windows agent first")
+    try:
+        plan = DocumentPlan(
+            id=uuid4(),
+            device_id=payload.device_id,
+            authorized_root=target["root"],
+            filename="resumen.txt",
+            content=payload.document_request.summary(),
+            document_request=payload.document_request,
+        )
+        return db.create(plan)
+    except ValueError as error:
+        raise conflict(error) from None
+
+
 @router.post("/tasks/{id}/cancel")
 def cancel(id: UUID, db: Store, actor: Operator) -> dict[str, Any]:
     try:
@@ -214,6 +251,32 @@ def receipt(
             raise ValueError("Task belongs to another paired device")
         if payload.ok:
             plan = parse_computer_plan(task["plan"])
+            if isinstance(plan, DocumentPlan):
+                steps = payload.steps
+                if (
+                    payload.cancelled
+                    or len(steps) != 6
+                    or steps[0].id != "validate_document_data"
+                    or steps[0].status != "VALIDATED"
+                    or steps[0].sha256 != plan.digest()
+                ):
+                    raise ValueError("Document validation receipt differs from the approved plan")
+                for actual, (step, name) in zip(steps[1:], DOCUMENT_OUTPUTS, strict=True):
+                    expected = PureWindowsPath(plan.authorized_root) / str(plan.id) / name
+                    if (
+                        actual.id != step
+                        or actual.status != "VERIFIED_READBACK"
+                        or PureWindowsPath(actual.path or "") != expected
+                        or not actual.sha256
+                        or not actual.bytes
+                    ):
+                        raise ValueError("Document receipt differs from the approved output")
+                return db.receipt(
+                    authenticated,
+                    str(id),
+                    payload.claim,
+                    payload.model_dump(exclude={"claim"}, exclude_none=True),
+                )
             if isinstance(plan, ApplicationLaunchPlan):
                 if (
                     payload.cancelled

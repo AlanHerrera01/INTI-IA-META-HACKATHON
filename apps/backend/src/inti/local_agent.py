@@ -114,6 +114,19 @@ def execute_task(
         plan = parse_computer_plan(task["plan"])
         if task["digest"] != plan.digest():
             raise ValueError("Reviewed manifest digest does not match")
+        from inti.domain.documents import DocumentPlan
+
+        if isinstance(plan, DocumentPlan):
+            from inti.local_documents import create_document_package
+
+            def document_progress(steps: list[dict]) -> None:
+                result["steps"] = list(steps)
+                if on_step:
+                    on_step(result["steps"])
+
+            result["steps"] = create_document_package(plan, root, still_allowed, document_progress)
+            result["ok"] = True
+            return result
         if isinstance(plan, ApplicationLaunchPlan):
             if Path(plan.authorized_root).resolve() != root.resolve():
                 raise ValueError("Task folder differs from the locally authorized folder")

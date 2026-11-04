@@ -9,6 +9,77 @@ from inti.main import create_app
 TOKEN = "fixture-computer-operator-capability"
 
 
+def test_document_draft_requires_exact_approval_and_matching_receipts(computer_client):
+    from inti.domain.documents import DOCUMENT_OUTPUTS, DocumentRequest
+
+    client = computer_client
+    device, operator, agent = enroll(client)
+    data = {
+        "reference": "INTI-EC-104",
+        "customer": "Cliente ficticio Andes",
+        "contact": "Daniela Demo",
+        "email": "demo@example.com",
+        "city": "Quito",
+        "issued": "2026-11-03",
+        "valid_until": "2026-11-18",
+        "tax_basis_points": 1500,
+        "items": [{"description": "Servicio de ejemplo", "quantity": 2, "unit_cents": 12000}],
+    }
+    assert client.post(
+        "/api/v1/computer/document-tasks",
+        json={"device_id": device["id"], "document_request": data},
+    ).status_code in {401, 403}
+    invalid = client.post(
+        "/api/v1/computer/document-tasks",
+        headers=operator,
+        json={"device_id": device["id"], "document_request": {**data, "email": ""}},
+    )
+    assert invalid.status_code == 422
+    result = client.post(
+        "/api/v1/computer/document-tasks",
+        headers=operator,
+        json={"device_id": device["id"], "document_request": data},
+    )
+    assert result.status_code == 200
+    task = result.json()
+    assert task["plan"]["kind"] == "create_documents" and len(task["steps"]) == 6
+    assert task["plan"]["content"] == DocumentRequest(**data).summary()
+    prefix = f"/api/v1/computer/devices/{device['id']}"
+    assert client.post(prefix + "/claim", headers=agent).json()["task"] is None
+    client.post(
+        f"/api/v1/computer/tasks/{task['id']}/approve",
+        headers=operator,
+        json={"digest": task["digest"]},
+    ).raise_for_status()
+    claim = client.post(prefix + "/claim", headers=agent).json()["task"]
+    receipts = [{"id": "validate_document_data", "status": "VALIDATED", "sha256": task["digest"]}]
+    receipts += [
+        {
+            "id": step,
+            "status": "VERIFIED_READBACK",
+            "sha256": "a" * 64,
+            "bytes": 100,
+            "path": str(PureWindowsPath(task["plan"]["authorized_root"]) / task["id"] / name),
+        }
+        for step, name in DOCUMENT_OUTPUTS
+    ]
+    endpoint = f"{prefix}/tasks/{task['id']}/receipt"
+    bad = [dict(step) for step in receipts]
+    bad[1]["path"] = r"C:\outside\cotizacion.docx"
+    assert (
+        client.post(
+            endpoint, headers=agent, json={"claim": claim["claim"], "ok": True, "steps": bad}
+        ).status_code
+        == 409
+    )
+    assert (
+        client.post(
+            endpoint, headers=agent, json={"claim": claim["claim"], "ok": True, "steps": receipts}
+        ).json()["status"]
+        == "COMPLETED"
+    )
+
+
 def test_application_catalog_permissions_and_exact_launch_receipt(computer_client):
     client = computer_client
     device, operator, agent = enroll(client)

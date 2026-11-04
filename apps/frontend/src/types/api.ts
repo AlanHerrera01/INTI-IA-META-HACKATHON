@@ -11,6 +11,21 @@ export interface ModelStatus {
   available: boolean | null;
   model: string;
   detail: string;
+  measurements?: {
+    attempts: number;
+    successful_calls: number;
+    failed_calls: number;
+    mean_latency_ms: number | null;
+    output_tokens_per_second: number | null;
+    token_samples: number;
+    grounding_samples: number;
+    grounding_hit_rate: number | null;
+    last_at: number | null;
+    last_ok: boolean | null;
+    last_http_status: number | null;
+    gpu_memory_bytes: null;
+    window_limit: number;
+  };
 }
 export interface VisionAnalysis {
   model: string;

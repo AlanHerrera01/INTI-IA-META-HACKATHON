@@ -125,6 +125,9 @@ class ApplicationLaunchPlan(BaseModel):
 
 
 def parse_computer_plan(value: dict) -> ComputerPlan | ApplicationLaunchPlan:
+    if value.get("kind") == "create_documents":
+        from inti.domain.documents import DocumentPlan
+        return DocumentPlan.model_validate(value)
     if value.get("kind") == "open_application":
         return ApplicationLaunchPlan.model_validate(value)
     return ComputerPlan.model_validate(value)

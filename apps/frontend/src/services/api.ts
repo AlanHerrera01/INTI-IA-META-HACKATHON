@@ -20,6 +20,14 @@ export const api = {
     ).data,
   system: async () => (await client.get<SystemStatus>("/system/status")).data,
   model: async () => (await client.get<ModelStatus>("/models/status")).data,
+  evaluateModel: async (token: string) =>
+    (
+      await client.post<ModelStatus>(
+        "/models/evaluate",
+        { confirm_real_call: true },
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+    ).data,
   observations: async () =>
     (await client.get<Observation[]>("/observations")).data,
   observation: async (id: string, token?: string) =>

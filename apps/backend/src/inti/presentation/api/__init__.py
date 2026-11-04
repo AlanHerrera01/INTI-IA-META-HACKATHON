@@ -1,7 +1,8 @@
-from typing import Annotated
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, Response
+from pydantic import BaseModel, ConfigDict
 
 from inti import __version__
 from inti.application.use_cases import (
@@ -10,6 +11,8 @@ from inti.application.use_cases import (
     GetSystemStatusUseCase,
 )
 from inti.domain.exceptions import ConfigurationError, NotFoundError
+from inti.infrastructure.meta import MetaModelAPIAdapter
+from inti.infrastructure.model_evaluation import evaluate_model
 from inti.presentation.dependencies import Services
 from inti.presentation.execution_auth import require_operator
 from inti.presentation.schemas import (
@@ -66,8 +69,21 @@ async def capabilities(svc: Container) -> dict[str, str | bool]:
 
 
 @router.get("/models/status")
-async def model_status(svc: Container) -> dict[str, str | bool | None]:
+async def model_status(svc: Container) -> dict[str, Any]:
     return await svc.model.status()
+
+
+class EvaluateModelRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    confirm_real_call: Literal[True]
+
+
+@router.post("/models/evaluate")
+async def model_evaluate(payload: EvaluateModelRequest, svc: Container, request: Request) -> dict:
+    require_operator(svc.settings, request.headers.get("Authorization"), True)
+    if not isinstance(svc.model, MetaModelAPIAdapter):
+        raise ConfigurationError("Real Meta adapter is required for calibration")
+    return await evaluate_model(svc.model)
 
 
 @router.post("/observations/capture", status_code=201)

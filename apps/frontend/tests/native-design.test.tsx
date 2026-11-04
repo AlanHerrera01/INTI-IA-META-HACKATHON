@@ -13,6 +13,7 @@ import {
   type NativeView,
 } from "../src/pages/NativeDesignedPage";
 import { OperatorProvider } from "../src/app/OperatorContext";
+import { api } from "../src/services/api";
 import {
   computerApi,
   type ComputerState,
@@ -32,13 +33,30 @@ vi.mock("../src/services/computerApi", () => ({
     prepareApplication: vi.fn(),
   },
 }));
+const measurements = vi.hoisted(() => ({
+  attempts: 1,
+  successful_calls: 1,
+  failed_calls: 0,
+  mean_latency_ms: 1250,
+  output_tokens_per_second: 12.5,
+  token_samples: 1,
+  grounding_samples: 1,
+  grounding_hit_rate: 1,
+  last_at: 100,
+  last_ok: true,
+  last_http_status: null,
+  gpu_memory_bytes: null,
+  window_limit: 200,
+}));
+const modelConfiguration = vi.hoisted(() => ({ configured: false }));
 vi.mock("../src/hooks/useSystem", () => ({
   useModel: () => ({
     data: {
       provider: "Meta",
       model: "fixture-model",
-      configured: false,
+      configured: modelConfiguration.configured,
       available: null,
+      measurements,
     },
     refetch: vi.fn(),
   }),
@@ -91,6 +109,7 @@ const task: ComputerTask = {
 let state: ComputerState;
 beforeEach(() => {
   vi.clearAllMocks();
+  modelConfiguration.configured = false;
   state = {
     devices: [
       {
@@ -153,6 +172,49 @@ async function connect() {
   fireEvent.click(screen.getByRole("button", { name: "Connect" }));
   await waitFor(() => expect(computerApi.state).toHaveBeenCalled());
 }
+
+it("shows measured model values and synthetic scope without claiming hosted GPU telemetry", async () => {
+  mount("models");
+  expect(screen.getByText("12.50 tok/s")).toBeInTheDocument();
+  expect(screen.getByText("1250 ms")).toBeInTheDocument();
+  expect(screen.getByText("100.0%")).toBeInTheDocument();
+  expect(screen.getByText("Not exposed")).toBeInTheDocument();
+  expect(
+    screen.getByText(/Point inside target on synthetic/),
+  ).toBeInTheDocument();
+  const send = vi.spyOn(api, "evaluateModel");
+  expect(
+    screen.getByRole("button", { name: "Run one real calibration" }),
+  ).toBeDisabled();
+  expect(send).not.toHaveBeenCalled();
+});
+
+it("submits one calibration only after explicit confirmation", async () => {
+  modelConfiguration.configured = true;
+  const send = vi.spyOn(api, "evaluateModel").mockResolvedValue({
+    provider: "Meta",
+    configured: true,
+    available: true,
+    model: "fixture-model",
+    detail: "fixture",
+  });
+  const confirm = vi
+    .spyOn(window, "confirm")
+    .mockReturnValueOnce(false)
+    .mockReturnValueOnce(true);
+  mount("models");
+  await connect();
+  const button = screen.getByRole("button", {
+    name: "Run one real calibration",
+  });
+  fireEvent.click(button);
+  expect(send).not.toHaveBeenCalled();
+  fireEvent.click(button);
+  await waitFor(() =>
+    expect(send).toHaveBeenCalledExactlyOnceWith("fixture-local-token"),
+  );
+  expect(confirm).toHaveBeenCalledTimes(2);
+});
 
 it("keeps the selected computer and application permissions synchronized without authorizing a launch", async () => {
   state.devices.push({

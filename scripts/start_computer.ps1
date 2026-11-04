@@ -29,6 +29,9 @@ services:
   backend:
     build:
       secrets: [build_ca]
+    secrets: [build_ca]
+    environment:
+      SSL_CERT_FILE: /run/secrets/build_ca
   frontend:
     build:
       secrets: [build_ca]

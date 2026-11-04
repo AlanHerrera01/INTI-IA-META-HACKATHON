@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { modelAccessState } from "../../features/computer/modelStatus";
+import { DocumentWorkflowForm } from "../../components/DocumentWorkflowForm";
 import { Link } from "react-router-dom";
 import {
   Activity,
@@ -333,11 +335,9 @@ export function NativeOverview() {
             />
             <RuntimeRow
               label={model.data?.model || "Meta"}
-              note={t("Planning source")}
-              value={t(
-                model.data?.configured ? "Unverified" : "Not configured",
-              )}
-              state="gold"
+              note={t("Model access")}
+              value={t(modelAccessState(model.data))}
+              state={model.data?.available === true ? "green" : "gold"}
               icon={<Bot size={17} />}
             />
             <RuntimeRow
@@ -472,12 +472,29 @@ export function NativeStudio() {
                 >
                   {t("Applications on this computer")}
                 </button>
+                <button
+                  aria-pressed={mode === "documents"}
+                  onClick={() => setMode("documents")}
+                >
+                  {t("Documents")}
+                </button>
               </div>
             </header>
             {mode === "text" ? (
               <ComputerPage
                 presentation="compose"
                 onTaskPrepared={async (task) => {
+                  setSelectedId(task.id);
+                  await query.refetch();
+                }}
+              />
+            ) : mode === "documents" ? (
+              <DocumentWorkflowForm
+                token={token}
+                devices={devices}
+                deviceId={device?.id || ""}
+                onDevice={setDeviceId}
+                onPrepared={async (task) => {
                   setSelectedId(task.id);
                   await query.refetch();
                 }}
@@ -523,16 +540,14 @@ export function NativeStudio() {
               <h3>{t("Reviewed typed plan")}</h3>
               <p className="native-note">
                 {t(
-                  "Current local plans are explicitly authored. Live-model calls remain disabled; model planning and desktop visual reasoning have not been connected to this agent yet.",
+                  "Local plans remain authored. Automatic task model calls are disabled; calibration is a separate, explicitly confirmed request. Desktop visual planning is not connected yet.",
                 )}
               </p>
               <dl className="native-design-facts">
                 <dt>{t("Model access")}</dt>
-                <dd>
-                  {t(model.data?.configured ? "Unverified" : "Not configured")}
-                </dd>
+                <dd>{t(modelAccessState(model.data))}</dd>
                 <dt>{t("Recorded model calls")}</dt>
-                <dd>0</dd>
+                <dd>{model.data?.measurements?.attempts ?? 0}</dd>
               </dl>
             </div>
             <Link to="/models">

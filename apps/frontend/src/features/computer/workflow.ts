@@ -3,7 +3,9 @@ import type { ComputerTask } from "../../services/computerApi";
 export const taskName = (task: ComputerTask) =>
   task.plan.kind === "open_application"
     ? task.plan.application.name
-    : task.plan.filename;
+    : task.plan.kind === "create_documents"
+      ? task.plan.document_request?.reference || task.plan.filename
+      : task.plan.filename;
 
 export function localMetrics(tasks: ComputerTask[]) {
   return {

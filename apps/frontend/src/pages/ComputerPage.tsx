@@ -359,8 +359,12 @@ function ComputerWorkspace({
                         {selected.plan.authorized_root}\{selected.id}\
                         {selected.plan.filename}
                       </code>
-                      <span>{t("BROWSER TARGET")}</span>
-                      <code>{selected.plan.url}</code>
+                      {selected.plan.kind !== "create_documents" && (
+                        <span>{t("BROWSER TARGET")}</span>
+                      )}
+                      {selected.plan.kind !== "create_documents" && (
+                        <code>{selected.plan.url}</code>
+                      )}
                     </>
                   )}
                 </div>
@@ -372,7 +376,7 @@ function ComputerWorkspace({
                     const Icon =
                       step.id === "open_application"
                         ? Monitor
-                        : [FileText, Monitor, Globe][index];
+                        : [FileText, Monitor, Globe][index] || FileText;
                     return (
                       <li key={step.id}>
                         <span
@@ -391,7 +395,11 @@ function ComputerWorkspace({
                                 ? t(
                                     "Windows accepted an application launch request. Visual completion is not independently verified.",
                                   )
-                                : t("Waiting for approved execution.")}
+                                : receipt?.status === "VALIDATED"
+                                  ? t(
+                                      "Approved document fields and totals validated.",
+                                    )
+                                  : t("Waiting for approved execution.")}
                           </p>
                           {receipt?.sha256 && (
                             <code>SHA-256 {receipt.sha256}</code>
@@ -676,7 +684,22 @@ function ComputerWorkspace({
         </header>
         {review && (
           <>
-            {review.plan.kind === "open_application" ? (
+            {review.plan.kind === "create_documents" ? (
+              <>
+                <p>
+                  {t(
+                    "Five new document files will be created in a new task folder. No application will be opened and nothing will be sent externally.",
+                  )}
+                </p>
+                <code>{review.plan.authorized_root}</code>
+                <pre>{review.plan.content}</pre>
+                <p>
+                  {t(
+                    "Outputs: Word quotation, Excel budget, PDF quotation, text summary and integrity manifest.",
+                  )}
+                </p>
+              </>
+            ) : review.plan.kind === "open_application" ? (
               <>
                 <p>
                   {t(

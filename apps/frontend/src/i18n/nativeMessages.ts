@@ -1,8 +1,82 @@
 export const nativeSpanish: Record<string, string> = {
+  Documents: "Documentos",
+  "Document dossier": "Expediente documental",
+  "Quotation & purchase dossier": "Cotización y expediente de compra",
+  "Fill one structured request. INTI fills Word, calculates Excel, produces PDF and checks the saved package after approval.":
+    "Completa una solicitud estructurada. Tras tu aprobación, INTI rellena Word, calcula Excel, genera PDF y comprueba el expediente guardado.",
+  "Document computer": "Equipo del expediente",
+  "Quotation reference": "Referencia de cotización",
+  "Customer name": "Nombre del cliente",
+  "Contact name": "Nombre del contacto",
+  "Contact email": "Correo del contacto",
+  City: "Ciudad",
+  "Issue date": "Fecha de emisión",
+  "Valid until": "Válido hasta",
+  "Products & services": "Productos y servicios",
+  "Add item": "Añadir partida",
+  "Remove item": "Quitar partida",
+  Description: "Descripción",
+  Quantity: "Cantidad",
+  "Unit price USD": "Precio unitario USD",
+  "Tax rate (%)": "Impuesto (%)",
+  Tax: "Impuesto",
+  "Conditions & notes": "Condiciones y notas",
+  Summary: "Resumen",
+  "Preparing…": "Preparando…",
+  "Prepare document dossier": "Preparar expediente documental",
+  "Complete the customer, contact, dates and item fields before preparing the dossier.":
+    "Completa los datos del cliente, contacto, fechas y partidas antes de preparar el expediente.",
+  "Structured templates; no model-generated plan, signatures or external submissions. Existing files are never overwritten.":
+    "Plantillas estructuradas; sin plan generado por modelo, firmas ni envíos externos. No se sobrescriben archivos existentes.",
+  "Five new document files will be created in a new task folder. No application will be opened and nothing will be sent externally.":
+    "Se crearán cinco archivos nuevos en una carpeta nueva de la tarea. No se abrirán aplicaciones ni se enviará información al exterior.",
+  "Outputs: Word quotation, Excel budget, PDF quotation, text summary and integrity manifest.":
+    "Resultados: cotización Word, presupuesto Excel, cotización PDF, resumen de texto y manifiesto de integridad.",
+  "Validate fields and integer-cent totals":
+    "Validar campos e importes en centavos",
+  "Fill the Word quotation template":
+    "Rellenar la plantilla de cotización Word",
+  "Calculate the Excel budget": "Calcular el presupuesto Excel",
+  "Generate the PDF quotation": "Generar la cotización PDF",
+  "Write the approved document summary":
+    "Escribir el resumen documental aprobado",
+  "Reopen outputs and verify the package manifest":
+    "Reabrir los archivos y verificar el manifiesto",
+  VALIDATED: "VALIDADO",
+  "Approved document fields and totals validated.":
+    "Campos e importes del expediente aprobado validados.",
+  "Automatic model calls disabled":
+    "Llamadas automáticas al modelo deshabilitadas",
+  "Local plans remain authored. Automatic task model calls are disabled; calibration is a separate, explicitly confirmed request. Desktop visual planning is not connected yet.":
+    "Los planes locales siguen escritos. Las llamadas automáticas para tareas están deshabilitadas; la calibración es una solicitud separada con confirmación explícita. La planificación visual del escritorio aún no está conectada.",
+  "Access verified": "Acceso verificado",
+  "Last request failed": "Última solicitud fallida",
+  "Not exposed": "No disponible por API",
+  "Reported output tokens divided by end-to-end request time.":
+    "Tokens de salida informados divididos entre el tiempo total de solicitud.",
+  "Successful requests, including network and response validation.":
+    "Solicitudes válidas, incluyendo la red y la validación de respuesta.",
+  "The hosted API does not report GPU memory to this application.":
+    "La API alojada no informa la memoria GPU a esta aplicación.",
+  "Point inside target on synthetic calibration images; not desktop accuracy.":
+    "Aciertos dentro del objetivo en imágenes sintéticas; no mide precisión en el escritorio.",
+  "Model calibration": "Calibración del modelo",
+  "Real successful requests": "Solicitudes reales válidas",
+  "Failed requests": "Solicitudes fallidas",
+  "Token samples": "Muestras con tokens",
+  "Localization samples": "Muestras de localización",
+  "Latest 200 requests for this model. Test fixtures are excluded. One sample is not a benchmark.":
+    "Últimas 200 solicitudes de este modelo. Se excluyen las pruebas simuladas. Una muestra no constituye una evaluación completa.",
+  "Last measurement": "Última medición",
+  "Measuring…": "Midiendo…",
+  "Run one real calibration": "Ejecutar una calibración real",
+  "Send one real model request with a synthetic image? This can consume provider quota. No desktop data is sent.":
+    "¿Enviar una solicitud real al modelo con una imagen sintética? Puede consumir cuota del proveedor. No se envían datos del escritorio.",
   "Computers & Applications": "Equipos y aplicaciones",
   "Active device registrations.": "Vinculaciones de equipos activas.",
   "Catalog of the selected computer.": "Catálogo del equipo seleccionado.",
-  "Launch permissions on the selected computer.": "Permisos de apertura en el equipo seleccionado.",
+  "Launch permissions on the selected computer.":
+    "Permisos de apertura en el equipo seleccionado.",
   "Pair a Windows agent": "Vincular un agente de Windows",
   "No computers match your search.": "Ningún equipo coincide con tu búsqueda.",
   "Manage connected computers, detected applications and the permissions you grant INTI.":

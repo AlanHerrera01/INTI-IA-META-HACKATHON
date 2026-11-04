@@ -25,6 +25,18 @@ export interface ComputerApplication {
   identity: string;
   allowed: boolean;
 }
+export interface DocumentRequest {
+  reference: string;
+  customer: string;
+  contact: string;
+  email: string;
+  city: string;
+  issued: string;
+  valid_until: string;
+  tax_basis_points: number;
+  notes: string;
+  items: { description: string; quantity: number; unit_cents: number }[];
+}
 export interface ComputerTask {
   id: string;
   device_id: string;
@@ -46,7 +58,8 @@ export interface ComputerTask {
         url?: never;
       }
     | {
-        kind?: never;
+        kind?: "create_documents";
+        document_request?: DocumentRequest;
         application?: never;
         filename: string;
         content: string;
@@ -66,6 +79,18 @@ const auth = (token: string) => ({
   headers: { Authorization: `Bearer ${token}` },
 });
 export const computerApi = {
+  prepareDocuments: async (
+    token: string,
+    deviceId: string,
+    documentRequest: DocumentRequest,
+  ) =>
+    (
+      await client.post<ComputerTask>(
+        "/computer/document-tasks",
+        { device_id: deviceId, document_request: documentRequest },
+        auth(token),
+      )
+    ).data,
   applications: async (token: string, deviceId: string) =>
     (
       await client.get<{

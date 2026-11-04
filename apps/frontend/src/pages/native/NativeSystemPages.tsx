@@ -29,19 +29,43 @@ import { taskName } from "../../features/computer/workflow";
 import { downloadTaskJson } from "../../features/tasks/records";
 import { ComputerPage } from "../ComputerPage";
 import { ComputerApplications } from "../../components/ComputerApplications";
+import { api, errorMessage } from "../../services/api";
+import { modelAccessState } from "../../features/computer/modelStatus";
 
 export function NativeModels() {
-  const { t } = useLocale();
-  const { model, system, metrics, device } = useNativeWorkspace();
+  const { t, dateLocale } = useLocale();
+  const { token, model, system, metrics, device } = useNativeWorkspace();
+  const [evaluating, setEvaluating] = useState(false);
+  const [evaluationError, setEvaluationError] = useState("");
+  const measured = model.isError ? undefined : model.data?.measurements;
+  const providerState = modelAccessState(model.data);
+  const evaluate = async () => {
+    if (
+      !window.confirm(
+        t(
+          "Send one real model request with a synthetic image? This can consume provider quota. No desktop data is sent.",
+        ),
+      )
+    )
+      return;
+    setEvaluating(true);
+    setEvaluationError("");
+    try {
+      await api.evaluateModel(token);
+    } catch (error) {
+      setEvaluationError(errorMessage(error));
+    } finally {
+      await model.refetch();
+      setEvaluating(false);
+    }
+  };
   return (
     <div className="models-workspace native-design-page" data-design="models">
       <header className="models-heading">
         <div>
           <p className="models-eyebrow">
             {t("INTELLIGENCE / MODEL RUNTIME")}{" "}
-            <span className="models-neutral">
-              {t(model.data?.configured ? "Unverified" : "Not configured")}
-            </span>
+            <span className="models-neutral">{t(providerState)}</span>
           </p>
           <h1>{t("AI Models & Multi-Modal Engines")}</h1>
           <p>
@@ -66,20 +90,71 @@ export function NativeModels() {
       </header>
       <NativeAccess />
       <div className="models-metrics">
-        {[
-          "Model throughput",
-          "Mean inference latency",
-          "Dedicated GPU memory",
-          "Grounding precision",
-        ].map((label) => (
-          <NativeStat
-            key={label}
-            label={label}
-            value={t("Not measured")}
-            note="No live-model benchmark is claimed."
-          />
-        ))}
+        <NativeStat
+          label="Model throughput"
+          value={
+            measured?.output_tokens_per_second != null
+              ? `${measured.output_tokens_per_second.toFixed(2)} tok/s`
+              : t("Not measured")
+          }
+          note="Reported output tokens divided by end-to-end request time."
+        />
+        <NativeStat
+          label="Mean inference latency"
+          value={
+            measured?.mean_latency_ms != null
+              ? `${measured.mean_latency_ms.toFixed(0)} ms`
+              : t("Not measured")
+          }
+          note="Successful requests, including network and response validation."
+        />
+        <NativeStat
+          label="Dedicated GPU memory"
+          value={t("Not exposed")}
+          note="The hosted API does not report GPU memory to this application."
+        />
+        <NativeStat
+          label="Grounding precision"
+          value={
+            measured?.grounding_hit_rate != null
+              ? `${(measured.grounding_hit_rate * 100).toFixed(1)}%`
+              : t("Not measured")
+          }
+          note="Point inside target on synthetic calibration images; not desktop accuracy."
+        />
       </div>
+      <section className="models-card native-model-calibration">
+        <div>
+          <h2>{t("Model calibration")}</h2>
+          <p className="native-note">
+            {t("Real successful requests")}: {measured?.successful_calls ?? 0} ·{" "}
+            {t("Failed requests")}: {measured?.failed_calls ?? 0} ·{" "}
+            {t("Token samples")}: {measured?.token_samples ?? 0} ·{" "}
+            {t("Localization samples")}: {measured?.grounding_samples ?? 0}
+          </p>
+          <p className="native-note">
+            {t(
+              "Latest 200 requests for this model. Test fixtures are excluded. One sample is not a benchmark.",
+            )}
+          </p>
+          {measured?.last_at && (
+            <p className="native-note">
+              {t("Last measurement")}:{" "}
+              {new Date(measured.last_at * 1000).toLocaleString(dateLocale)}{" "}
+              {measured.last_http_status
+                ? `(HTTP ${measured.last_http_status})`
+                : ""}
+            </p>
+          )}
+          {evaluationError && <p role="alert">{t(evaluationError)}</p>}
+        </div>
+        <button
+          disabled={evaluating || !token || !model.data?.configured}
+          onClick={() => void evaluate()}
+        >
+          {t(evaluating ? "Measuring…" : "Run one real calibration")}
+        </button>
+      </section>
       <div className="models-layout">
         <div className="models-main">
           <header className="models-section-heading">
@@ -97,11 +172,7 @@ export function NativeModels() {
                 <h2>{model.data?.model || "Meta"}</h2>
                 <div className="models-tags">
                   <span className="models-tag">{t("PRIMARY ADAPTER")}</span>
-                  <span className="models-tag">
-                    {t(
-                      model.data?.configured ? "Unverified" : "Not configured",
-                    )}
-                  </span>
+                  <span className="models-tag">{t(providerState)}</span>
                 </div>
                 <p>
                   {t(
@@ -116,11 +187,8 @@ export function NativeModels() {
             <div className="models-facts">
               {[
                 ["Provider", model.data?.provider || "Meta"],
-                [
-                  "Configuration",
-                  t(model.data?.configured ? "Unverified" : "Not configured"),
-                ],
-                ["Recorded model calls", "0"],
+                ["Configuration", t(providerState)],
+                ["Recorded model calls", String(measured?.attempts ?? 0)],
                 ["Planning source", t("Reviewed typed plan")],
               ].map(([label, value]) => (
                 <div key={label}>
@@ -131,10 +199,10 @@ export function NativeModels() {
             </div>
             <div className="models-route">
               <p className="models-eyebrow">{t("MODEL REQUEST POLICY")}</p>
-              <h3>{t("Live-model calls disabled")}</h3>
+              <h3>{t("Automatic model calls disabled")}</h3>
               <p className="native-note">
                 {t(
-                  "Current local plans are explicitly authored. Live-model calls remain disabled; model planning and desktop visual reasoning have not been connected to this agent yet.",
+                  "Local plans remain authored. Automatic task model calls are disabled; calibration is a separate, explicitly confirmed request. Desktop visual planning is not connected yet.",
                 )}
               </p>
             </div>
@@ -230,9 +298,7 @@ export function NativeModels() {
             </dl>
             <div className="models-credential-state">
               <h3>{t("Configuration")}</h3>
-              <strong>
-                {t(model.data?.configured ? "Unverified" : "Not configured")}
-              </strong>
+              <strong>{t(providerState)}</strong>
             </div>
           </section>
           <section className="models-card models-policy">
@@ -379,11 +445,11 @@ export function NativeSettings() {
               <div className="settings-model-fields">
                 {[
                   ["Primary vision model", model.data?.model || "—"],
+                  ["Provider configuration", t(modelAccessState(model.data))],
                   [
-                    "Provider configuration",
-                    t(model.data?.configured ? "Unverified" : "Not configured"),
+                    "Recorded model calls",
+                    String(model.data?.measurements?.attempts ?? 0),
                   ],
-                  ["Recorded model calls", "0"],
                   ["Secondary fallback", t("Not configured")],
                 ].map(([label, value]) => (
                   <div key={label}>
@@ -490,11 +556,7 @@ export function NativeSettings() {
               <div className="settings-sandbox-grid">
                 <div>
                   <h3>{t("Model access")}</h3>
-                  <strong>
-                    {t(
-                      model.data?.configured ? "Unverified" : "Not configured",
-                    )}
-                  </strong>
+                  <strong>{t(modelAccessState(model.data))}</strong>
                   <p className="native-note">
                     {t(
                       "Model access is separate from the local execution agent.",

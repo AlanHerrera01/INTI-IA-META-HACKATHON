@@ -444,6 +444,15 @@ export function NativeRecovery() {
           current.device_id,
           app,
         );
+      } else if (
+        current.plan.kind === "create_documents" &&
+        current.plan.document_request
+      ) {
+        draft = await computerApi.prepareDocuments(
+          token,
+          current.device_id,
+          current.plan.document_request,
+        );
       } else {
         draft = await computerApi.prepare(token, {
           device_id: current.device_id,

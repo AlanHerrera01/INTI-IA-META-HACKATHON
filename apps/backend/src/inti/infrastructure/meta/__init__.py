@@ -5,6 +5,7 @@ import logging
 import random
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
+from time import perf_counter
 from typing import Any
 
 import httpx
@@ -16,6 +17,7 @@ from inti.domain.exceptions import ConfigurationError, DependencyError
 from inti.domain.planning import ModelUsage
 from inti.domain.ports import ArtifactStoragePort
 from inti.infrastructure.config import ConfigurationProvider
+from inti.infrastructure.model_metrics import ModelMetricsStore
 
 logger = logging.getLogger(__name__)
 
@@ -57,19 +59,26 @@ class MetaModelAPIAdapter:
     ) -> None:
         self.settings, self.storage, self.transport = settings, storage, transport
         self.last_available: bool | None = None
+        self.metrics = ModelMetricsStore(settings.artifact_dir)
 
-    async def status(self) -> dict[str, str | bool | None]:
+    async def status(self) -> dict[str, Any]:
         configured = bool(
             self.settings.meta_api_key.get_secret_value() and self.settings.meta_model_id
         )
+        measurements = self.metrics.summary(self.settings.meta_model_id)
         return {
             "provider": "Meta",
             "configured": configured,
-            "available": self.last_available if configured else None,
+            "available": (
+                self.last_available if self.last_available is not None else measurements["last_ok"]
+            )
+            if configured
+            else None,
             "model": self.settings.meta_model_id,
             "detail": "Availability reflects last real analysis; no billing probe."
             if configured
             else "META_API_KEY is missing. Capture remains available.",
+            "measurements": measurements,
         }
 
     async def analyze_observation(
@@ -103,6 +112,7 @@ class MetaModelAPIAdapter:
         max_tokens: int = 4096,
         max_retries: int = 2,
         images_base64: tuple[str, ...] = (),
+        evaluation_bounds: tuple[int, int, int, int] | None = None,
     ) -> tuple[T, ModelUsage]:
         """One shared authenticated transport for vision, intent and planning."""
         if not (await self.status())["configured"]:
@@ -140,6 +150,12 @@ class MetaModelAPIAdapter:
                 },
             },
         }
+        if evaluation_bounds is not None:
+            payload["reasoning_effort"] = "minimal"
+        started = perf_counter()
+        ok = False
+        output_tokens = None
+        http_status = None
         try:
             async with httpx.AsyncClient(
                 timeout=self.settings.meta_request_timeout_seconds,
@@ -161,9 +177,30 @@ class MetaModelAPIAdapter:
                 output_tokens=counters.completion_tokens,
                 retries=int(response.extensions.get("inti_retries", 0)),
             )
+            output_tokens = counters.completion_tokens
+            ok = True
         except (httpx.HTTPError, TimeoutError, ValidationError, ValueError) as exc:
+            if isinstance(exc, httpx.HTTPStatusError):
+                http_status = exc.response.status_code
             self.last_available = False
             raise DependencyError("Meta request failed or returned invalid analysis") from exc
+        finally:
+            hit = None
+            if ok and evaluation_bounds:
+                left, top, right, bottom = evaluation_bounds
+                hit = (
+                    left <= getattr(structured, "x", -1) < right
+                    and top <= getattr(structured, "y", -1) < bottom
+                )
+            self.metrics.record(
+                self.settings.meta_model_id,
+                perf_counter() - started,
+                ok,
+                output_tokens,
+                "live" if self.transport is None else "fixture",
+                grounding_hit=hit,
+                http_status=http_status,
+            )
         self.last_available = True
         return structured, usage
 
